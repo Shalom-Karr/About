@@ -65,10 +65,24 @@ nav {
     padding: 0 20px;
 }
 
-.logo {
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #2c3e50;
+}
+
+.navbar-logo {
+    height: 35px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.logo-text {
     font-size: 1.8em;
     font-weight: 700;
     font-family: 'Roboto', sans-serif;
+    color: #2c3e50;
 }
 
 .nav-links {
@@ -129,7 +143,7 @@ section {
     margin-top: 70px; /* Adjust for fixed header */
 }
 section:first-of-type {
-     margin-top: 0; /* Hero doesn't need top margin if header is fixed */
+     margin-top: 0;
      padding-top: 120px; /* Extra padding for hero under fixed header */
 }
 section:nth-child(even) {
@@ -145,7 +159,7 @@ section:nth-child(even) {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 100px 20px; /* Increased padding */
+    padding: 100px 20px;
 }
 
 .hero-content {
@@ -156,18 +170,18 @@ section:nth-child(even) {
     font-size: 1.8em;
     font-weight: 300;
     margin-bottom: 1.5em;
-    color: #ecf0f1; /* Light Grey */
+    color: #ecf0f1;
 }
 .hero-content .intro-text {
     font-size: 1.1em;
     margin-bottom: 2em;
     line-height: 1.8;
-    color: #bdc3c7; /* Lighter Grey */
+    color: #bdc3c7;
 }
 
 .cta-button {
     display: inline-block;
-    background: #007bff; /* Primary Blue */
+    background: #007bff;
     color: #fff;
     padding: 15px 35px;
     border-radius: 50px;
@@ -178,7 +192,7 @@ section:nth-child(even) {
 }
 
 .cta-button:hover {
-    background: #0056b3; /* Darker Blue */
+    background: #0056b3;
     transform: translateY(-3px);
 }
 
@@ -188,25 +202,23 @@ section:nth-child(even) {
 }
 .about-content {
     display: flex;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    align-items: flex-start; /* Align items to the top */
+    flex-wrap: wrap;
+    align-items: flex-start;
     gap: 40px;
     margin-top: 2em;
     text-align: left;
 }
 .about-text {
-    flex: 2; /* Text takes more space */
-    min-width: 300px; /* Ensure text has enough space before wrapping */
+    flex: 2;
+    min-width: 300px;
 }
 .about-image {
-    flex: 1; /* Image takes less space */
+    flex: 1;
     max-width: 300px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    /* Add this if you include an image:
-    min-width: 250px;
-    align-self: center;
-    */
+    min-width: 250px; 
+    align-self: center; 
 }
 
 
@@ -238,9 +250,9 @@ section:nth-child(even) {
     box-shadow: 0 5px 15px rgba(0,0,0,0.12);
 }
 .skill-item i {
-    color: #007bff; /* Primary Blue */
+    color: #007bff;
     font-size: 1.5em;
-    margin-right: 8px; /* For skills without text directly next to icon */
+    margin-right: 8px;
 }
 
 
@@ -294,17 +306,17 @@ section:nth-child(even) {
 }
 
 .project-info h3 {
-    color: #007bff; /* Primary Blue */
+    color: #007bff;
 }
 
 .project-info p {
-    flex-grow: 1; /* Allows description to take available space */
+    flex-grow: 1;
     font-size: 0.95em;
     margin-bottom: 1.5em;
 }
 
 .project-links {
-    margin-top: auto; /* Pushes links to the bottom */
+    margin-top: auto;
     padding-top: 15px;
     border-top: 1px solid #eee;
     display: flex;
@@ -326,14 +338,6 @@ section:nth-child(even) {
     color: #0056b3;
     text-decoration: underline;
 }
-.project-link.disabled-link {
-    color: #aaa;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-.project-link.disabled-link:hover {
-    text-decoration: none;
-}
 
 
 /* Contact Section */
@@ -349,7 +353,7 @@ section:nth-child(even) {
     margin-top: 2em;
     display: flex;
     justify-content: center;
-    gap: 20px; /* Adjusted gap */
+    gap: 20px;
     flex-wrap: wrap;
 }
 .contact-link {
@@ -357,56 +361,39 @@ section:nth-child(even) {
     align-items: center;
     gap: 10px;
     font-size: 1.1em;
-    padding: 10px 18px; /* Adjusted padding */
+    padding: 10px 18px;
     border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-    color: white; /* Default text color for all contact links */
+    color: white;
 }
 .contact-link i {
     font-size: 1.3em;
 }
 
-/* MODIFIED: Styles for ALL Contact Links to be Dark Grey/Black */
 .email-link,
 .call-link,
 .text-link,
 .groupme-link,
 .github-link {
-    background-color: #333; /* Dark Grey/Black */
+    background-color: #333;
 }
 .email-link:hover,
 .call-link:hover,
 .text-link:hover,
 .groupme-link:hover,
 .github-link:hover {
-    background-color: #555; /* Lighter Grey/Black on hover */
+    background-color: #555;
     transform: translateY(-3px);
 }
-/* END MODIFICATION */
 
-/* Optional: Specific colors if desired for Call and Text - can be re-added here if you want different colors later */
-/*
-.call-link {
-    background-color: #28a745;
-}
-.call-link:hover {
-    background-color: #218838;
-}
-.text-link {
-    background-color: #17a2b8;
-}
-.text-link:hover {
-    background-color: #138496;
-}
-*/
 
 /* Footer */
 footer {
-    background: #2c3e50; /* Dark Blue/Grey */
-    color: #bdc3c7; /* Light Grey */
+    background: #2c3e50;
+    color: #bdc3c7;
     text-align: center;
     padding: 2em 0;
-    margin-top: 40px; /* Give some space from last section */
+    margin-top: 40px;
 }
 footer p {
     margin: 0;
@@ -418,11 +405,18 @@ footer p {
     h1 { font-size: 2.5em; }
     h2 { font-size: 1.8em; }
 
+    .logo-text {
+        font-size: 1.6em;
+    }
+    .navbar-logo {
+        height: 30px;
+    }
+
     .nav-links {
         position: fixed;
         right: 0px;
-        height: 92vh; /* A bit less than full viewport */
-        top: 8vh; /* Below header */
+        height: 92vh;
+        top: 8vh;
         background-color: #ffffff;
         display: flex;
         flex-direction: column;
@@ -487,13 +481,13 @@ footer p {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
     .projects-grid {
-        grid-template-columns: 1fr; /* Stack projects on mobile */
+        grid-template-columns: 1fr;
     }
     .contact-links {
-        gap: 15px; /* Smaller gap on mobile */
+        gap: 15px;
     }
     .contact-link {
-        padding: 10px 15px; /* Slightly smaller padding on mobile */
+        padding: 10px 15px;
         font-size: 1em;
     }
 }
@@ -504,10 +498,18 @@ footer p {
     .hero-content .tagline { font-size: 1.4em; }
     .hero-content .intro-text { font-size: 1em; }
     .cta-button { font-size: 1em; padding: 12px 28px; }
+
+    .logo-text {
+        font-size: 1.4em;
+    }
+    .navbar-logo {
+        height: 25px;
+        margin-right: 8px;
+    }
     .nav-links { width: 75%; }
-    .logo { font-size: 1.5em; }
+    
     .contact-link {
-        width: calc(50% - 10px); /* Two buttons per row with gap */
-        justify-content: center; /* Center content in button */
+        width: calc(50% - 10px); 
+        justify-content: center;
     }
 }
