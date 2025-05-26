@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shalom Karr | Web Developer</title>
+    <meta name="description" content="Portfolio of Shalom Karr, a web developer specializing in building practical and engaging web applications.">
+    <!-- Assuming you'll create a favicon.ico and place it in the root -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph / Facebook / LinkedIn / etc. -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://YOUR_PORTFOLIO_NETLIFY_URL.netlify.app/"> <!-- !! REPLACE with YOUR PORTFOLIO's live Netlify URL !! -->
+    <meta property="og:title" content="Shalom Karr | Web Developer Portfolio">
+    <meta property="og:description" content="Explore the web development portfolio of Shalom Karr, showcasing projects like Cleveland Marketplace and GroupMe Bot solutions.">
+    <!-- Create a social-preview.jpg, upload it to your portfolio project (e.g., in an 'img' folder) -->
+    <meta property="og:image" content="https://YOUR_PORTFOLIO_NETLIFY_URL.netlify.app/img/social-preview.jpg"> <!-- !! REPLACE with YOUR PORTFOLIO URL & image path !! -->
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Shalom Karr Portfolio">
+
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@YourTwitterHandle"> <!-- Optional: Your Twitter username -->
+    <meta name="twitter:creator" content="@YourTwitterHandle"> <!-- Optional -->
+    <meta name="twitter:url" content="https://YOUR_PORTFOLIO_NETLIFY_URL.netlify.app/"> <!-- !! REPLACE with YOUR PORTFOLIO's live Netlify URL !! -->
+    <meta name="twitter:title" content="Shalom Karr | Web Developer Portfolio">
+    <meta name="twitter:description" content="Explore the web development portfolio of Shalom Karr, showcasing projects like Cleveland Marketplace and GroupMe Bot solutions.">
+    <meta name="twitter:image" content="https://YOUR_PORTFOLIO_NETLIFY_URL.netlify.app/img/social-preview.jpg"> <!-- !! REPLACE with YOUR PORTFOLIO URL & image path !! -->
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Shalom Karr</div>
+            <ul class="nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+                <h1>Shalom Karr</h1>
+                <p class="tagline">Building Practical & Engaging Web Applications</p>
+                <p class="intro-text">
+                    I transform ideas into functional, user-friendly digital experiences.
+                    From robust backend logic with Supabase to dynamic frontend interfaces with JavaScript,
+                    I'm passionate about creating solutions that work seamlessly.
+                </p>
+                <a href="#projects" class="cta-button">View My Work</a>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2>About Me</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>
+                            Hello! I'm Shalom, a developer dedicated to crafting web applications that are not only functional but also provide a great user experience. My focus is on understanding user needs and translating them into well-structured, secure, and maintainable code.
+                        </p>
+                        <p>
+                            My recent work on projects like the **Cleveland Marketplace** and the **GroupMe Copilot Image Bot** reflects my commitment to full-stack development, integrating everything from user authentication and real-time features with Supabase to responsive frontend design. I enjoy the challenge of problem-solving and continuously learning new technologies to enhance my development toolkit.
+                        </p>
+                        <p>
+                            I believe in clear communication, attention to detail, and the power of technology to connect people and simplify tasks. Whether it's a community marketplace or a specialized bot, my goal is to deliver quality and value.
+                        </p>
+                    </div>
+                    <!-- Optional: Add an image of yourself here -->
+                    <!-- <img src="img/shalom-karr-profile.jpg" alt="Shalom Karr" class="about-image"> -->
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="container">
+                <h2>My Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-item"><i class="fab fa-html5"></i> HTML5</div>
+                    <div class="skill-item"><i class="fab fa-css3-alt"></i> CSS3</div>
+                    <div class="skill-item"><i class="fab fa-js-square"></i> JavaScript (ES6+)</div>
+                    <div class="skill-item"><i class="fas fa-database"></i> Supabase (PostgreSQL, Auth, Storage, Realtime, Edge Functions)</div>
+                    <div class="skill-item"><i class="fas fa-shield-alt"></i> Security (RLS, 2FA, Turnstile)</div>
+                    <div class="skill-item"><i class="fas fa-mobile-alt"></i> PWA Basics</div>
+                    <div class="skill-item"><i class="fas fa-chart-line"></i> Analytics (GA4, Amplitude)</div>
+                    <div class="skill-item"><i class="fas fa-cogs"></i> API Integration</div>
+                    <div class="skill-item"><i class="fas fa-users"></i> UI/UX Principles</div>
+                    <div class="skill-item"><i class="fab fa-git-alt"></i> Git & Version Control</div>
+                </div>
+            </div>
+        </section>
+        <section id="projects">
+            <div class="container">
+                <h2>Projects</h2>
+                <div class="projects-grid">
+                    <article class="project-card">
+                        <!-- Consider adding a screenshot in img/cleveland-marketplace-preview.jpg -->
+                        <div class="project-image-placeholder">Cleveland Marketplace</div>
+                        <div class="project-info">
+                            <h3>Cleveland Marketplace</h3>
+                            <p>A full-featured local marketplace application enabling users to buy and sell items. Includes user authentication (with 2FA), item posting/management, search, commenting, and direct messaging with file attachments and reactions. Features an admin panel for user and content oversight.</p>
+                            <div class="project-links">
+                                <a href="https://clemarket.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                                <a href="https://github.com/Shalom-Karr/clevelandmarket" target="_blank" class="project-link"><i class="fab fa-github"></i> GitHub</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card">
+                        <!-- Consider adding a screenshot in img/groupme-bot-setup-preview.jpg -->
+                        <div class="project-image-placeholder">GroupMe Bot Setup</div>
+                         <div class="project-info">
+                            <h3>GroupMe Copilot Image Bot - Instructions</h3>
+                            <p>A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience.</p>
+                            <div class="project-links">
+                                <a href="https://copilotimage.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> View Page</a>
+                                <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="project-link"><i class="fab fa-github"></i> GitHub</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h2>Get In Touch</h2>
+                <p>I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.</p>
+                <div class="contact-links">
+                    <a href="mailto:your-email@example.com" class="contact-link email-link"><i class="fas fa-envelope"></i> Email Me</a> <!-- !! REPLACE EMAIL !! -->
+                    <a href="#" class="contact-link groupme-link disabled-link"><i class="fas fa-comment-dots"></i> GroupMe (Your Info)</a> <!-- !! REPLACE GROUPME INFO & remove disabled-link class !! -->
+                    <a href="https://github.com/Shalom-Karr" target="_blank" class="contact-link github-link"><i class="fab fa-github"></i> GitHub</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© <span id="currentYear"></span> Shalom Karr. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
