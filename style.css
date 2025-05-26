@@ -491,3 +491,64 @@ footer p {
     .nav-links { width: 75%; }
     .logo { font-size: 1.5em; }
 }
+
+/* style.css */
+
+/* ... (keep all existing styles) ... */
+
+/* Contact Section - Add or Modify Styles */
+.contact-links {
+    margin-top: 2em;
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Adjusted gap slightly for more links */
+    flex-wrap: wrap;
+}
+.contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    padding: 10px 18px; /* Adjusted padding slightly */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    color: white; /* Default color for new links */
+}
+.contact-link i {
+    font-size: 1.3em;
+}
+.email-link {
+    background-color: #007bff; /* Primary Blue */
+}
+.email-link:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
+.call-link,
+.text-link,
+.groupme-link,
+.github-link {
+    background-color: #333; /* Dark Grey/Black */
+}
+.call-link:hover,
+.text-link:hover,
+.groupme-link:hover,
+.github-link:hover {
+    background-color: #555; /* Lighter Grey/Black on hover */
+    transform: translateY(-3px);
+}
+
+/* Specific colors if desired for Call and Text */
+.call-link {
+    /* background-color: #28a745; /* Example: Green for call */
+}
+.call-link:hover {
+    /* background-color: #218838; */
+}
+.text-link {
+    /* background-color: #17a2b8; /* Example: Teal for text */
+}
+.text-link:hover {
+    /* background-color: #138496; */
+}
