@@ -349,7 +349,7 @@ section:nth-child(even) {
     margin-top: 2em;
     display: flex;
     justify-content: center;
-    gap: 25px;
+    gap: 20px; /* Adjusted gap */
     flex-wrap: wrap;
 }
 .contact-link {
@@ -357,39 +357,48 @@ section:nth-child(even) {
     align-items: center;
     gap: 10px;
     font-size: 1.1em;
-    padding: 10px 20px;
+    padding: 10px 18px; /* Adjusted padding */
     border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    color: white; /* Default text color for all contact links */
 }
 .contact-link i {
     font-size: 1.3em;
 }
-.email-link {
-    background-color: #007bff;
-    color: white;
-}
-.email-link:hover {
-    background-color: #0056b3;
-    transform: translateY(-3px);
-}
-.groupme-link, .github-link {
-    background-color: #333;
-    color: white;
-}
-.groupme-link:hover, .github-link:hover {
-    background-color: #555;
-    transform: translateY(-3px);
-}
-.contact-link.disabled-link {
-    background-color: #ccc;
-    color: #777;
-    cursor: not-allowed;
-}
-.contact-link.disabled-link:hover {
-    background-color: #ccc;
-    transform: none;
-}
 
+/* MODIFIED: Styles for ALL Contact Links to be Dark Grey/Black */
+.email-link,
+.call-link,
+.text-link,
+.groupme-link,
+.github-link {
+    background-color: #333; /* Dark Grey/Black */
+}
+.email-link:hover,
+.call-link:hover,
+.text-link:hover,
+.groupme-link:hover,
+.github-link:hover {
+    background-color: #555; /* Lighter Grey/Black on hover */
+    transform: translateY(-3px);
+}
+/* END MODIFICATION */
+
+/* Optional: Specific colors if desired for Call and Text - can be re-added here if you want different colors later */
+/*
+.call-link {
+    background-color: #28a745;
+}
+.call-link:hover {
+    background-color: #218838;
+}
+.text-link {
+    background-color: #17a2b8;
+}
+.text-link:hover {
+    background-color: #138496;
+}
+*/
 
 /* Footer */
 footer {
@@ -480,6 +489,13 @@ footer p {
     .projects-grid {
         grid-template-columns: 1fr; /* Stack projects on mobile */
     }
+    .contact-links {
+        gap: 15px; /* Smaller gap on mobile */
+    }
+    .contact-link {
+        padding: 10px 15px; /* Slightly smaller padding on mobile */
+        font-size: 1em;
+    }
 }
 
 @media(max-width: 480px) {
@@ -490,65 +506,8 @@ footer p {
     .cta-button { font-size: 1em; padding: 12px 28px; }
     .nav-links { width: 75%; }
     .logo { font-size: 1.5em; }
-}
-
-/* style.css */
-
-/* ... (keep all existing styles) ... */
-
-/* Contact Section - Add or Modify Styles */
-.contact-links {
-    margin-top: 2em;
-    display: flex;
-    justify-content: center;
-    gap: 20px; /* Adjusted gap slightly for more links */
-    flex-wrap: wrap;
-}
-.contact-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.1em;
-    padding: 10px 18px; /* Adjusted padding slightly */
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-    color: white; /* Default color for new links */
-}
-.contact-link i {
-    font-size: 1.3em;
-}
-.email-link {
-    background-color: #007bff; /* Primary Blue */
-}
-.email-link:hover {
-    background-color: #0056b3;
-    transform: translateY(-3px);
-}
-
-.call-link,
-.text-link,
-.groupme-link,
-.github-link {
-    background-color: #333; /* Dark Grey/Black */
-}
-.call-link:hover,
-.text-link:hover,
-.groupme-link:hover,
-.github-link:hover {
-    background-color: #555; /* Lighter Grey/Black on hover */
-    transform: translateY(-3px);
-}
-
-/* Specific colors if desired for Call and Text */
-.call-link {
-    /* background-color: #28a745; /* Example: Green for call */
-}
-.call-link:hover {
-    /* background-color: #218838; */
-}
-.text-link {
-    /* background-color: #17a2b8; /* Example: Teal for text */
-}
-.text-link:hover {
-    /* background-color: #138496; */
+    .contact-link {
+        width: calc(50% - 10px); /* Two buttons per row with gap */
+        justify-content: center; /* Center content in button */
+    }
 }
