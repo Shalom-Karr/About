@@ -73,20 +73,20 @@
             <div class="container">
                 <h2>About Me</h2>
                 <div class="about-content">
-<div class="about-text">
-    <p>
-        Hello, I'm Shalom Karr, an 18-year-old full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
-    </p>
-    <p>
-        My expertise spans the full development lifecycle, encompassing both frontend and backend technologies. I'm proficient in HTML, CSS, and modern JavaScript (ES6+) for crafting engaging user interfaces. On the backend, I leverage the power of Supabase, utilizing its PostgreSQL database, authentication mechanisms, real-time capabilities, storage solutions, and Edge Functions to build comprehensive and dynamic applications.
-    </p>
-    <p>
-        This approach is demonstrated in my recent work on significant projects. For instance, the <strong>SK News</strong> platform, the community-focused <strong>Cleveland Marketplace</strong>, and the utility-driven <strong>GroupMe Copilot Image Bot</strong> each showcase my ability to integrate these diverse technologies effectively. These endeavors have involved architecting systems that handle real-time data, secure user authentication (including considerations for 2FA), and responsive design principles to ensure a consistent experience across all devices. My work consistently reflects a commitment to thoughtful architecture, well-documented code, and a proactive approach to continuous learning, which is essential in the fast-evolving tech landscape.
-    </p>
-    <p>
-        I genuinely thrive on the analytical challenges inherent in software development. Driven by a love for problem-solving and innovation, I strive not just to meet user needs but to anticipate them, delivering solutions that can enhance community engagement, streamline complex processes, or provide unique utility. I believe that transparent communication and rigorous attention to detail are the cornerstones of successful project delivery, ensuring that every endeavor offers tangible quality and lasting value to its users.
-    </p>
- </div>
+                    <div class="about-text">
+                        <p>
+                            Hello, I'm Shalom Karr, a dedicated full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
+                        </p>
+                        <p>
+                            My expertise spans the full development lifecycle, encompassing both frontend and backend technologies. I'm proficient in HTML, CSS, and modern JavaScript (ES6+) for crafting engaging user interfaces. On the backend, I leverage the power of Supabase, utilizing its PostgreSQL database, authentication mechanisms, real-time capabilities, storage solutions, and Edge Functions to build comprehensive and dynamic applications.
+                        </p>
+                        <p>
+                            This approach is demonstrated in my recent work on significant projects. For instance, the <strong>SK News</strong> platform, the community-focused <strong>Cleveland Marketplace</strong>, and the utility-driven <strong>GroupMe Copilot Image Bot</strong> each showcase my ability to integrate these diverse technologies effectively. These endeavors have involved architecting systems that handle real-time data, secure user authentication (including considerations for 2FA), and responsive design principles to ensure a consistent experience across all devices. My work consistently reflects a commitment to thoughtful architecture, well-documented code, and a proactive approach to continuous learning, which is essential in the fast-evolving tech landscape.
+                        </p>
+                        <p>
+                            I genuinely thrive on the analytical challenges inherent in software development. Driven by a love for problem-solving and innovation, I strive not just to meet user needs but to anticipate them, delivering solutions that can enhance community engagement, streamline complex processes, or provide unique utility. I believe that transparent communication and rigorous attention to detail are the cornerstones of successful project delivery, ensuring that every endeavor offers tangible quality and lasting value to its users.
+                        </p>
+                    </div>
                     <img src="img/shalom-karr-profile-img-1.jpeg" alt="Shalom Karr" class="about-image">
                 </div>
             </div>
@@ -113,6 +113,50 @@
             <div class="container">
                 <h2>Projects</h2>
                 <div class="projects-grid">
+                    <article class="project-card">
+                        <div class="project-image-placeholder">Multi-Platform Content Dashboard</div>
+                        <div class="project-info">
+                            <h3>Multi-Platform Content Dashboard</h3>
+                            <p>A comprehensive dashboard for managing media embeds from YouTube, Spotify, and TikTok. Features API-driven search, direct link submission, and content deletion, with all data managed through a Supabase backend.</p>
+                            <div class="project-links">
+                                <a href="https://skvideos.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card">
+                        <div class="project-image-placeholder">Vimeo Video Manager</div>
+                        <div class="project-info">
+                            <h3>Vimeo Video Manager</h3>
+                            <p>A focused tool for managing a collection of Vimeo video embeds. Users can add videos by URL and delete existing entries, with all links stored and managed via a Supabase backend.</p>
+                            <div class="project-links">
+                                <a href="https://skvimeo.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card">
+                        <div class="project-image-placeholder">SK News</div>
+                        <div class="project-info">
+                            <h3>SK News Community Platform</h3>
+                            <p>A comprehensive news and community platform featuring real-time news updates via a Supabase-powered live feed, multiple topic-specific SMS/GroupMe chat groups, and an admin panel for content management. The site is designed to deliver kosher-filtered news and foster engagement within the Yeshiva community.</p>
+                            <div class="project-links">
+                                <a href="https://sk-news.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Site</a>
+                            </div>
+                        </div>
+                    </article>
+
+                     <article class="project-card">
+                        <div class="project-image-placeholder">Khal Yereim</div>
+                        <div class="project-info">
+                            <h3>Khal Yereim Community Site</h3>
+                            <p>A comprehensive community portal for a local synagogue, built with Supabase and vanilla JavaScript. Features include a dynamic PDF schedule viewer, an archive system, a Mikvah pass activation form, and a full admin dashboard for content management.</p>
+                            <div class="project-links">
+                                <a href="https://khalyereim.com" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Site</a>
+                            </div>
+                        </div>
+                    </article>
+
                     <article class="project-card">
                         <div class="project-image-placeholder">Cleveland Marketplace</div>
                         <div class="project-info">
@@ -160,8 +204,7 @@
     </footer>
 
     <script src="script.js"></script>
-    <script src='https://cdn.jotfor.ms/agent/embedjs/01970d818b787a5a83dbafff0c69ed3f4b8e/embed.js?skipWelcome=1&maximizable=1'>
-</script>
-<script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script><script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script><script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script><script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script><script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
 </body>
+
 </html>
