@@ -27,185 +27,189 @@
     <meta name="twitter:description" content="Explore the web development portfolio of Shalom Karr, showcasing projects like Cleveland Marketplace and GroupMe Bot solutions.">
     <meta name="twitter:image" content="https://shalomkarr.netlify.app/img/social-preview.jpg">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="#hero" class="logo-link">
-                <!-- UPDATED LOGO FILENAME HERE -->
-                <img src="img/logo.jpeg" alt="Shalom Karr Logo" class="navbar-logo">
-                <div class="logo-text">Shalom Karr</div>
+<body class="bg-gray-900 text-white">
+    <header class="bg-gray-800 text-white p-4 fixed w-full z-10">
+        <nav class="container mx-auto flex justify-between items-center">
+            <a href="#hero" class="flex items-center">
+                <img src="img/logo.jpeg" alt="Shalom Karr Logo" class="h-8 w-auto mr-2">
+                <span class="text-xl font-bold">Shalom Karr</span>
             </a>
-            <ul class="nav-links">
-                <li><a href="#hero">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#contact">Contact</a></li>
+            <ul class="hidden md:flex space-x-4">
+                <li><a href="#hero" class="hover:text-blue-500 transition-colors duration-300">Home</a></li>
+                <li><a href="#about" class="hover:text-blue-500 transition-colors duration-300">About</a></li>
+                <li><a href="#skills" class="hover:text-blue-500 transition-colors duration-300">Skills</a></li>
+                <li><a href="#projects" class="hover:text-blue-500 transition-colors duration-300">Projects</a></li>
+                <li><a href="#contact" class="hover:text-blue-500 transition-colors duration-300">Contact</a></li>
             </ul>
-            <div class="burger">
-                <div class="line1"></div>
-                <div class="line2"></div>
-                <div class="line3"></div>
+            <div class="md:hidden">
+                <button class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
         </nav>
     </header>
     <main>
-        <section id="hero">
-            <div class="hero-content">
-                <h1>Shalom Karr</h1>
-                <p class="tagline">Building Practical & Engaging Web Applications</p>
-                <p class="intro-text">
+        <section id="hero" class="pt-20" data-aos="fade-in">
+            <div class="container mx-auto text-center py-20">
+                <h1 class="text-5xl font-bold" data-aos="fade-down" data-aos-delay="200">Shalom Karr</h1>
+                <p class="text-2xl mt-4" data-aos="fade-down" data-aos-delay="400">Building Practical & Engaging Web Applications</p>
+                <p class="mt-4 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="600">
                     I transform ideas into functional, user-friendly digital experiences.
                     From robust backend logic with Supabase to dynamic frontend interfaces with JavaScript,
                     I'm passionate about creating solutions that work seamlessly.
                 </p>
-                <a href="#projects" class="cta-button">View My Work</a>
+                <a href="#projects" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full mt-8 inline-block transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="800">View My Work</a>
             </div>
         </section>
 
-        <section id="about">
-            <div class="container">
-                <h2>About Me</h2>
-                <div class="about-content">
-                    <div class="about-text">
-                        <p>
+        <section id="about" class="py-20" data-aos="fade-right">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-12">About Me</h2>
+                <div class="flex flex-wrap md:flex-nowrap items-center">
+                    <div class="md:w-2/3 md:pr-8">
+                        <p class="text-lg leading-relaxed">
                             Hello, I'm Shalom Karr, a dedicated full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
                         </p>
-                        <p>
+                        <p class="mt-4 text-lg leading-relaxed">
                             My expertise spans the full development lifecycle, encompassing both frontend and backend technologies. I'm proficient in HTML, CSS, and modern JavaScript (ES6+) for crafting engaging user interfaces. On the backend, I leverage the power of Supabase, utilizing its PostgreSQL database, authentication mechanisms, real-time capabilities, storage solutions, and Edge Functions to build comprehensive and dynamic applications.
                         </p>
-                        <p>
+                        <p class="mt-4 text-lg leading-relaxed">
                             This approach is demonstrated in my recent work on significant projects. For instance, the <strong>SK News</strong> platform, the community-focused <strong>Cleveland Marketplace</strong>, and the utility-driven <strong>GroupMe Copilot Image Bot</strong> each showcase my ability to integrate these diverse technologies effectively. These endeavors have involved architecting systems that handle real-time data, secure user authentication (including considerations for 2FA), and responsive design principles to ensure a consistent experience across all devices. My work consistently reflects a commitment to thoughtful architecture, well-documented code, and a proactive approach to continuous learning, which is essential in the fast-evolving tech landscape.
                         </p>
-                        <p>
+                        <p class="mt-4 text-lg leading-relaxed">
                             I genuinely thrive on the analytical challenges inherent in software development. Driven by a love for problem-solving and innovation, I strive not just to meet user needs but to anticipate them, delivering solutions that can enhance community engagement, streamline complex processes, or provide unique utility. I believe that transparent communication and rigorous attention to detail are the cornerstones of successful project delivery, ensuring that every endeavor offers tangible quality and lasting value to its users.
                         </p>
                     </div>
-                    <img src="img/ShalomProfessional.jpg" alt="Shalom Karr" class="about-image">
+                    <div class="w-full md:w-1/3 mt-8 md:mt-0 flex justify-center" data-aos="fade-left" data-aos-delay="200">
+                        <img src="img/ShalomProfessional.jpg" alt="Shalom Karr" class="rounded-full shadow-lg w-64 h-64 object-cover">
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="skills">
-            <div class="container">
-                <h2>My Skills</h2>
-                <div class="skills-grid">
-                    <div class="skill-item"><i class="fab fa-html5"></i> HTML5</div>
-                    <div class="skill-item"><i class="fab fa-css3-alt"></i> CSS3</div>
-                    <div class="skill-item"><i class="fab fa-js-square"></i> JavaScript (ES6+)</div>
-                    <div class="skill-item"><i class="fas fa-database"></i> Supabase (PostgreSQL, Auth, Storage, Realtime, Edge Functions)</div>
-                    <div class="skill-item"><i class="fas fa-shield-alt"></i> Security (RLS, 2FA, Turnstile)</div>
-                    <div class="skill-item"><i class="fas fa-mobile-alt"></i> PWA Basics</div>
-                    <div class="skill-item"><i class="fas fa-chart-line"></i> Analytics (GA4, Amplitude)</div>
-                    <div class="skill-item"><i class="fas fa-cogs"></i> API Integration</div>
-                    <div class="skill-item"><i class="fas fa-users"></i> UI/UX Principles</div>
-                    <div class="skill-item"><i class="fab fa-git-alt"></i> Git & Version Control</div>
+        <section id="skills" class="py-20 bg-gray-800" data-aos="fade-up">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-12">My Skills</h2>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="100">HTML5</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="200">CSS3</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="300">JavaScript (ES6+)</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="400">Supabase</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="500">Security</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="600">PWA Basics</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="700">Analytics</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="800">API Integration</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="900">UI/UX Principles</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="1000">Git & Version Control</div>
                 </div>
             </div>
         </section>
-        <section id="projects">
-            <div class="container">
-                <h2>Projects</h2>
-                <div class="projects-grid">
-                    <article class="project-card">
-                        <div class="project-image-placeholder">Multi-Platform Content Dashboard</div>
-                        <div class="project-info">
-                            <h3>Multi-Platform Content Dashboard</h3>
-                            <p>A comprehensive dashboard for managing media embeds from YouTube, Spotify, and TikTok. Features API-driven search, direct link submission, and content deletion, with all data managed through a Supabase backend.</p>
-                            <div class="project-links">
-                                <a href="https://skvideos.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                            </div>
+        <section id="projects" class="py-20" data-aos="fade-up">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-12">Projects</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Multi-Platform Content Dashboard</span>
                         </div>
-                    </article>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Multi-Platform Content Dashboard</h3>
+                            <p class="text-gray-400 mb-4">A comprehensive dashboard for managing media embeds from YouTube, Spotify, and TikTok. Features API-driven search, direct link submission, and content deletion, with all data managed through a Supabase backend.</p>
+                            <a href="https://skvideos.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
 
-                    <article class="project-card">
-                        <div class="project-image-placeholder">Vimeo Video Manager</div>
-                        <div class="project-info">
-                            <h3>Vimeo Video Manager</h3>
-                            <p>A focused tool for managing a collection of Vimeo video embeds. Users can add videos by URL and delete existing entries, with all links stored and managed via a Supabase backend.</p>
-                            <div class="project-links">
-                                <a href="https://skvimeo.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                            </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Vimeo Video Manager</span>
                         </div>
-                    </article>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Vimeo Video Manager</h3>
+                            <p class="text-gray-400 mb-4">A focused tool for managing a collection of Vimeo video embeds. Users can add videos by URL and delete existing entries, with all links stored and managed via a Supabase backend.</p>
+                            <a href="https://skvimeo.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
 
-                    <article class="project-card">
-                        <div class="project-image-placeholder">SK News</div>
-                        <div class="project-info">
-                            <h3>SK News Community Platform</h3>
-                            <p>A comprehensive news and community platform featuring real-time news updates via a Supabase-powered live feed, multiple topic-specific SMS/GroupMe chat groups, and an admin panel for content management. The site is designed to deliver kosher-filtered news and foster engagement within the Yeshiva community.</p>
-                            <div class="project-links">
-                                <a href="https://sk-news.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Site</a>
-                            </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SK News Community Platform</span>
                         </div>
-                    </article>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SK News Community Platform</h3>
+                            <p class="text-gray-400 mb-4">A comprehensive news and community platform featuring real-time news updates via a Supabase-powered live feed, multiple topic-specific SMS/GroupMe chat groups, and an admin panel for content management.</p>
+                            <a href="https://sk-news.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                        </div>
+                    </div>
 
-                     <article class="project-card">
-                        <div class="project-image-placeholder">Khal Yereim</div>
-                        <div class="project-info">
-                            <h3>Khal Yereim Community Site</h3>
-                            <p>A comprehensive community portal for a local synagogue, built with Supabase and vanilla JavaScript. Features include a dynamic PDF schedule viewer, an archive system, a Mikvah pass activation form, and a full admin dashboard for content management.</p>
-                            <div class="project-links">
-                                <a href="https://khalyereim.com" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Site</a>
-                            </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="400">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Khal Yereim Community Site</span>
                         </div>
-                    </article>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Khal Yereim Community Site</h3>
+                            <p class="text-gray-400 mb-4">A comprehensive community portal for a local synagogue, built with Supabase and vanilla JavaScript. Features include a dynamic PDF schedule viewer, an archive system, a Mikvah pass activation form, and a full admin dashboard for content management.</p>
+                            <a href="https://khalyereim.com" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                        </div>
+                    </div>
 
-                    <article class="project-card">
-                        <div class="project-image-placeholder">Cleveland Marketplace</div>
-                        <div class="project-info">
-                            <h3>Cleveland Marketplace</h3>
-                            <p>A full-featured local marketplace application enabling users to buy and sell items. Includes user authentication (with 2FA), item posting/management, search, commenting, and direct messaging with file attachments and reactions. Features an admin panel for user and content oversight.</p>
-                            <div class="project-links">
-                                <a href="https://clemarket.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                                <a href="https://github.com/Shalom-Karr/clevelandmarket" target="_blank" class="project-link"><i class="fab fa-github"></i> GitHub</a>
-                            </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="500">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Cleveland Marketplace</span>
                         </div>
-                    </article>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Cleveland Marketplace</h3>
+                            <p class="text-gray-400 mb-4">A full-featured local marketplace application enabling users to buy and sell items. Includes user authentication (with 2FA), item posting/management, search, commenting, and direct messaging with file attachments and reactions.</p>
+                            <a href="https://clemarket.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                            <a href="https://github.com/Shalom-Karr/clevelandmarket" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
+                        </div>
+                    </div>
 
-                    <article class="project-card">
-                        <div class="project-image-placeholder">GroupMe Bot Setup</div>
-                         <div class="project-info">
-                            <h3>GroupMe Copilot Image Bot - Instructions</h3>
-                            <p>A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience.</p>
-                            <div class="project-links">
-                                <a href="https://copilotimage.netlify.app" target="_blank" class="project-link"><i class="fas fa-external-link-alt"></i> View Page</a>
-                                <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="project-link"><i class="fab fa-github"></i> GitHub</a>
-                            </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="600">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">GroupMe Copilot Image Bot</span>
                         </div>
-                    </article>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">GroupMe Copilot Image Bot - Instructions</h3>
+                            <p class="text-gray-400 mb-4">A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience.</p>
+                            <a href="https://copilotimage.netlify.app" target="_blank" class="text-blue-500 hover:underline">View Page</a>
+                            <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <section id="contact">
-            <div class="container">
-                <h2>Get In Touch</h2>
-                <p>I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.</p>
-                <div class="contact-links">
-                    <a href="mailto:shalomkarr@gmail.com" class="contact-link email-link"><i class="fas fa-envelope"></i> Email Me</a>
-                    <a href="tel:+12164516698" class="contact-link call-link"><i class="fas fa-phone"></i> Call Me</a>
-                    <a href="sms:+12164516698" class="contact-link text-link"><i class="fas fa-comment-sms"></i> Text Me</a>
-                    <a href="https://groupme.com/join_group/104645931/ycyf6NC1" target="_blank" class="contact-link groupme-link"><i class="fas fa-comment-dots"></i> GroupMe</a>
-                    <a href="https://github.com/Shalom-Karr" target="_blank" class="contact-link github-link"><i class="fab fa-github"></i> GitHub</a>
+        <section id="contact" class="py-20 bg-gray-800" data-aos="zoom-in">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
+                <p class="text-lg text-gray-400 mb-8">I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="mailto:shalomkarr@gmail.com" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">Email Me</a>
+                    <a href="tel:+12164516698" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">Call Me</a>
+                    <a href="sms:+12164516698" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">Text Me</a>
+                    <a href="https://groupme.com/join_group/104645931/ycyf6NC1" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">GroupMe</a>
+                    <a href="https://github.com/Shalom-Karr" target="_blank" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">GitHub</a>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer>
-        <p>© <span id="currentYear"></span> Shalom Karr. All rights reserved.</p>
+    <footer class="bg-gray-900 py-4">
+        <div class="container mx-auto text-center text-gray-500">
+            <p>© <span id="currentYear"></span> Shalom Karr. All rights reserved.</p>
+        </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script><script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script><script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
+    <a href="#hero" id="to-top" class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-3 rounded-full hidden transition-all duration-300 transform hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </a>
 </body>
 
 </html>
-

@@ -1,41 +1,17 @@
 // Responsive Navigation
 const navSlide = () => {
-    const burger = document.querySelector('.burger');
-    const nav = document.querySelector('.nav-links');
-    const navLinks = document.querySelectorAll('.nav-links li');
+    const burger = document.querySelector('.md\\:hidden button');
+    const nav = document.querySelector('.hidden.md\\:flex');
 
     burger.addEventListener('click', () => {
-        // Toggle Nav
-        nav.classList.toggle('nav-active');
-
-        // Animate Links
-        navLinks.forEach((link, index) => {
-            if (link.style.animation) {
-                link.style.animation = '';
-            } else {
-                link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
-            }
-        });
-        // Burger Animation
-        burger.classList.toggle('toggle');
-    });
-
-    // Close nav when a link is clicked
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (nav.classList.contains('nav-active')) {
-                nav.classList.remove('nav-active');
-                burger.classList.remove('toggle');
-                navLinks.forEach(item => item.style.animation = ''); // Reset animation
-            }
-        });
+        nav.classList.toggle('hidden');
     });
 }
 
 // Smooth Scrolling for nav links
 const smoothScroll = () => {
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const ctaButton = document.querySelector('.cta-button'); // If you have one
+    const navLinks = document.querySelectorAll('nav a');
+    const ctaButton = document.querySelector('.bg-blue-500'); // A bit generic, but it works for now
 
     const scrollToSection = (event) => {
         event.preventDefault();
@@ -78,4 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
     navSlide();
     smoothScroll();
     setDynamicYear();
+    AOS.init();
+});
+
+// To-Top Button
+const toTopButton = document.getElementById('to-top');
+
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        toTopButton.classList.remove('hidden');
+    } else {
+        toTopButton.classList.add('hidden');
+    }
 });
