@@ -29,6 +29,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 </head>
 <body class="bg-gray-900 text-white">
     <header class="bg-gray-800 text-white p-4 fixed w-full z-10">
@@ -55,7 +56,7 @@
         <section id="hero" class="pt-20" data-aos="fade-in">
             <div class="container mx-auto text-center py-20">
                 <h1 class="text-5xl font-bold" data-aos="fade-down" data-aos-delay="200">Shalom Karr</h1>
-                <p class="text-2xl mt-4" data-aos="fade-down" data-aos-delay="400">Building Practical & Engaging Web Applications</p>
+                <p class="text-2xl mt-4" data-aos="fade-down" data-aos-delay="400"><span id="typed"></span></p>
                 <p class="mt-4 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="600">
                     I transform ideas into functional, user-friendly digital experiences.
                     From robust backend logic with Supabase to dynamic frontend interfaces with JavaScript,
@@ -65,11 +66,11 @@
             </div>
         </section>
 
-        <section id="about" class="py-20" data-aos="fade-right">
+        <section id="about" class="py-20" data-aos="fade-up">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12">About Me</h2>
+                <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">About Me</h2>
                 <div class="flex flex-wrap md:flex-nowrap items-center">
-                    <div class="md:w-2/3 md:pr-8">
+                    <div class="md:w-2/3 md:pr-8" data-aos="fade-right">
                         <p class="text-lg leading-relaxed">
                             Hello, I'm Shalom Karr, a dedicated full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
                         </p>
@@ -92,10 +93,10 @@
 
         <section id="skills" class="py-20 bg-gray-800" data-aos="fade-up">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12">My Skills</h2>
+                <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">My Skills</h2>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="100">HTML5</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="200">CSS3</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="flip-left" data-aos-delay="100">HTML5</div>
+                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="flip-left" data-aos-delay="200">CSS3</div>
                     <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="300">JavaScript (ES6+)</div>
                     <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="400">Supabase</div>
                     <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="500">Security</div>
@@ -109,9 +110,9 @@
         </section>
         <section id="projects" class="py-20" data-aos="fade-up">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12">Projects</h2>
+                <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">Projects</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
                         <div class="h-48 bg-gray-700 flex items-center justify-center">
                             <span class="text-gray-500">Multi-Platform Content Dashboard</span>
                         </div>
@@ -122,7 +123,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
                         <div class="h-48 bg-gray-700 flex items-center justify-center">
                             <span class="text-gray-500">Vimeo Video Manager</span>
                         </div>
@@ -133,7 +134,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
                         <div class="h-48 bg-gray-700 flex items-center justify-center">
                             <span class="text-gray-500">SK News Community Platform</span>
                         </div>
@@ -144,7 +145,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="400">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="400">
                         <div class="h-48 bg-gray-700 flex items-center justify-center">
                             <span class="text-gray-500">Khal Yereim Community Site</span>
                         </div>
@@ -155,7 +156,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="500">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="500">
                         <div class="h-48 bg-gray-700 flex items-center justify-center">
                             <span class="text-gray-500">Cleveland Marketplace</span>
                         </div>
@@ -167,7 +168,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="600">
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="600">
                         <div class="h-48 bg-gray-700 flex items-center justify-center">
                             <span class="text-gray-500">GroupMe Copilot Image Bot</span>
                         </div>
@@ -176,6 +177,156 @@
                             <p class="text-gray-400 mb-4">A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience.</p>
                             <a href="https://copilotimage.netlify.app" target="_blank" class="text-blue-500 hover:underline">View Page</a>
                             <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">RevealOS Unfilter Tool</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">RevealOS Unfilter Tool</h3>
+                            <p class="text-gray-400 mb-4">A powerful tool designed to restore full internet access and app functionality to filtered, kosher-certified phones. It works by safely modifying system partitions, bypassing restrictions without compromising the device's integrity.</p>
+                            <a href="https://unfilter.kosherandroid.com/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SK Copilot AI</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SK Copilot AI</h3>
+                            <p class="text-gray-400 mb-4">A user-friendly platform for creating and managing AI-powered GroupMe bots. It allows users to easily configure and deploy bots that can automate tasks, answer questions, and enhance group conversations.</p>
+                            <a href="https://skcopilot.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SKFilter</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SKFilter</h3>
+                            <p class="text-gray-400 mb-4">A comprehensive tool for managing and configuring GroupMe group filters. It helps group administrators maintain a safe and positive chat environment by automatically filtering out unwanted content.</p>
+                            <a href="https://skfilter.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="400">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">JTech Website</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">JTech Website</h3>
+                            <p class="text-gray-400 mb-4">A reverse mirror proxy for the JTech Forums, providing an alternative way to access the forums and their content. This ensures that the community can always stay connected, even when the main site is unavailable.</p>
+                            <a href="https://jtechwebsite.shalomkarr.workers.dev/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="500">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SK Redirector</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SK Redirector</h3>
+                            <p class="text-gray-400 mb-4">A convenient browser script that automatically bypasses Techloq filter pages, allowing users to access blocked content without interruption. It's a simple, effective solution for a smoother browsing experience.</p>
+                            <a href="https://skredirector.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="600">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">JTech Redirector</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">JTech Redirector</h3>
+                            <p class="text-gray-400 mb-4">A browser script that automatically bypasses filter pages for JTech Forums links, ensuring that users can always access the forums without being blocked. It's a must-have tool for any active member of the JTech community.</p>
+                            <a href="https://jtech-redirector.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Rabbi Sacks Website</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Rabbi Sacks Website</h3>
+                            <p class="text-gray-400 mb-4">A comprehensive website for Rabbi Yonason Sacks, featuring his shiurim, seforim, and community information. It serves as a valuable resource for his students and the wider Jewish community.</p>
+                            <a href="https://rabbisacks.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">The Hock Cleveland</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">The Hock Cleveland</h3>
+                            <p class="text-gray-400 mb-4">A community news platform for Cleveland, providing weekly email blasts and real-time WhatsApp updates. It's the go-to source for local news, events, and deals, keeping the community connected and informed.</p>
+                            <a href="https://thehockcleveland.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SK Brutes</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SK Brutes</h3>
+                            <p class="text-gray-400 mb-4">An educational tool that demonstrates the concept of brute-force password cracking on a simple 4-digit code. It's a great way to learn about the importance of strong passwords and secure coding practices.</p>
+                            <a href="https://skbrutes.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="400">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SK Image Fetch</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SK Image Fetch</h3>
+                            <p class="text-gray-400 mb-4">A powerful tool for creating and managing image retrievers for GroupMe. It allows users to easily find and share images in their GroupMe chats, making conversations more engaging and fun.</p>
+                            <a href="https://skimagefetch.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="500">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">SK YouTube</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">SK YouTube</h3>
+                            <p class="text-gray-400 mb-4">A personalized YouTube player that allows users to save and organize their favorite videos. It's a great way to create a curated collection of content that's always easy to find and watch.</p>
+                            <a href="https://skyoutube.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="600">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Visual PDF Editor</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Visual PDF Editor</h3>
+                            <p class="text-gray-400 mb-4">A web-based tool for combining, reordering, and editing pages from PDFs and images. It's a simple, intuitive solution for managing and manipulating PDF documents without the need for expensive software.</p>
+                            <a href="https://fileeditor.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Batch WMV to MP4 Converter</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Batch WMV to MP4 Converter</h3>
+                            <p class="text-gray-400 mb-4">A simple web tool for converting multiple WMV files to MP4 format. It's a fast, efficient solution for anyone who needs to convert video files for use on different devices or platforms.</p>
+                            <a href="https://mp4convert.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Web Media Toolkit</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Web Media Toolkit</h3>
+                            <p class="text-gray-400 mb-4">A browser-based tool for editing audio metadata and converting media files. It's a versatile solution for anyone who works with audio or video files on a regular basis.</p>
+                            <a href="https://mpedit.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
+                        <div class="h-48 bg-gray-700 flex items-center justify-center">
+                            <span class="text-gray-500">Kemach</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2">Kemach</h3>
+                            <p class="text-gray-400 mb-4">A Pesach order program for the Kemach community, making it easy for members to order and pay for their Passover essentials. It's a great example of how technology can be used to support and strengthen local communities.</p>
+                            <a href="https://kemach.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
                         </div>
                     </div>
                 </div>

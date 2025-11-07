@@ -55,6 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
     smoothScroll();
     setDynamicYear();
     AOS.init();
+
+    new Typed('#typed', {
+        strings: ['Building Practical & Engaging Web Applications', 'Full-Stack Developer', 'JavaScript Enthusiast', 'Supabase Expert'],
+        typeSpeed: 50,
+        backSpeed: 50,
+        loop: true,
+        cursorChar: '_',
+    });
 });
 
 // To-Top Button
