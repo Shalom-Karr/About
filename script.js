@@ -57,7 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
     AOS.init();
 
     new Typed('#typed', {
-        strings: ['Building Practical & Engaging Web Applications', 'Full-Stack Developer', 'JavaScript Enthusiast', 'Supabase Expert'],
+        strings: [
+            'Full-Stack Developer',
+            'JavaScript Enthusiast',
+            'Supabase Expert',
+            'Creator of Practical & Engaging Web Applications'
+        ],
         typeSpeed: 50,
         backSpeed: 50,
         loop: true,
