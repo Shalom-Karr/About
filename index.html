@@ -30,6 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="bg-gray-900 text-white">
     <header class="bg-gray-800 text-white p-4 fixed w-full z-10">
@@ -69,23 +70,45 @@
         <section id="about" class="py-20" data-aos="fade-up">
             <div class="container mx-auto px-4">
                 <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">About Me</h2>
-                <div class="flex flex-wrap md:flex-nowrap items-center">
-                    <div class="md:w-2/3 md:pr-8" data-aos="fade-right">
-                        <p class="text-lg leading-relaxed">
-                            Hello, I'm Shalom Karr, a dedicated full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
-                        </p>
-                        <p class="mt-4 text-lg leading-relaxed">
-                            My expertise spans the full development lifecycle, encompassing both frontend and backend technologies. I'm proficient in HTML, CSS, and modern JavaScript (ES6+) for crafting engaging user interfaces. On the backend, I leverage the power of Supabase, utilizing its PostgreSQL database, authentication mechanisms, real-time capabilities, storage solutions, and Edge Functions to build comprehensive and dynamic applications.
-                        </p>
-                        <p class="mt-4 text-lg leading-relaxed">
-                            This approach is demonstrated in my recent work on significant projects. For instance, the <strong>SK News</strong> platform, the community-focused <strong>Cleveland Marketplace</strong>, and the utility-driven <strong>GroupMe Copilot Image Bot</strong> each showcase my ability to integrate these diverse technologies effectively. These endeavors have involved architecting systems that handle real-time data, secure user authentication (including considerations for 2FA), and responsive design principles to ensure a consistent experience across all devices. My work consistently reflects a commitment to thoughtful architecture, well-documented code, and a proactive approach to continuous learning, which is essential in the fast-evolving tech landscape.
-                        </p>
-                        <p class="mt-4 text-lg leading-relaxed">
-                            I genuinely thrive on the analytical challenges inherent in software development. Driven by a love for problem-solving and innovation, I strive not just to meet user needs but to anticipate them, delivering solutions that can enhance community engagement, streamline complex processes, or provide unique utility. I believe that transparent communication and rigorous attention to detail are the cornerstones of successful project delivery, ensuring that every endeavor offers tangible quality and lasting value to its users.
-                        </p>
+                <div class="bg-gray-800 rounded-lg shadow-lg p-6 font-mono text-white">
+                    <div class="flex items-center mb-4">
+                        <span class="text-green-400">shalomkarr@portfolio</span>
+                        <span class="text-gray-500">:</span>
+                        <span class="text-blue-400">~</span>
+                        <span class="text-gray-500">$</span>
+                        <span class="ml-2">whoami</span>
                     </div>
-                    <div class="w-full md:w-1/3 mt-8 md:mt-0 flex justify-center" data-aos="fade-left" data-aos-delay="200">
-                        <img src="img/ShalomProfessional.jpg" alt="Shalom Karr" class="rounded-full shadow-lg w-64 h-64 object-cover">
+                    <p class="text-lg leading-relaxed">Shalom Karr</p>
+
+                    <div class="flex items-center mt-8 mb-4">
+                        <span class="text-green-400">shalomkarr@portfolio</span>
+                        <span class="text-gray-500">:</span>
+                        <span class="text-blue-400">~</span>
+                        <span class="text-gray-500">$</span>
+                        <span class="ml-2">cat bio.txt</span>
+                    </div>
+                    <p class="text-lg leading-relaxed">
+                        A dedicated full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
+                    </p>
+
+                    <div class="flex items-center mt-8 mb-4">
+                        <span class="text-green-400">shalomkarr@portfolio</span>
+                        <span class="text-gray-500">:</span>
+                        <span class="text-blue-400">~</span>
+                        <span class="text-gray-500">$</span>
+                        <span class="ml-2">ls skills/</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <span>HTML5</span>
+                        <span>CSS3</span>
+                        <span>JavaScript (ES6+)</span>
+                        <span>Supabase</span>
+                        <span>Security</span>
+                        <span>PWA Basics</span>
+                        <span>Analytics</span>
+                        <span>API Integration</span>
+                        <span>UI/UX Principles</span>
+                        <span>Git & Version Control</span>
                     </div>
                 </div>
             </div>
@@ -112,223 +135,308 @@
             <div class="container mx-auto px-4">
                 <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">Projects</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Multi-Platform Content Dashboard</span>
+                    <a href="https://skvideos.netlify.app" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Multi-Platform Content Dashboard</h3>
+                        <p class="text-gray-400 mb-4">A comprehensive dashboard for managing media embeds from YouTube, Spotify, and TikTok. Features API-driven search, direct link submission, and content deletion, with all data managed through a Supabase backend. This tool streamlines content management by providing a centralized interface for all your favorite media platforms.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                    <span class="text-xs font-semibold">Supabase</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Multi-Platform Content Dashboard</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive dashboard for managing media embeds from YouTube, Spotify, and TikTok. Features API-driven search, direct link submission, and content deletion, with all data managed through a Supabase backend.</p>
-                            <a href="https://skvideos.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                    </a>
+                    <a href="https://skvimeo.netlify.app" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Vimeo Video Manager</h3>
+                        <p class="text-gray-400 mb-4">A focused tool for managing a collection of Vimeo video embeds. Users can add videos by URL and delete existing entries, with all links stored and managed via a Supabase backend. It's a simple and effective solution for curating and sharing your favorite Vimeo content.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                    <span class="text-xs font-semibold">Supabase</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Vimeo Video Manager</span>
+                    </a>
+                    <a href="https://sk-news.netlify.app" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SK News Community Platform</h3>
+                        <p class="text-gray-400 mb-4">A comprehensive news and community platform featuring real-time news updates via a Supabase-powered live feed, multiple topic-specific SMS/GroupMe chat groups, and an admin panel for content management. Stay informed and connected with your community through this dynamic and engaging platform.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                    <span class="text-xs font-semibold">Supabase</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Vimeo Video Manager</h3>
-                            <p class="text-gray-400 mb-4">A focused tool for managing a collection of Vimeo video embeds. Users can add videos by URL and delete existing entries, with all links stored and managed via a Supabase backend.</p>
-                            <a href="https://skvimeo.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                    </a>
+                    <a href="https://khalyereim.com" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="400">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Khal Yereim Community Site</h3>
+                        <p class="text-gray-400 mb-4">A comprehensive community portal for a local synagogue, built with Supabase and vanilla JavaScript. Features include a dynamic PDF schedule viewer, an archive system, a Mikvah pass activation form, and a full admin dashboard for content management. It's a one-stop-shop for all your community needs.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                    <span class="text-xs font-semibold">Supabase</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK News Community Platform</span>
+                    </a>
+                    <a href="https://clemarket.netlify.app" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="500">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Cleveland Marketplace</h3>
+                        <p class="text-gray-400 mb-4">A full-featured local marketplace application enabling users to buy and sell items. Includes user authentication (with 2FA), item posting/management, search, commenting, and direct messaging with file attachments and reactions. It's the perfect platform for buying and selling in your local community.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                    <span class="text-xs font-semibold">Supabase</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                    <a href="https://github.com/Shalom-Karr/clevelandmarket" target="_blank" class="hover:text-blue-400"><i class="fab fa-github"></i></a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK News Community Platform</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive news and community platform featuring real-time news updates via a Supabase-powered live feed, multiple topic-specific SMS/GroupMe chat groups, and an admin panel for content management.</p>
-                            <a href="https://sk-news.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                    </a>
+                    <a href="https://copilotimage.netlify.app" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="600">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">GroupMe Copilot Image Bot - Instructions</h3>
+                        <p class="text-gray-400 mb-4">A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience. This tool makes it easy to add a powerful AI-powered image bot to your GroupMe chats.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                    <span class="text-xs font-semibold">Supabase</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                    <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="hover:text-blue-400"><i class="fab fa-github"></i></a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="400">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Khal Yereim Community Site</span>
+                    </a>
+                    <a href="https://unfilter.kosherandroid.com/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">RevealOS Unfilter Tool</h3>
+                        <p class="text-gray-400 mb-4">A powerful tool designed to restore full internet access and app functionality to filtered, kosher-certified phones. It works by safely modifying system partitions, bypassing restrictions without compromising the device's integrity. It's a must-have tool for anyone who wants to unlock the full potential of their filtered phone.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Khal Yereim Community Site</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive community portal for a local synagogue, built with Supabase and vanilla JavaScript. Features include a dynamic PDF schedule viewer, an archive system, a Mikvah pass activation form, and a full admin dashboard for content management.</p>
-                            <a href="https://khalyereim.com" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                    </a>
+                    <a href="https://skcopilot.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SK Copilot AI</h3>
+                        <p class="text-gray-400 mb-4">A user-friendly platform for creating and managing AI-powered GroupMe bots. It allows users to easily configure and deploy bots that can automate tasks, answer questions, and enhance group conversations. It's the perfect tool for anyone who wants to add a powerful AI assistant to their GroupMe chats.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="500">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Cleveland Marketplace</span>
+                    </a>
+                    <a href="https://skfilter.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SKFilter</h3>
+                        <p class="text-gray-400 mb-4">A comprehensive tool for managing and configuring GroupMe group filters. It helps group administrators maintain a safe and positive chat environment by automatically filtering out unwanted content. It's an essential tool for any GroupMe group administrator.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Cleveland Marketplace</h3>
-                            <p class="text-gray-400 mb-4">A full-featured local marketplace application enabling users to buy and sell items. Includes user authentication (with 2FA), item posting/management, search, commenting, and direct messaging with file attachments and reactions.</p>
-                            <a href="https://clemarket.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                            <a href="https://github.com/Shalom-Karr/clevelandmarket" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
+                    </a>
+                    <a href="https://jtechwebsite.shalomkarr.workers.dev/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="400">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">JTech Website</h3>
+                        <p class="text-gray-400 mb-4">A reverse mirror proxy for the JTech Forums, providing an alternative way to access the forums and their content. This ensures that the community can always stay connected, even when the main site is unavailable. It's a great example of how to use Cloudflare Workers to create a simple and effective proxy.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">Cloudflare Workers</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="600">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">GroupMe Copilot Image Bot</span>
+                    </a>
+                    <a href="https://skredirector.pages.dev/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="500">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SK Redirector</h3>
+                        <p class="text-gray-400 mb-4">A convenient browser script that automatically bypasses Techloq filter pages, allowing users to access blocked content without interruption. It's a simple, effective solution for a smoother browsing experience. It's a great example of how to use JavaScript to automate tasks and improve the user experience.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">GroupMe Copilot Image Bot - Instructions</h3>
-                            <p class="text-gray-400 mb-4">A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience.</p>
-                            <a href="https://copilotimage.netlify.app" target="_blank" class="text-blue-500 hover:underline">View Page</a>
-                            <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
+                    </a>
+                    <a href="https://jtech-redirector.pages.dev/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="600">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">JTech Redirector</h3>
+                        <p class="text-gray-400 mb-4">A browser script that automatically bypasses filter pages for JTech Forums links, ensuring that users can always access the forums without being blocked. It's a must-have tool for any active member of the JTech community. It's a great example of how to use JavaScript to automate tasks and improve the user experience.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">RevealOS Unfilter Tool</span>
+                    </a>
+                    <a href="https://rabbisacks.pages.dev/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Rabbi Sacks Website</h3>
+                        <p class="text-gray-400 mb-4">A comprehensive website for Rabbi Yonason Sacks, featuring his shiurim, seforim, and community information. It serves as a valuable resource for his students and the wider Jewish community. It's a great example of how to use web technologies to create a simple and effective website for a community leader.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">RevealOS Unfilter Tool</h3>
-                            <p class="text-gray-400 mb-4">A powerful tool designed to restore full internet access and app functionality to filtered, kosher-certified phones. It works by safely modifying system partitions, bypassing restrictions without compromising the device's integrity.</p>
-                            <a href="https://unfilter.kosherandroid.com/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                    </a>
+                    <a href="https://thehockcleveland.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">The Hock Cleveland</h3>
+                        <p class="text-gray-400 mb-4">A community news platform for Cleveland, providing weekly email blasts and real-time WhatsApp updates. It's the go-to source for local news, events, and deals, keeping the community connected and informed. It's a great example of how to use web technologies to create a simple and effective community news platform.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK Copilot AI</span>
+                    </a>
+                    <a href="https://skbrutes.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SK Brutes</h3>
+                        <p class="text-gray-400 mb-4">An educational tool that demonstrates the concept of brute-force password cracking on a simple 4-digit code. It's a great way to learn about the importance of strong passwords and secure coding practices. It's a great example of how to use JavaScript to create a simple and effective educational tool.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK Copilot AI</h3>
-                            <p class="text-gray-400 mb-4">A user-friendly platform for creating and managing AI-powered GroupMe bots. It allows users to easily configure and deploy bots that can automate tasks, answer questions, and enhance group conversations.</p>
-                            <a href="https://skcopilot.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                    </a>
+                    <a href="https://skimagefetch.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="400">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SK Image Fetch</h3>
+                        <p class="text-gray-400 mb-4">A powerful tool for creating and managing image retrievers for GroupMe. It allows users to easily find and share images in their GroupMe chats, making conversations more engaging and fun. It's a great example of how to use JavaScript to create a simple and effective tool for GroupMe.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SKFilter</span>
+                    </a>
+                    <a href="https://skyoutube.pages.dev/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="500">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">SK YouTube</h3>
+                        <p class="text-gray-400 mb-4">A personalized YouTube player that allows users to save and organize their favorite videos. It's a great way to create a curated collection of content that's always easy to find and watch. It's a great example of how to use JavaScript to create a simple and effective tool for YouTube.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SKFilter</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive tool for managing and configuring GroupMe group filters. It helps group administrators maintain a safe and positive chat environment by automatically filtering out unwanted content.</p>
-                            <a href="https://skfilter.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
+                    </a>
+                    <a href="https://fileeditor.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="600">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Visual PDF Editor</h3>
+                        <p class="text-gray-400 mb-4">A web-based tool for combining, reordering, and editing pages from PDFs and images. It's a simple, intuitive solution for managing and manipulating PDF documents without the need for expensive software. It's a great example of how to use JavaScript to create a simple and effective tool for PDFs.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="400">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">JTech Website</span>
+                    </a>
+                    <a href="https://mp4convert.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Batch WMV to MP4 Converter</h3>
+                        <p class="text-gray-400 mb-4">A simple web tool for converting multiple WMV files to MP4 format. It's a fast, efficient solution for anyone who needs to convert video files for use on different devices or platforms. It's a great example of how to use JavaScript to create a simple and effective tool for video conversion.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">JTech Website</h3>
-                            <p class="text-gray-400 mb-4">A reverse mirror proxy for the JTech Forums, providing an alternative way to access the forums and their content. This ensures that the community can always stay connected, even when the main site is unavailable.</p>
-                            <a href="https://jtechwebsite.shalomkarr.workers.dev/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
+                    </a>
+                    <a href="https://mpedit.netlify.app/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Web Media Toolkit</h3>
+                        <p class="text-gray-400 mb-4">A browser-based tool for editing audio metadata and converting media files. It's a versatile solution for anyone who works with audio or video files on a regular basis. It's a great example of how to use JavaScript to create a simple and effective tool for media editing.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="500">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK Redirector</span>
+                    </a>
+                    <a href="https://kemach.pages.dev/" target="_blank" class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300" data-aos="fade-up" data-aos-delay="300">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">Kemach</h3>
+                        <p class="text-gray-400 mb-4">A Pesach order program for the Kemach community, making it easy for members to order and pay for their Passover essentials. It's a great example of how technology can be used to support and strengthen local communities. It's a great example of how to use JavaScript to create a simple and effective tool for community organizing.</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    <span class="text-xs font-semibold">JavaScript</span>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK Redirector</h3>
-                            <p class="text-gray-400 mb-4">A convenient browser script that automatically bypasses Techloq filter pages, allowing users to access blocked content without interruption. It's a simple, effective solution for a smoother browsing experience.</p>
-                            <a href="https://skredirector.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="600">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">JTech Redirector</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">JTech Redirector</h3>
-                            <p class="text-gray-400 mb-4">A browser script that automatically bypasses filter pages for JTech Forums links, ensuring that users can always access the forums without being blocked. It's a must-have tool for any active member of the JTech community.</p>
-                            <a href="https://jtech-redirector.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Rabbi Sacks Website</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Rabbi Sacks Website</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive website for Rabbi Yonason Sacks, featuring his shiurim, seforim, and community information. It serves as a valuable resource for his students and the wider Jewish community.</p>
-                            <a href="https://rabbisacks.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">The Hock Cleveland</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">The Hock Cleveland</h3>
-                            <p class="text-gray-400 mb-4">A community news platform for Cleveland, providing weekly email blasts and real-time WhatsApp updates. It's the go-to source for local news, events, and deals, keeping the community connected and informed.</p>
-                            <a href="https://thehockcleveland.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK Brutes</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK Brutes</h3>
-                            <p class="text-gray-400 mb-4">An educational tool that demonstrates the concept of brute-force password cracking on a simple 4-digit code. It's a great way to learn about the importance of strong passwords and secure coding practices.</p>
-                            <a href="https://skbrutes.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="400">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK Image Fetch</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK Image Fetch</h3>
-                            <p class="text-gray-400 mb-4">A powerful tool for creating and managing image retrievers for GroupMe. It allows users to easily find and share images in their GroupMe chats, making conversations more engaging and fun.</p>
-                            <a href="https://skimagefetch.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="500">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK YouTube</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK YouTube</h3>
-                            <p class="text-gray-400 mb-4">A personalized YouTube player that allows users to save and organize their favorite videos. It's a great way to create a curated collection of content that's always easy to find and watch.</p>
-                            <a href="https://skyoutube.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="600">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Visual PDF Editor</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Visual PDF Editor</h3>
-                            <p class="text-gray-400 mb-4">A web-based tool for combining, reordering, and editing pages from PDFs and images. It's a simple, intuitive solution for managing and manipulating PDF documents without the need for expensive software.</p>
-                            <a href="https://fileeditor.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="100">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Batch WMV to MP4 Converter</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Batch WMV to MP4 Converter</h3>
-                            <p class="text-gray-400 mb-4">A simple web tool for converting multiple WMV files to MP4 format. It's a fast, efficient solution for anyone who needs to convert video files for use on different devices or platforms.</p>
-                            <a href="https://mp4convert.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="200">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Web Media Toolkit</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Web Media Toolkit</h3>
-                            <p class="text-gray-400 mb-4">A browser-based tool for editing audio metadata and converting media files. It's a versatile solution for anyone who works with audio or video files on a regular basis.</p>
-                            <a href="https://mpedit.netlify.app/" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl hover:border-blue-500 border-2 border-transparent" data-aos="fade-up" data-aos-delay="300">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Kemach</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Kemach</h3>
-                            <p class="text-gray-400 mb-4">A Pesach order program for the Kemach community, making it easy for members to order and pay for their Passover essentials. It's a great example of how technology can be used to support and strengthen local communities.</p>
-                            <a href="https://kemach.pages.dev/" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </section>
