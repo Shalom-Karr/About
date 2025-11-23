@@ -1,3 +1,4 @@
+<!-- START OF FILE index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,133 +21,258 @@
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@YourTwitterHandle"> <!-- !! REPLACE or REMOVE !! -->
-    <meta name="twitter:creator" content="@YourTwitterHandle"> <!-- !! REPLACE or REMOVE !! -->
+    <meta name="twitter:site" content="@YourTwitterHandle">
+    <meta name="twitter:creator" content="@YourTwitterHandle">
     <meta name="twitter:url" content="https://shalomkarr.netlify.app/">
     <meta name="twitter:title" content="Shalom Karr | Web Developer Portfolio">
     <meta name="twitter:description" content="Explore the web development portfolio of Shalom Karr, showcasing projects like Cleveland Marketplace and GroupMe Bot solutions.">
     <meta name="twitter:image" content="https://shalomkarr.netlify.app/img/social-preview.jpg">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Tailwind CSS (CDN for runtime usage) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/typeit@8.7.0/dist/index.umd.js"></script>
+
+    <style>
+        /* Hide elements initially for GSAP reveal */
+        .gsap-reveal { visibility: hidden; }
+
+        /* Navbar Scroll State Classes */
+        header {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Initial transparent state (default in HTML) */
+        
+        /* Scrolled State (Added via JS) */
+        header.scrolled-nav {
+            background-color: rgba(17, 24, 39, 0.85); /* bg-gray-900 with opacity */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5); /* gray-700 */
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Hamburger Menu Animation */
+        .hamburger-line {
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        
+        button.active .line-top {
+            transform: translateY(6px) rotate(45deg);
+        }
+        button.active .line-middle {
+            opacity: 0;
+        }
+        button.active .line-bottom {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <header class="bg-gray-800 text-white p-4 fixed w-full z-10">
-        <nav class="container mx-auto flex justify-between items-center">
-            <a href="#hero" class="flex items-center">
-                <img src="img/logo.jpeg" alt="Shalom Karr Logo" class="h-8 w-auto mr-2">
-                <span class="text-xl font-bold">Shalom Karr</span>
+<body class="bg-gray-900 text-white overflow-x-hidden">
+    
+    <!-- Updated Header -->
+    <header class="fixed w-full z-50 top-0 py-4 transition-all duration-300 bg-transparent">
+        <nav class="container mx-auto px-6 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#hero" class="flex items-center group">
+                <div class="relative w-10 h-10 mr-3 overflow-hidden rounded-full border-2 border-blue-500 group-hover:border-white transition-colors duration-300">
+                    <img src="img/logo.jpeg" alt="Shalom Karr Logo" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                </div>
+                <span class="text-xl font-bold tracking-wide group-hover:text-blue-400 transition-colors duration-300">Shalom Karr</span>
             </a>
-            <ul class="hidden md:flex space-x-4">
-                <li><a href="#hero" class="hover:text-blue-500 transition-colors duration-300">Home</a></li>
-                <li><a href="#about" class="hover:text-blue-500 transition-colors duration-300">About</a></li>
-                <li><a href="#skills" class="hover:text-blue-500 transition-colors duration-300">Skills</a></li>
-                <li><a href="#projects" class="hover:text-blue-500 transition-colors duration-300">Projects</a></li>
-                <li><a href="#contact" class="hover:text-blue-500 transition-colors duration-300">Contact</a></li>
+
+            <!-- Desktop Nav -->
+            <ul class="hidden md:flex space-x-8 items-center">
+                <li><a href="#hero" class="relative group py-2 text-gray-300 hover:text-white transition-colors">Home<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+                <li><a href="#about" class="relative group py-2 text-gray-300 hover:text-white transition-colors">About<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+                <li><a href="#skills" class="relative group py-2 text-gray-300 hover:text-white transition-colors">Skills<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+                <li><a href="#projects" class="relative group py-2 text-gray-300 hover:text-white transition-colors">Projects<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span></a></li>
+                <li><a href="#contact" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-medium transition-transform hover:scale-105 shadow-lg shadow-blue-500/30">Contact</a></li>
             </ul>
-            <div class="md:hidden">
-                <button class="text-white focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+
+            <!-- Mobile Burger Button -->
+            <div class="md:hidden z-50">
+                <button id="mobile-menu-btn" class="text-white focus:outline-none w-8 h-8 flex flex-col justify-center items-center gap-1.5">
+                    <span class="hamburger-line line-top w-6 h-0.5 bg-white rounded-full"></span>
+                    <span class="hamburger-line line-middle w-6 h-0.5 bg-white rounded-full"></span>
+                    <span class="hamburger-line line-bottom w-6 h-0.5 bg-white rounded-full"></span>
                 </button>
             </div>
         </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-gray-900/95 backdrop-blur-xl z-40 flex flex-col items-center justify-center space-y-8 opacity-0 pointer-events-none transition-opacity duration-300">
+            <a href="#hero" class="mobile-link text-2xl font-bold text-white hover:text-blue-400">Home</a>
+            <a href="#about" class="mobile-link text-2xl font-bold text-white hover:text-blue-400">About</a>
+            <a href="#skills" class="mobile-link text-2xl font-bold text-white hover:text-blue-400">Skills</a>
+            <a href="#projects" class="mobile-link text-2xl font-bold text-white hover:text-blue-400">Projects</a>
+            <a href="#contact" class="mobile-link text-2xl font-bold text-white hover:text-blue-400">Contact</a>
+        </div>
     </header>
+
     <main>
-        <section id="hero" class="pt-20" data-aos="fade-in">
-            <div class="container mx-auto text-center py-20">
-                <h1 class="text-5xl font-bold" data-aos="fade-down" data-aos-delay="200">Shalom Karr</h1>
-                <p class="text-2xl mt-4" data-aos="fade-down" data-aos-delay="400">
+        <section id="hero" class="pt-20 min-h-screen flex items-center justify-center relative overflow-hidden">
+            <!-- Background decoration -->
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 via-gray-900 to-black -z-10"></div>
+            
+            <div class="container mx-auto text-center py-20 px-4">
+                <h1 class="hero-anim text-5xl md:text-6xl font-bold opacity-0 translate-y-10 mb-4">Shalom Karr</h1>
+                <div class="hero-anim opacity-0 translate-y-10 text-2xl md:text-3xl text-blue-400 h-10 mb-6 font-mono">
                     <span id="typed"></span>
-                </p>
-                <p class="mt-4 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="600">
+                </div>
+                <p class="hero-anim opacity-0 translate-y-10 mt-6 max-w-2xl mx-auto text-gray-300 leading-relaxed text-lg">
                     I transform ideas into functional, user-friendly digital experiences.
                     From robust backend logic with Supabase to dynamic frontend interfaces with JavaScript,
                     I'm passionate about creating solutions that work seamlessly.
                 </p>
-                <a href="#projects" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full mt-8 inline-block transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="800">View My Work</a>
+                <a href="#projects" class="hero-anim opacity-0 translate-y-10 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full mt-10 inline-flex items-center transition-all duration-300 shadow-lg hover:shadow-blue-600/50 hover:-translate-y-1">
+                    View My Work
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                </a>
             </div>
         </section>
 
-        <section id="about" class="py-20" data-aos="fade-right">
+        <section id="about" class="py-20 bg-gray-850 border-t border-gray-800">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12">About Me</h2>
-                <div class="flex flex-wrap md:flex-nowrap items-center">
-                    <div class="md:w-2/3 md:pr-8">
-                        <p class="text-lg leading-relaxed">
+                <h2 class="section-title text-4xl font-bold text-center mb-16 opacity-0 text-blue-400">About Me</h2>
+                <div class="flex flex-wrap md:flex-nowrap items-center gap-12">
+                    <div class="about-text md:w-2/3 opacity-0 -translate-x-10">
+                        <p class="text-lg leading-relaxed text-gray-300 mb-6">
                             Hello, I'm Shalom Karr, a dedicated full-stack web developer driven by a passion for creating digital experiences that are not only powerful and user-friendly but also meticulously engineered. My core objective is to build solutions that seamlessly blend intuitive design with robust functionality, addressing complex user requirements through clean, secure, and scalable code.
                         </p>
-                        <p class="mt-4 text-lg leading-relaxed">
+                        <p class="text-lg leading-relaxed text-gray-300 mb-6">
                             My expertise spans the full development lifecycle, encompassing both frontend and backend technologies. I'm proficient in HTML, CSS, and modern JavaScript (ES6+) for crafting engaging user interfaces. On the backend, I leverage the power of Supabase, utilizing its PostgreSQL database, authentication mechanisms, real-time capabilities, storage solutions, and Edge Functions to build comprehensive and dynamic applications.
                         </p>
-                        <p class="mt-4 text-lg leading-relaxed">
-                            This approach is demonstrated in my recent work on significant projects. For instance, the <strong>SK News</strong> platform, the community-focused <strong>Cleveland Marketplace</strong>, and the utility-driven <strong>GroupMe Copilot Image Bot</strong> each showcase my ability to integrate these diverse technologies effectively. These endeavors have involved architecting systems that handle real-time data, secure user authentication (including considerations for 2FA), and responsive design principles to ensure a consistent experience across all devices. My work consistently reflects a commitment to thoughtful architecture, well-documented code, and a proactive approach to continuous learning, which is essential in the fast-evolving tech landscape.
+                        <p class="text-lg leading-relaxed text-gray-300 mb-6">
+                            My work consistently reflects a commitment to thoughtful architecture, well-documented code, and a proactive approach to continuous learning, which is essential in the fast-evolving tech landscape.
                         </p>
-                        <p class="mt-4 text-lg leading-relaxed">
-                            I genuinely thrive on the analytical challenges inherent in software development. Driven by a love for problem-solving and innovation, I strive not just to meet user needs but to anticipate them, delivering solutions that can enhance community engagement, streamline complex processes, or provide unique utility. I believe that transparent communication and rigorous attention to detail are the cornerstones of successful project delivery, ensuring that every endeavor offers tangible quality and lasting value to its users.
+                        <p class="text-lg leading-relaxed text-gray-300">
+                            I genuinely thrive on the analytical challenges inherent in software development. Driven by a love for problem-solving and innovation, I strive not just to meet user needs but to anticipate them, delivering solutions that can enhance community engagement, streamline complex processes, or provide unique utility. I believe that transparent communication and rigorous attention to detail are the cornerstones of successful project delivery.
                         </p>
                     </div>
-                    <div class="w-full md:w-1/3 mt-8 md:mt-0 flex justify-center" data-aos="fade-left" data-aos-delay="200">
-                        <img src="img/ShalomProfessional.jpg" alt="Shalom Karr" class="rounded-full shadow-lg w-64 h-64 object-cover">
+                    <div class="about-img w-full md:w-1/3 flex justify-center opacity-0 translate-x-10">
+                        <div class="relative w-72 h-72 group">
+                            <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                            <img src="img/ShalomProfessional.jpg" alt="Shalom Karr" class="relative rounded-full shadow-2xl w-72 h-72 object-cover border-4 border-gray-700 group-hover:border-blue-500 transition-colors duration-300">
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="skills" class="py-20 bg-gray-800" data-aos="fade-up">
+        <section id="skills" class="py-20 bg-gray-800">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12">My Skills</h2>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="100">HTML5</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="200">CSS3</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="300">JavaScript (ES6+)</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="400">Supabase</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="500">Security</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="600">PWA Basics</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="700">Analytics</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="800">API Integration</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="900">UI/UX Principles</div>
-                    <div class="bg-gray-700 p-6 rounded-lg text-center text-lg font-semibold hover:bg-blue-500 transition-all duration-300 transform hover:scale-110" data-aos="zoom-in" data-aos-delay="1000">Git & Version Control</div>
+                <h2 class="section-title text-4xl font-bold text-center mb-16 opacity-0 text-blue-400">My Skills</h2>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                    <!-- Skill Cards -->
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">HTML5</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">CSS3</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">JavaScript (ES6+)</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Supabase</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">PostgreSQL</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Web Security</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">API Integration</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">UI/UX Principles</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">PWA Basics</div>
+                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Git & GitHub</div>
                 </div>
             </div>
         </section>
-        <section id="projects" class="py-20" data-aos="fade-up">
+
+        <section id="projects" class="py-20 bg-gray-900">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">Projects</h2>
-                <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Project cards will be dynamically inserted here -->
+                <h2 class="section-title text-4xl font-bold text-center mb-16 opacity-0 text-blue-400">Projects</h2>
+                <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[300px]">
+                    <!-- Loading State -->
+                    <div class="col-span-full flex flex-col justify-center items-center h-64">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                        <p class="text-gray-400">Loading Projects...</p>
+                    </div>
                 </div>
             </div>
         </section>
-        <section id="contact" class="py-20 bg-gray-800" data-aos="zoom-in">
+
+        <section id="contact" class="py-20 bg-gray-800">
             <div class="container mx-auto px-4 text-center">
-                <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
-                <p class="text-lg text-gray-400 mb-8">I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.</p>
-                <div class="flex justify-center space-x-4">
-                    <a href="mailto:shalomkarr@gmail.com" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">Email Me</a>
-                    <a href="tel:+12164516698" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">Call Me</a>
-                    <a href="sms:+12164516698" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">Text Me</a>
-                    <a href="https://groupme.com/join_group/104645931/ycyf6NC1" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">GroupMe</a>
-                    <a href="https://github.com/Shalom-Karr" target="_blank" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-110">GitHub</a>
+                <div class="contact-anim opacity-0 translate-y-10">
+                    <h2 class="text-4xl font-bold mb-6 text-blue-400">Get In Touch</h2>
+                    <p class="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
+                        I'm always open to discussing new projects, creative ideas, or opportunities to collaborate. 
+                    </p>
+                    
+                    <div class="flex flex-wrap justify-center gap-6">
+                        <!-- Email -->
+                        <a href="mailto:shalomkarr@gmail.com" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            Email Me
+                        </a>
+                        
+                        <!-- Call -->
+                        <a href="tel:+12164516698" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                            </svg>
+                            Call Me
+                        </a>
+                        
+                        <!-- Text -->
+                        <a href="sms:+12164516698" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd" />
+                            </svg>
+                            Text Me
+                        </a>
+                        
+                        <!-- GroupMe -->
+                        <a href="https://groupme.com/join_group/104645931/ycyf6NC1" target="_blank" class="flex items-center gap-2 bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                            </svg>
+                            GroupMe
+                        </a>
+                        
+                        <!-- GitHub -->
+                        <a href="https://github.com/Shalom-Karr" target="_blank" class="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg border border-gray-600">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                            </svg>
+                            GitHub
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-900 py-4">
+    <footer class="bg-gray-900 py-8 border-t border-gray-800">
         <div class="container mx-auto text-center text-gray-500">
             <p>© <span id="currentYear"></span> Shalom Karr. All rights reserved.</p>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script type="module" src="script.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script><script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script><script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
-    <a href="#hero" id="to-top" class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-3 rounded-full hidden transition-all duration-300 transform hover:scale-110">
+    
+    <!-- Amplitude -->
+    <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script>
+    <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script>
+    <script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
+
+    <!-- To Top Button -->
+    <a href="#hero" id="to-top" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full hidden shadow-xl z-50 transition-all duration-300 hover:-translate-y-1">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
         </svg>
     </a>
 </body>
-
 </html>

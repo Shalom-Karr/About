@@ -7,6 +7,8 @@ const dashboardSection = document.getElementById('dashboard-section');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 const logoutButton = document.getElementById('logout-button');
+
+// Projects Elements
 const projectsList = document.getElementById('projects-list');
 const addProjectButton = document.getElementById('add-project-button');
 const projectModal = document.getElementById('project-modal');
@@ -21,6 +23,10 @@ const descriptionInput = document.getElementById('description');
 const selectedTagsContainer = document.getElementById('selected-tags');
 const techDropdown = document.getElementById('tech-dropdown');
 const newTechInput = document.getElementById('new-tech-input');
+
+// Visitor Logs Elements
+const visitorLogsBody = document.getElementById('visitor-logs-body');
+const refreshLogsButton = document.getElementById('refresh-logs-button');
 
 
 // --- State ---
@@ -87,8 +93,11 @@ const checkSession = async () => {
 
 // --- Data Loading ---
 const loadInitialData = async () => {
-    await loadTechnologies();
-    await loadProjects();
+    await Promise.all([
+        loadTechnologies(),
+        loadProjects(),
+        loadVisitorLogs()
+    ]);
 };
 
 const loadTechnologies = async () => {
@@ -110,26 +119,83 @@ const loadProjects = async () => {
     renderProjects(data);
 };
 
+const loadVisitorLogs = async () => {
+    visitorLogsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading...</td></tr>';
+    
+    // Attempt to fetch logs
+    // ERROR HANDLING NOTE: If you get "column created_at does not exist", 
+    // you need to add that column to your Supabase table.
+    const { data, error } = await supabase
+        .from('page_visits')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+    if (error) {
+        console.error("Error loading logs:", error);
+        if (error.code === "42703") {
+            // Specific error for missing column
+            visitorLogsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-400">Database Error: Missing "created_at" column in "page_visits" table. Please update Supabase.</td></tr>';
+        } else {
+            visitorLogsBody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+        }
+        return;
+    }
+
+    renderVisitorLogs(data);
+};
+
 
 // --- Rendering ---
+
+const renderVisitorLogs = (logs) => {
+    visitorLogsBody.innerHTML = '';
+    if (logs.length === 0) {
+        visitorLogsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">No logs found.</td></tr>';
+        return;
+    }
+
+    logs.forEach(log => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-700 transition-colors';
+        
+        const date = log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A';
+        // Safe access to meta in case it's null
+        const browser = log.meta?.browser || 'Unknown';
+        const os = log.meta?.os || 'Unknown';
+        const duration = log.duration_seconds ? `${log.duration_seconds}s` : 'Active/Unfinished';
+
+        row.innerHTML = `
+            <td class="px-4 py-3 text-gray-300">${date}</td>
+            <td class="px-4 py-3 text-blue-300 font-mono text-xs">${log.ip_address}</td>
+            <td class="px-4 py-3 text-gray-400 text-xs">${browser} on ${os}</td>
+            <td class="px-4 py-3 text-right text-gray-300">${duration}</td>
+        `;
+        visitorLogsBody.appendChild(row);
+    });
+};
+
 const renderProjects = (projects) => {
     projectsList.innerHTML = '';
     if (projects.length === 0) {
-        projectsList.innerHTML = '<p class="text-gray-500">No projects found. Add one to get started!</p>';
+        projectsList.innerHTML = '<p class="text-gray-500 text-center py-4">No projects found. Add one to get started!</p>';
         return;
     }
 
     projects.forEach(project => {
         const projectEl = document.createElement('div');
-        projectEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+        projectEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center border border-gray-600 hover:border-gray-500 transition-colors';
         projectEl.innerHTML = `
             <div>
-                <h3 class="text-xl font-bold">${project.title}</h3>
-                <p class="text-sm text-gray-400">${project.url}</p>
+                <h3 class="text-xl font-bold text-gray-200">${project.title}</h3>
+                <a href="${project.url}" target="_blank" class="text-sm text-blue-400 hover:underline">${project.url}</a>
+                <div class="mt-1 flex gap-1 flex-wrap">
+                    ${project.technologies.map(t => `<span class="text-xs bg-gray-600 px-2 py-0.5 rounded text-gray-300">${t}</span>`).join('')}
+                </div>
             </div>
-            <div class="space-x-2">
-                <button class="edit-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded text-sm" data-id="${project.id}">Edit</button>
-                <button class="delete-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded text-sm" data-id="${project.id}">Delete</button>
+            <div class="flex space-x-2">
+                <button class="edit-btn bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-1.5 px-3 rounded text-sm transition-colors" data-id="${project.id}">Edit</button>
+                <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded text-sm transition-colors" data-id="${project.id}">Delete</button>
             </div>
         `;
         projectsList.appendChild(projectEl);
@@ -141,7 +207,7 @@ const renderTechDropdown = () => {
     const unselected = allTechnologies.filter(tech => !selectedTechnologies.includes(tech));
     unselected.forEach(tech => {
         const option = document.createElement('div');
-        option.className = 'multi-select-option';
+        option.className = 'multi-select-option text-sm text-gray-200';
         option.textContent = tech;
         option.addEventListener('click', () => addTag(tech));
         techDropdown.appendChild(option);
@@ -152,10 +218,10 @@ const renderSelectedTags = () => {
     selectedTagsContainer.innerHTML = '';
     selectedTechnologies.forEach(tech => {
         const tag = document.createElement('div');
-        tag.className = 'tag';
+        tag.className = 'tag text-xs';
         tag.innerHTML = `
             <span>${tech}</span>
-            <span class="tag-remove" data-tech="${tech}">&#10005;</span>
+            <span class="tag-remove text-gray-400 hover:text-white" data-tech="${tech}">&#10005;</span>
         `;
         selectedTagsContainer.appendChild(tag);
     });
@@ -174,7 +240,7 @@ const openModal = (project = null) => {
         titleInput.value = project.title;
         urlInput.value = project.url;
         descriptionInput.value = project.description;
-        selectedTechnologies = [...project.technologies];
+        selectedTechnologies = project.technologies ? [...project.technologies] : [];
     } else {
         modalTitle.textContent = 'Add Project';
     }
@@ -286,6 +352,7 @@ addProjectButton.addEventListener('click', () => openModal());
 modalClose.addEventListener('click', closeModal);
 modalCancel.addEventListener('click', closeModal);
 projectForm.addEventListener('submit', handleFormSubmit);
+refreshLogsButton.addEventListener('click', loadVisitorLogs);
 
 projectsList.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-btn')) {
