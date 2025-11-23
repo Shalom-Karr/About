@@ -49,12 +49,99 @@ const setDynamicYear = () => {
     }
 }
 
+import { initTracker } from './tracker.js';
+import { supabase } from './supabase-client.js';
+
+// --- Project Card Dynamic Loading ---
+const loadProjects = async () => {
+    const projectsGrid = document.getElementById('projects-grid');
+    if (!projectsGrid) return;
+
+    // 1. Fetch data from the 'profile_websites' table
+    const { data: projects, error } = await supabase
+        .from('profile_websites')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching projects:', error);
+        projectsGrid.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load projects. Please try again later.</p>';
+        return;
+    }
+
+    if (projects.length === 0) {
+        projectsGrid.innerHTML = '<p class="text-gray-400 text-center col-span-full">No projects to display at the moment.</p>';
+        return;
+    }
+
+    // 2. Clear placeholder and create a card for each project
+    projectsGrid.innerHTML = ''; 
+    projects.forEach((project, index) => {
+        const card = document.createElement('a');
+        card.href = project.url;
+        card.target = '_blank';
+        card.className = 'bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300';
+        
+        // Add AOS animation attributes
+        card.setAttribute('data-aos', 'fade-up');
+        card.setAttribute('data-aos-delay', `${(index % 3 + 1) * 100}`); // Stagger animation
+
+        // Create technologies spans
+        const techSpans = project.technologies.map(tech => 
+            `<span class="text-xs font-semibold">${tech}</span>`
+        ).join('');
+
+        card.innerHTML = `
+            <h3 class="text-2xl font-bold mb-2 text-blue-400">${project.title}</h3>
+            <p class="text-gray-400 mb-4">${project.description}</p>
+            <div class="mt-auto">
+                <div class="flex items-center justify-between text-gray-500">
+                    <div class="flex space-x-2">
+                        ${techSpans}
+                    </div>
+                    <div class="flex space-x-4">
+                        <i class="fas fa-link"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        projectsGrid.appendChild(card);
+    });
+};
+
+
+// --- Hero Section Typing Animation ---
+const initTypingAnimation = () => {
+    const typedElement = document.getElementById('typed');
+    if (!typedElement) return;
+
+    new TypeIt('#typed', {
+        strings: [
+            'Full-Stack Developer',
+            'JavaScript Enthusiast',
+            'Supabase Expert',
+            'Creator of Practical & Engaging Web Applications'
+        ],
+        speed: 50,
+        backSpeed: 50,
+        loop: true,
+        cursorChar: '_',
+        waitUntilVisible: true,
+        breakLines: false,
+    }).go();
+};
+
+
 // Initialize functions
 document.addEventListener('DOMContentLoaded', () => {
+    initTypingAnimation();
     navSlide();
     smoothScroll();
     setDynamicYear();
     AOS.init();
+    initTracker();
+    loadProjects();
 });
 
 // To-Top Button
