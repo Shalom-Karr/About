@@ -29,17 +29,40 @@ let selectedTechnologies = [];
 
 
 // --- Authentication ---
+
+const verifyAdmin = async (user) => {
+    if (!user) return false;
+
+    const { data, error } = await supabase
+        .from('admin_users')
+        .select('email')
+        .eq('email', user.email)
+        .single();
+
+    if (error || !data) {
+        console.error('Authorization failed:', error);
+        await supabase.auth.signOut();
+        loginError.textContent = 'Access Denied: You are not an authorized admin.';
+        return false;
+    }
+
+    return true;
+};
+
 const handleLogin = async (event) => {
     event.preventDefault();
     loginError.textContent = '';
     const email = loginForm.email.value;
     const password = loginForm.password.value;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
         loginError.textContent = error.message;
-    } else {
+        return;
+    }
+
+    if (await verifyAdmin(user)) {
         loginSection.classList.add('hidden');
         dashboardSection.classList.remove('hidden');
         await loadInitialData();
@@ -54,7 +77,7 @@ const handleLogout = async () => {
 // Check user session on page load
 const checkSession = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
+    if (session && await verifyAdmin(session.user)) {
         loginSection.classList.add('hidden');
         dashboardSection.classList.remove('hidden');
         await loadInitialData();
