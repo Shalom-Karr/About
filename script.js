@@ -55,10 +55,9 @@ import { supabase } from './supabase-client.js';
 // --- Project Card Dynamic Loading ---
 const loadProjects = async () => {
     const projectsGrid = document.getElementById('projects-grid');
-    if (!projectsGrid) {
-        console.error("Could not find #projects-grid element.");
-        return;
-    }
+    if (!projectsGrid) return;
+
+    const skeletonCards = projectsGrid.querySelectorAll('.skeleton-card');
 
     try {
         const { data: projects, error } = await supabase
@@ -67,54 +66,76 @@ const loadProjects = async () => {
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('Error fetching projects from Supabase:', error);
-            projectsGrid.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load projects. Please try again later.</p>';
+            projectsGrid.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load projects.</p>';
             return;
         }
+
+        // Hide all skeleton cards initially
+        skeletonCards.forEach(card => card.style.display = 'none');
 
         if (projects.length === 0) {
-            projectsGrid.innerHTML = '<p class="text-gray-400 text-center col-span-full">No projects to display at the moment.</p>';
+            projectsGrid.innerHTML = '<p class="text-gray-400 text-center col-span-full">No projects to display yet.</p>';
             return;
         }
-
-        // 2. Clear placeholder and create a card for each project
-        projectsGrid.innerHTML = '';
+        
+        // Populate skeleton cards with real data
         projects.forEach((project, index) => {
-            const card = document.createElement('a');
-            card.href = project.url;
-            card.target = '_blank';
-            card.className = 'bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col hover:bg-gray-700 transition-colors duration-300';
+            if (index < skeletonCards.length) {
+                const card = skeletonCards[index];
+                card.classList.remove('skeleton-card'); // Remove skeleton class to stop shimmer
+                card.style.display = 'block'; // Make it visible
 
-            // Add AOS animation attributes
-            card.setAttribute('data-aos', 'fade-up');
-            card.setAttribute('data-aos-delay', `${(index % 3 + 1) * 100}`); // Stagger animation
+                const techSpans = project.technologies.map(tech =>
+                    `<span class="text-xs font-semibold">${tech}</span>`
+                ).join('');
 
-            // Create technologies spans
-            const techSpans = project.technologies.map(tech =>
-                `<span class="text-xs font-semibold">${tech}</span>`
-            ).join('');
-
-            card.innerHTML = `
-                <h3 class="text-2xl font-bold mb-2 text-blue-400">${project.title}</h3>
-                <p class="text-gray-400 mb-4">${project.description}</p>
-                <div class="mt-auto">
-                    <div class="flex items-center justify-between text-gray-500">
-                        <div class="flex space-x-2">
-                            ${techSpans}
+                card.innerHTML = `
+                    <a href="${project.url}" target="_blank" class="project-card block p-6 h-full flex flex-col">
+                        <h3 class="text-2xl font-bold mb-2 text-blue-400">${project.title}</h3>
+                        <p class="text-gray-400 mb-4">${project.description}</p>
+                        <div class="mt-auto">
+                            <div class="flex items-center justify-between text-gray-500">
+                                <div class="flex space-x-2">
+                                    ${techSpans}
+                                </div>
+                                <div class="flex space-x-4">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex space-x-4">
-                            <i class="fas fa-link"></i>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            projectsGrid.appendChild(card);
+                    </a>
+                `;
+            }
         });
+
+        animateProjectCards(); // This function will be created in the next step
+
     } catch (e) {
-        console.error('A critical exception occurred in loadProjects:', e);
-        projectsGrid.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load projects. Please try again later.</p>';
+        console.error('Error loading projects:', e);
+        projectsGrid.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load projects.</p>';
     }
+};
+
+// --- GSAP Animations ---
+const animateProjectCards = () => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Set the initial state of the cards (invisible and slightly moved down)
+    gsap.set(".project-card", { y: 50, opacity: 0 });
+
+    ScrollTrigger.batch(".project-card", {
+        start: "top 80%", // Trigger when the top of the card hits 80% from the top of the viewport
+        onEnter: batch => {
+            gsap.to(batch, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: "power3.out"
+            });
+        },
+        once: true // Only run the animation once
+    });
 };
 
 
@@ -150,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
     navSlide();
     smoothScroll();
     setDynamicYear();
-    AOS.init();
     initTracker();
     loadProjects();
 });
