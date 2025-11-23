@@ -49,22 +49,34 @@
             margin-left: 0.5rem;
             cursor: pointer;
         }
+        /* Custom scrollbar for table */
+        .custom-scroll::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white font-sans">
 
     <!-- Login Section -->
     <div id="login-section" class="min-h-screen flex items-center justify-center">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-3xl font-bold text-center mb-6">Admin Login</h2>
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md border border-gray-700">
+            <h2 class="text-3xl font-bold text-center mb-6 text-blue-400">Admin Login</h2>
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="email" class="block mb-2 text-sm font-medium">Email</label>
-                    <input type="email" id="email" class="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none" required>
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Email</label>
+                    <input type="email" id="email" autocomplete="username" class="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
                 </div>
                 <div class="mb-6">
-                    <label for="password" class="block mb-2 text-sm font-medium">Password</label>
-                    <input type="password" id="password" class="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none" required>
+                    <label for="password" class="block mb-2 text-sm font-medium text-gray-300">Password</label>
+                    <input type="password" id="password" autocomplete="current-password" class="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition-colors duration-300">Sign In</button>
                 <p id="login-error" class="text-red-500 text-center mt-4"></p>
@@ -74,16 +86,48 @@
 
     <!-- Dashboard Section -->
     <div id="dashboard-section" class="hidden min-h-screen p-4 sm:p-8">
-        <div class="container mx-auto">
-            <header class="flex justify-between items-center mb-8">
-                <h1 class="text-4xl font-bold">Project Dashboard</h1>
-                <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300">Logout</button>
+        <div class="container mx-auto max-w-6xl">
+            <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
+                <div class="flex items-center gap-4">
+                     <img src="img/logo.jpeg" class="h-10 w-10 rounded-full" alt="logo">
+                     <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+                </div>
+                <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300 shadow-lg">Logout</button>
             </header>
 
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <!-- Stats / Visitor Logs Section -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-blue-400">Recent Visitor Logs</h2>
+                    <button id="refresh-logs-button" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-gray-300">Refresh</button>
+                </div>
+                <div class="overflow-x-auto custom-scroll">
+                    <table class="min-w-full text-left text-sm text-gray-300">
+                        <thead class="bg-gray-700 text-gray-100 uppercase font-medium">
+                            <tr>
+                                <th class="px-4 py-3 rounded-tl-lg">Time</th>
+                                <th class="px-4 py-3">IP Address</th>
+                                <th class="px-4 py-3">Browser / OS</th>
+                                <th class="px-4 py-3 text-right rounded-tr-lg">Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitor-logs-body" class="divide-y divide-gray-700">
+                            <!-- Logs injected via JS -->
+                            <tr>
+                                <td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Projects Manager Section -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold">Manage Projects</h2>
-                    <button id="add-project-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300">Add New Project</button>
+                    <h2 class="text-2xl font-semibold text-blue-400">Manage Projects</h2>
+                    <button id="add-project-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300 shadow-lg flex items-center gap-2">
+                        <span>+</span> Add Project
+                    </button>
                 </div>
                 <div id="projects-list" class="space-y-4">
                     <!-- Projects will be loaded here -->
@@ -93,51 +137,51 @@
     </div>
 
     <!-- Add/Edit Project Modal -->
-    <div id="project-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div class="modal-container bg-gray-800 w-full max-w-2xl mx-auto rounded-lg shadow-lg z-50 overflow-y-auto">
+    <div id="project-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="modal-container bg-gray-800 w-full max-w-2xl mx-auto rounded-lg shadow-2xl z-50 overflow-y-auto border border-gray-700">
             <div class="modal-content py-4 text-left px-6">
                 <!--Title-->
-                <div class="flex justify-between items-center pb-3">
-                    <p id="modal-title" class="text-2xl font-bold">Add Project</p>
-                    <button id="modal-close" class="modal-close cursor-pointer z-50">
-                        <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                <div class="flex justify-between items-center pb-3 border-b border-gray-700">
+                    <p id="modal-title" class="text-2xl font-bold text-blue-400">Add Project</p>
+                    <button id="modal-close" class="modal-close cursor-pointer z-50 text-gray-400 hover:text-white">
+                        <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18">
                             <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
                         </svg>
                     </button>
                 </div>
 
                 <!--Body-->
-                <form id="project-form">
+                <form id="project-form" class="mt-4">
                     <input type="hidden" id="project-id">
                     <div class="mb-4">
-                        <label for="title" class="block text-sm font-medium mb-1">Title</label>
-                        <input type="text" id="title" class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none" required>
+                        <label for="title" class="block text-sm font-medium mb-1 text-gray-300">Title</label>
+                        <input type="text" id="title" class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
                     </div>
                     <div class="mb-4">
-                        <label for="url" class="block text-sm font-medium mb-1">URL</label>
-                        <input type="url" id="url" class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none" required>
+                        <label for="url" class="block text-sm font-medium mb-1 text-gray-300">URL</label>
+                        <input type="url" id="url" class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
                     </div>
                     <div class="mb-4">
-                        <label for="description" class="block text-sm font-medium mb-1">Description</label>
-                        <textarea id="description" rows="4" class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none" required></textarea>
+                        <label for="description" class="block text-sm font-medium mb-1 text-gray-300">Description</label>
+                        <textarea id="description" rows="4" class="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required></textarea>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1">Technologies</label>
+                        <label class="block text-sm font-medium mb-1 text-gray-300">Technologies</label>
                         <div class="multi-select-container">
-                            <div id="selected-tags" class="flex flex-wrap items-center p-2 bg-gray-700 rounded border border-gray-600">
+                            <div id="selected-tags" class="flex flex-wrap items-center p-2 bg-gray-700 rounded border border-gray-600 min-h-[42px]">
                                 <!-- Selected tags will appear here -->
                             </div>
-                            <div id="tech-dropdown" class="multi-select-menu hidden">
+                            <div id="tech-dropdown" class="multi-select-menu hidden shadow-xl">
                                 <!-- Options will be populated by JS -->
                             </div>
                         </div>
-                        <input type="text" id="new-tech-input" class="w-full mt-2 p-2 bg-gray-700 rounded border border-gray-600" placeholder="Add a new technology and press Enter">
+                        <input type="text" id="new-tech-input" class="w-full mt-2 p-2 bg-gray-700 rounded border border-gray-600 text-sm text-white focus:border-blue-500 focus:outline-none" placeholder="Type new tech and press Enter">
                     </div>
 
                     <!--Footer-->
-                    <div class="flex justify-end pt-2">
-                        <button type="button" id="modal-cancel" class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-600 hover:text-indigo-400 mr-2">Cancel</button>
-                        <button type="submit" class="px-4 bg-blue-600 p-3 rounded-lg text-white hover:bg-blue-700">Save Project</button>
+                    <div class="flex justify-end pt-4 border-t border-gray-700">
+                        <button type="button" id="modal-cancel" class="px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white mr-2 transition-colors">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-colors shadow-lg">Save Project</button>
                     </div>
                 </form>
             </div>
