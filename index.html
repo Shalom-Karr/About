@@ -29,6 +29,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/typeit@8.7.0/dist/index.umd.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
     <header class="bg-gray-800 text-white p-4 fixed w-full z-10">
@@ -55,7 +56,9 @@
         <section id="hero" class="pt-20" data-aos="fade-in">
             <div class="container mx-auto text-center py-20">
                 <h1 class="text-5xl font-bold" data-aos="fade-down" data-aos-delay="200">Shalom Karr</h1>
-                <p class="text-2xl mt-4" data-aos="fade-down" data-aos-delay="400">Building Practical & Engaging Web Applications</p>
+                <p class="text-2xl mt-4" data-aos="fade-down" data-aos-delay="400">
+                    <span id="typed"></span>
+                </p>
                 <p class="mt-4 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="600">
                     I transform ideas into functional, user-friendly digital experiences.
                     From robust backend logic with Supabase to dynamic frontend interfaces with JavaScript,
@@ -109,75 +112,9 @@
         </section>
         <section id="projects" class="py-20" data-aos="fade-up">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl font-bold text-center mb-12">Projects</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Multi-Platform Content Dashboard</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Multi-Platform Content Dashboard</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive dashboard for managing media embeds from YouTube, Spotify, and TikTok. Features API-driven search, direct link submission, and content deletion, with all data managed through a Supabase backend.</p>
-                            <a href="https://skvideos.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Vimeo Video Manager</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Vimeo Video Manager</h3>
-                            <p class="text-gray-400 mb-4">A focused tool for managing a collection of Vimeo video embeds. Users can add videos by URL and delete existing entries, with all links stored and managed via a Supabase backend.</p>
-                            <a href="https://skvimeo.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">SK News Community Platform</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">SK News Community Platform</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive news and community platform featuring real-time news updates via a Supabase-powered live feed, multiple topic-specific SMS/GroupMe chat groups, and an admin panel for content management.</p>
-                            <a href="https://sk-news.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="400">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Khal Yereim Community Site</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Khal Yereim Community Site</h3>
-                            <p class="text-gray-400 mb-4">A comprehensive community portal for a local synagogue, built with Supabase and vanilla JavaScript. Features include a dynamic PDF schedule viewer, an archive system, a Mikvah pass activation form, and a full admin dashboard for content management.</p>
-                            <a href="https://khalyereim.com" target="_blank" class="text-blue-500 hover:underline">Live Site</a>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="500">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">Cleveland Marketplace</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">Cleveland Marketplace</h3>
-                            <p class="text-gray-400 mb-4">A full-featured local marketplace application enabling users to buy and sell items. Includes user authentication (with 2FA), item posting/management, search, commenting, and direct messaging with file attachments and reactions.</p>
-                            <a href="https://clemarket.netlify.app" target="_blank" class="text-blue-500 hover:underline">Live Demo</a>
-                            <a href="https://github.com/Shalom-Karr/clevelandmarket" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="600">
-                        <div class="h-48 bg-gray-700 flex items-center justify-center">
-                            <span class="text-gray-500">GroupMe Copilot Image Bot</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">GroupMe Copilot Image Bot - Instructions</h3>
-                            <p class="text-gray-400 mb-4">A secure, gated instruction page for setting up a GroupMe bot that enhances image sharing and AI interaction. Features Supabase email/password authentication and Cloudflare Turnstile for a controlled user experience.</p>
-                            <a href="https://copilotimage.netlify.app" target="_blank" class="text-blue-500 hover:underline">View Page</a>
-                            <a href="https://github.com/Shalom-Karr/Copilot-SMS-Integration" target="_blank" class="text-blue-500 hover:underline ml-4">GitHub</a>
-                        </div>
-                    </div>
+                <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-down">Projects</h2>
+                <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project cards will be dynamically inserted here -->
                 </div>
             </div>
         </section>
@@ -202,7 +139,7 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script><script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script><script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
     <a href="#hero" id="to-top" class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-3 rounded-full hidden transition-all duration-300 transform hover:scale-110">
