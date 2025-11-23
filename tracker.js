@@ -4,6 +4,7 @@ import { supabase } from './supabase-client.js';
 // --- 1. CONFIGURATION & STATE ---
 let userIP = null;
 const startTime = new Date(); // Record the time when the script loads.
+let hasLogged = false; // Flag to ensure we only log once per session.
 
 // --- 2. DATA COLLECTION HELPERS ---
 
@@ -64,6 +65,10 @@ function getMetaData() {
  * This function is designed to be called when the page is being unloaded.
  */
 const logVisit = async () => {
+    // 1. Check if the visit has already been logged for this session.
+    if (hasLogged) return;
+    hasLogged = true; // Set the flag to prevent duplicate logs.
+
     const ip = await getIP();
 
     // Don't log if the IP couldn't be fetched.
