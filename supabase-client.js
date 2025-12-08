@@ -1,7 +1,7 @@
 // supabase-client.js
 
 // 1. Import the Supabase client library.
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/+esm';
 
 // 2. Define your Supabase project credentials.
 // IMPORTANT: Replace these with your actual Supabase URL and anon key.
