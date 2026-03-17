@@ -188,12 +188,24 @@
       </div>
 
       <div class="mb-8 slide-in-right" style="transition-delay: 100ms;">
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Archives</h3>
+        <div class="relative">
+          <select id="date-filter" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-4 pr-10 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm transition-all cursor-pointer appearance-none group-hover:bg-white dark:group-hover:bg-gray-800">
+            <option value="">All Time</option>
+            <!-- Options dynamically injected here -->
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-8 slide-in-right" style="transition-delay: 200ms;">
         <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Topics</h3>
         <div id="tag-cloud" class="flex flex-wrap gap-2">
           <!-- Tags dynamically injected here -->
         </div>
-      </div>
-    </aside>  </div>
+      </div>    </aside>  </div>
 
 
   
@@ -235,10 +247,45 @@
             ).join('');
         }
 
+        // Build Date Archives
+        const dateFilter = document.getElementById('date-filter');
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const uniqueMonths = new Set();
+        allPosts.forEach(p => {
+            const d = new Date(p.created_at);
+            uniqueMonths.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+        });
+
+        if (dateFilter) {
+            const sortedMonths = Array.from(uniqueMonths).sort().reverse();
+            sortedMonths.forEach(m => {
+                const [year, month] = m.split('-');
+                const option = document.createElement('option');
+                option.value = m;
+                option.textContent = `${monthNames[parseInt(month)-1]} ${year}`;
+                dateFilter.appendChild(option);
+            });
+            
+            const activeDate = new URLSearchParams(window.location.search).get('date');
+            if (activeDate) dateFilter.value = activeDate;
+            
+            dateFilter.addEventListener('change', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (dateFilter.value) {
+                    urlParams.set('date', dateFilter.value);
+                } else {
+                    urlParams.delete('date');
+                }
+                window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+                applyFilters();
+            });
+        }
+
         // Apply filters based on search input and URL query params
         function applyFilters() {
            const urlParams = new URLSearchParams(window.location.search);
            const activeTag = urlParams.get('tag');
+           const activeDate = urlParams.get('date');
            const query = searchInput ? searchInput.value.toLowerCase() : '';
 
            let filtered = allPosts;
@@ -256,6 +303,10 @@
                  <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">Writing</h1>
                  <p class="mt-2 text-gray-500 dark:text-gray-400 font-medium">Thoughts, tutorials, and deep dives.</p>
                `;
+           }
+
+           if (activeDate) {
+               filtered = filtered.filter(p => p.created_at.startsWith(activeDate));
            }
 
            if (query) {
