@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <title>Blog · Your Name</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          animation: {
+            'blob': 'blob 7s infinite',
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            blob: {
+              '0%': { transform: 'translate(0px, 0px) scale(1)' },
+              '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+              '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+              '100%': { transform: 'translate(0px, 0px) scale(1)' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::selection { background-color: rgba(59, 130, 246, 0.5); color: inherit; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    .glass-panel { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-right: 1px solid rgba(255, 255, 255, 0.3); }
+    .dark .glass-panel { background: rgba(17, 24, 39, 0.7); border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
+    
+    /* Post card hover effects */
+    .post-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .post-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border-color: rgba(59, 130, 246, 0.5); }
+    .dark .post-card:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); border-color: rgba(96, 165, 250, 0.5); background: rgba(31, 41, 55, 0.8); }
+    
+    /* Empty State SVG Pattern */
+    .pattern-dots {
+      background-image: radial-gradient(rgba(156, 163, 175, 0.4) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative overflow-x-hidden">
+
+  <!-- Animated Background -->
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob dark:bg-purple-900 dark:opacity-20 dark:mix-blend-screen"></div>
+    <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 dark:bg-blue-900 dark:opacity-20 dark:mix-blend-screen"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto min-h-screen lg:grid lg:grid-cols-[280px_1fr_280px] border-x border-gray-200/50 dark:border-gray-800/50 bg-white/40 dark:bg-gray-950/40 shadow-2xl relative z-0">
+    
+    <!-- Left Sidebar -->
+    <aside class="glass-panel p-8 flex flex-col items-center lg:items-start text-center lg:text-left sticky top-0 h-auto lg:h-screen lg:overflow-y-auto">
+      <img src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white dark:border-gray-800 mb-6 reveal site-avatar">
+      <h1 class="text-xl font-extrabold tracking-tight mb-2 reveal site-name">Your Name</h1>
+      
+      <nav class="flex flex-col gap-4 w-full mb-8 mt-6 reveal">
+        <a href="/" class="group flex items-center font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <span class="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg mr-3 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+          </span>
+          Profile
+        </a>
+        <a href="/blog/index.html" class="group flex items-center font-semibold text-blue-600 dark:text-blue-400">
+          <span class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+          </span>
+          Blog
+        </a>
+      </nav>
+      
+      <button id="theme-toggle" class="mt-auto w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm transition-all reveal">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        Theme
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="p-8 lg:p-14 relative z-10">
+      <header class="mb-10 reveal">
+        <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">Writing</h1>
+        <p class="mt-2 text-gray-500 dark:text-gray-400 font-medium">Thoughts, tutorials, and deep dives.</p>
+      </header>
+
+      <div id="posts-container" class="space-y-6">
+        <!-- Skeleton Loaders -->
+        <div class="animate-pulse flex flex-col gap-4 p-6 border border-gray-200 dark:border-gray-800 rounded-2xl bg-white/50 dark:bg-gray-900/50">
+          <div class="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/4"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full mt-2"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-5/6"></div>
+        </div>
+        <div class="animate-pulse flex flex-col gap-4 p-6 border border-gray-200 dark:border-gray-800 rounded-2xl bg-white/50 dark:bg-gray-900/50">
+          <div class="h-6 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/3"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full mt-2"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="hidden lg:block glass-panel border-l border-r-0 p-8 sticky top-0 h-screen overflow-y-auto">
+      <div class="mb-8 reveal">
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Search</h3>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          <input type="text" placeholder="Search articles..." class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm transition-all group-hover:bg-white dark:group-hover:bg-gray-800">
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/blog/js/supabase-client.js"></script>
+  <script src="/blog/js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const container = document.getElementById('posts-container');
+
+      if (!window.supabaseClient) {
+          container.innerHTML = '<div class="p-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl border border-red-200 dark:border-red-800"><b>Supabase Configuration Error:</b> The environment variables SUPABASE_URL and SUPABASE_ANON_KEY are missing. Please set them in your Cloudflare Pages dashboard and trigger a new build.</div>';
+          return;
+      }
+
+      try {
+        const { data: posts, error } = await window.supabaseClient
+          .from('posts')
+          .select('*')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (posts.length === 0) {
+          container.innerHTML = `
+            <div class="reveal animate-fade-in-up mt-12 mb-16 relative w-full rounded-3xl overflow-hidden bg-white/40 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 shadow-xl backdrop-blur-md flex flex-col items-center justify-center p-12 text-center group">
+              <!-- Decorative background pattern -->
+              <div class="absolute inset-0 pattern-dots opacity-20 pointer-events-none"></div>
+              
+              <!-- Floating Icon -->
+              <div class="relative mb-6 z-10 animate-float group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-blue-400/20 dark:bg-blue-500/20 rounded-full blur-xl scale-150"></div>
+                <div class="h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg flex items-center justify-center rotate-3 group-hover:rotate-12 transition-transform duration-500 border border-white/20">
+                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <h2 class="text-3xl font-extrabold tracking-tight mb-3 text-gray-900 dark:text-white z-10">Nothing here yet!</h2>
+              <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-8 z-10 font-medium">I'm currently writing the first few posts. Check back soon for fresh content and tutorials.</p>
+              
+              <!-- CTA Button -->
+              <a href="/blog/admin/index.html" class="z-10 relative inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+                Go to Dashboard
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = posts.map(post => {
+          const tagsHtml = post.tags && post.tags.length > 0 
+            ? post.tags.map(t => `<span class="bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2 py-0.5 rounded-full">${t}</span>`).join(' ')
+            : '';
+
+          return `
+          <article class="post-card reveal bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700/80 rounded-2xl p-6 relative overflow-hidden group">
+            <a href="/blog/post.html?slug=${post.slug}" class="absolute inset-0 z-10"></a>
+            
+            <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium mb-3">
+              <time datetime="${post.created_at}">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
+              ${tagsHtml ? `<div class="flex gap-1.5 z-20 relative">${tagsHtml}</div>` : ''}
+            </div>
+
+            <h2 class="text-2xl font-bold tracking-tight mb-3 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              ${post.title}
+            </h2>
+            
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-2">
+              ${post.excerpt || "Click to read the full article..."}
+            </p>
+            
+            <div class="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
+              Read article <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </div>
+          </article>
+        `}).join('');
+
+        // Re-initialize animations for dynamically added content
+        if (window.initScrollAnimations) window.initScrollAnimations();
+
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+        container.innerHTML = '<div class="p-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl border border-red-200 dark:border-red-800">Failed to load posts. Have you configured Supabase?</div>';
+      }
+    });
+  </script>
+</body>
+</html>

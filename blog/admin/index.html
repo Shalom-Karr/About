@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* Basic overrides for EasyMDE dark mode compatibility */
+    .dark .editor-toolbar { background: #374151; border-color: #4B5563; }
+    .dark .editor-toolbar button { color: #D1D5DB; }
+    .dark .editor-toolbar button:hover { background: #4B5563; }
+    .dark .CodeMirror { background: #1F2937; color: #F3F4F6; border-color: #4B5563; }
+    .dark .editor-statusbar { color: #9CA3AF; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 h-screen overflow-hidden flex flex-col">
+
+  <!-- Top bar -->
+  <header class="bg-white dark:bg-gray-800 shadow px-6 py-3 flex justify-between items-center z-10">
+    <h1 class="font-bold text-xl">Blog Admin</h1>
+    <div id="user-controls" class="hidden flex items-center gap-4">
+      <span id="user-mode-label" class="text-sm font-medium"></span>
+      <button onclick="logout()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-bold transition-colors">Log Out</button>
+    </div>
+  </header>
+
+  <!-- Login Section -->
+  <div id="login-section" class="flex-1 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">Log In</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-bold mb-1">Email</label>
+          <input type="email" id="email" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none" placeholder="admin@example.com">
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-1">Password</label>
+          <input type="password" id="password" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none" placeholder="••••••••">
+        </div>
+        <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">Log In securely</button>
+        <p id="login-msg" class="text-red-500 text-sm text-center h-4"></p>
+        
+        <div class="border-t dark:border-gray-700 my-4 pt-4">
+          <button onclick="devLogin()" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 px-4 rounded transition-colors">Enter Dev Mode (Mock Login)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div id="dashboard-section" class="hidden flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 border-r dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col h-full shrink-0">
+      <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center">
+        <h2 class="font-bold text-gray-500 uppercase text-xs tracking-wider">Menu</h2>
+        <button onclick="newPost()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded" title="New Post">New Post</button>
+      </div>
+      <div class="p-2 border-b dark:border-gray-700 flex flex-col gap-1">
+        <button onclick="switchTab('editor')" id="tab-editor" class="text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300">Editor</button>
+        <button onclick="switchTab('settings')" id="tab-settings" class="text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium">Settings</button>
+      </div>
+      <div id="post-list" class="flex-1 overflow-y-auto">
+        <!-- Posts injected here -->
+      </div>
+    </aside>
+    
+    <!-- Editor Tab -->
+    <main id="editor-view" class="flex-1 overflow-y-auto p-6 lg:p-10 bg-gray-50 dark:bg-gray-900">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 id="editor-title" class="text-2xl font-bold">Create New Post</h2>
+          <button onclick="submitPost()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold transition-colors">Save Post</button>
+        </div>
+        <p id="post-msg" class="text-sm h-4"></p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold mb-1">Title</label>
+            <input type="text" id="post-title" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="My Awesome Post">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-1">Slug (URL friendly)</label>
+            <input type="text" id="post-slug" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="my-awesome-post">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold mb-1">Excerpt</label>
+          <input type="text" id="post-excerpt" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="A short summary...">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-bold mb-1">Tags (comma separated)</label>
+          <input type="text" id="post-tags" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="code, life, python">
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold mb-1">Content (Markdown)</label>
+          <textarea id="post-content"></textarea>
+        </div>
+
+        <div class="flex items-center gap-2 pb-10">
+          <input type="checkbox" id="post-published" class="w-4 h-4">
+          <label for="post-published" class="font-bold cursor-pointer">Published</label>
+        </div>
+      </div>
+    </main>
+
+    <!-- Settings Tab -->
+    <main id="settings-view" class="hidden flex-1 overflow-y-auto p-6 lg:p-10 bg-gray-50 dark:bg-gray-900">
+      <div class="max-w-2xl mx-auto space-y-6">
+        <div class="flex justify-between items-center border-b dark:border-gray-700 pb-4">
+          <h2 class="text-2xl font-bold">Site Settings</h2>
+          <button onclick="saveSettings()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold transition-colors">Save Settings</button>
+        </div>
+        <p id="settings-msg" class="text-sm h-4"></p>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-bold mb-1">Display Name</label>
+            <input type="text" id="setting-name" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Your Name">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-1">Avatar URL</label>
+            <input type="text" id="setting-avatar" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://example.com/avatar.jpg">
+          </div>
+          <div>
+            <label class="block text-sm font-bold mb-1">Bio</label>
+            <textarea id="setting-bio" rows="4" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Full-stack developer..."></textarea>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/blog/js/supabase-client.js"></script>
+  <script src="/blog/js/app.js"></script>
+  <script>
+    let isDevMode = false;
+    let currentPostId = null;
+    let easyMDE = null;
+    let allPosts = [];
+    let mockSettings = { name: "Your Name", bio: "Full-stack developer building cool things on the internet.", avatar_url: "https://via.placeholder.com/150" };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Initialize EasyMDE
+      easyMDE = new EasyMDE({
+        element: document.getElementById('post-content'),
+        spellChecker: false,
+        status: false,
+        minHeight: "400px"
+      });
+
+      // Check auth session
+      if (window.supabaseClient) {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+          showDashboard(false);
+        }
+      }
+    });
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('login-msg');
+      msg.innerText = "Logging in...";
+      
+      const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        msg.innerText = error.message;
+      } else {
+        msg.innerText = "";
+        showDashboard(false);
+      }
+    }
+
+    function devLogin() {
+      isDevMode = true;
+      showDashboard(true);
+    }
+
+    async function logout() {
+      if (!isDevMode) await window.supabaseClient.auth.signOut();
+      isDevMode = false;
+      document.getElementById('dashboard-section').classList.add('hidden');
+      document.getElementById('dashboard-section').classList.remove('flex');
+      document.getElementById('login-section').classList.remove('hidden');
+      document.getElementById('user-controls').classList.add('hidden');
+    }
+
+    async function showDashboard(devMode = false) {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('dashboard-section').classList.remove('hidden');
+      document.getElementById('dashboard-section').classList.add('flex');
+      
+      const controls = document.getElementById('user-controls');
+      controls.classList.remove('hidden');
+      document.getElementById('user-mode-label').innerText = devMode ? 'DEV MODE' : 'Admin';
+      
+      await loadPosts();
+      await fetchSettings();
+    }
+
+    function switchTab(tab) {
+      document.getElementById('editor-view').classList.toggle('hidden', tab !== 'editor');
+      document.getElementById('settings-view').classList.toggle('hidden', tab !== 'settings');
+      
+      const tEditor = document.getElementById('tab-editor');
+      const tSettings = document.getElementById('tab-settings');
+      
+      if (tab === 'editor') {
+        tEditor.className = "text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300";
+        tSettings.className = "text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium";
+      } else {
+        tSettings.className = "text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300";
+        tEditor.className = "text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium";
+      }
+    }
+
+    async function loadPosts() {
+      if (isDevMode) {
+        allPosts = [
+          { id: 'dev-1', title: 'Test Post 1', slug: 'test-1', excerpt: 'Excerpt', content_md: '# Hello\\n\\nThis is a mock post.', is_published: true, tags: ['test'] },
+          { id: 'dev-2', title: 'Draft Post', slug: 'draft', excerpt: 'Draft', content_md: 'Drafting...', is_published: false, tags: [] }
+        ];
+        renderPostList();
+        return;
+      }
+
+      const { data, error } = await window.supabaseClient
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        allPosts = data;
+        renderPostList();
+      } else if (error) {
+        console.error("Error loading posts:", error);
+      }
+    }
+
+    function renderPostList() {
+      const list = document.getElementById('post-list');
+      list.innerHTML = '';
+      allPosts.forEach((p, index) => {
+        const div = document.createElement('div');
+        div.className = `p-4 border-b dark:border-gray-700 cursor-pointer transition-colors ${currentPostId === p.id ? 'bg-blue-50 dark:bg-blue-900' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`;
+        div.innerHTML = `
+          <h3 class="font-bold text-sm truncate">${p.title}</h3>
+          <p class="text-xs text-gray-500 mt-1">${p.is_published ? '<span class="text-green-600 dark:text-green-400">Published</span>' : '<span class="text-yellow-600 dark:text-yellow-400">Draft</span>'}</p>
+        `;
+        div.onclick = () => { editPost(index); switchTab('editor'); };
+        list.appendChild(div);
+      });
+    }
+
+    function newPost() {
+      currentPostId = null;
+      document.getElementById('editor-title').innerText = "Create New Post";
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-slug').value = '';
+      document.getElementById('post-excerpt').value = '';
+      document.getElementById('post-tags').value = '';
+      easyMDE.value('');
+      document.getElementById('post-published').checked = false;
+      document.getElementById('post-msg').innerText = '';
+      renderPostList(); // Clear active state
+      switchTab('editor');
+    }
+
+    function editPost(index) {
+      const post = allPosts[index];
+      currentPostId = post.id;
+      document.getElementById('editor-title').innerText = "Edit Post";
+      document.getElementById('post-title').value = post.title;
+      document.getElementById('post-slug').value = post.slug;
+      document.getElementById('post-excerpt').value = post.excerpt || '';
+      document.getElementById('post-tags').value = (post.tags || []).join(', ');
+      easyMDE.value(post.content_md);
+      document.getElementById('post-published').checked = post.is_published;
+      document.getElementById('post-msg').innerText = '';
+      renderPostList(); // Update active state
+    }
+
+    function showMsg(id, text, type = 'success') {
+      const msg = document.getElementById(id);
+      msg.innerText = text;
+      msg.className = `text-sm h-4 ${type === 'error' ? 'text-red-600' : 'text-green-600'}`;
+      setTimeout(() => msg.innerText = '', 3000);
+    }
+
+    async function submitPost() {
+      const title = document.getElementById('post-title').value.trim();
+      const slug = document.getElementById('post-slug').value.trim();
+      const excerpt = document.getElementById('post-excerpt').value.trim();
+      const tagsRaw = document.getElementById('post-tags').value;
+      const content_md = easyMDE.value().trim();
+      const is_published = document.getElementById('post-published').checked;
+
+      if (!title || !slug || !content_md) {
+        showMsg("post-msg", "Title, Slug, and Content are required.", "error");
+        return;
+      }
+
+      const tagsArray = tagsRaw.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      const postData = { title, slug, excerpt, content_md, tags: tagsArray, is_published };
+
+      if (isDevMode) {
+        if (currentPostId) {
+          const idx = allPosts.findIndex(p => p.id === currentPostId);
+          allPosts[idx] = { ...allPosts[idx], ...postData };
+        } else {
+          const newMock = { id: 'dev-' + Date.now(), ...postData };
+          allPosts.unshift(newMock);
+          currentPostId = newMock.id;
+        }
+        renderPostList();
+        showMsg("post-msg", "Saved locally in Dev Mode!");
+        return;
+      }
+
+      let error;
+      if (currentPostId) {
+        const res = await window.supabaseClient.from('posts').update(postData).eq('id', currentPostId);
+        error = res.error;
+      } else {
+        const res = await window.supabaseClient.from('posts').insert([postData]).select();
+        error = res.error;
+        if (res.data && res.data.length > 0) {
+          currentPostId = res.data[0].id;
+        }
+      }
+
+      if (error) {
+        showMsg("post-msg", "Error: " + error.message, "error");
+      } else {
+        showMsg("post-msg", "Post saved successfully!");
+        document.getElementById('editor-title').innerText = "Edit Post";
+        await loadPosts();
+      }
+    }
+
+    async function fetchSettings() {
+      if (isDevMode) {
+        document.getElementById('setting-name').value = mockSettings.name;
+        document.getElementById('setting-bio').value = mockSettings.bio;
+        document.getElementById('setting-avatar').value = mockSettings.avatar_url;
+        return;
+      }
+      const { data, error } = await window.supabaseClient.from('site_settings').select('*').eq('id', 1).single();
+      if (data) {
+        document.getElementById('setting-name').value = data.name;
+        document.getElementById('setting-bio').value = data.bio;
+        document.getElementById('setting-avatar').value = data.avatar_url || '';
+      }
+    }
+
+    async function saveSettings() {
+      const name = document.getElementById('setting-name').value.trim();
+      const bio = document.getElementById('setting-bio').value.trim();
+      const avatar_url = document.getElementById('setting-avatar').value.trim();
+
+      if (isDevMode) {
+        mockSettings = { name, bio, avatar_url };
+        showMsg("settings-msg", "Settings updated locally!");
+        return;
+      }
+
+      const { error } = await window.supabaseClient.from('site_settings').upsert({ id: 1, name, bio, avatar_url });
+      if (error) {
+        showMsg("settings-msg", "Error: " + error.message, "error");
+      } else {
+        showMsg("settings-msg", "Settings saved successfully!");
+      }
+    }
+  </script>
+</body>
+</html>
