@@ -273,37 +273,111 @@
             </div>
         </section>
 
-        <section id="skills" class="py-20 bg-gray-800">
-            <div class="container mx-auto px-4">
-                <h2 class="section-title text-4xl font-bold text-center mb-16 opacity-0 text-blue-400">My Technical Arsenal</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                    <!-- Core Frontend -->
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-yellow-500 hover:text-gray-900 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">JavaScript (ES6+)</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-400 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Tailwind CSS</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-orange-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">HTML5 / CSS3</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-purple-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Vite</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Alpine.js</div>
+        <section id="skills" class="py-24 bg-gray-850 relative overflow-hidden border-t border-gray-800">
+            <!-- Subtle Background Gradients -->
+            <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
-                    <!-- Backend & Infrastructure -->
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-green-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Supabase</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">PostgreSQL</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-green-600 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Node.js</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-400 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Python</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-red-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">NPM</div>
+            <div class="container mx-auto px-4 relative z-10 max-w-6xl">
+                <div class="text-center mb-16 opacity-0 translate-y-10" id="skills-header">
+                    <h2 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mb-4 inline-block">My Technical Arsenal</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto text-lg">The tools, languages, and frameworks I use to engineer robust digital solutions.</p>
+                </div>
+                
+                <!-- BENTO BOX GRID -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 auto-rows-fr">
+                    
+                    <!-- JavaScript (Wide Card) -->
+                    <div class="skill-card spotlight-card tilt-card col-span-2 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#F7DF1E]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#F7DF1E]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-javascript-plain colored text-6xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#F7DF1E] transition-colors relative z-10">JavaScript</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10">ES6+, Async, DOM</span>
+                    </div>
+                    
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#06B6D4]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#06B6D4]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-tailwindcss-original colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#06B6D4] transition-colors text-sm relative z-10">Tailwind</span>
+                    </div>
 
-                    <!-- Cloud & Integrations -->
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-yellow-400 hover:text-gray-900 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Google Cloud (GCP)</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Google Apps Script</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-indigo-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">OAuth 2.0 Auth</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-gray-900 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">REST API Design</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-red-400 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">SMTP Integration</div>
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#E34F26]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#E34F26]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-html5-plain colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#E34F26] transition-colors text-sm relative z-10">HTML/CSS</span>
+                    </div>
 
-                    <!-- Architecture & Domains -->
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-purple-600 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">E-Commerce Platforms</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-blue-600 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Serverless Architecture</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-teal-500 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Web Security (RLS)</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-indigo-600 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">UI/UX Principles</div>
-                    <div class="skill-card opacity-0 scale-90 bg-gray-700 p-6 rounded-xl text-center hover:bg-gray-800 font-semibold transition-all duration-300 cursor-default shadow-lg hover:-translate-y-2">Git & GitHub</div>
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#646CFF]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#646CFF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-vitejs-plain colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#646CFF] transition-colors text-sm relative z-10">Vite</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#8DD6F9]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#8DD6F9]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-alpinejs-original colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#8DD6F9] transition-colors text-sm relative z-10">Alpine.js</span>
+                    </div>
+
+                    <!-- Supabase (Wide Card) -->
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-4 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#3ECF8E]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#3ECF8E]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-supabase-plain colored text-6xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#3ECF8E] transition-colors relative z-10">Supabase</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10">Database, Auth, Storage, Edge</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#4169E1]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#4169E1]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-postgresql-plain colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#4169E1] transition-colors text-sm relative z-10">PostgreSQL</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#339933]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#339933]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-nodejs-plain-wordmark colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#339933] transition-colors text-sm relative z-10">Node.js</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#3776AB]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#3776AB]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-python-plain colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#3776AB] transition-colors text-sm relative z-10">Python</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#CB3837]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#CB3837]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-npm-original-wordmark colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#CB3837] transition-colors text-sm relative z-10">NPM</span>
+                    </div>
+
+                    <!-- Cloud (Wide Card) -->
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-4 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#4285F4]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#4285F4]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-googlecloud-plain colored text-6xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#4285F4] transition-colors relative z-10">Google Cloud</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10">APIs & Infrastructure</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#F05032]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#F05032]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <svg class="w-12 h-12 mb-3 text-[#F05032] grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#F05032] transition-colors text-sm relative z-10">Security</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-2 lg:col-span-1 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#ffffff]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#ffffff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <i class="devicon-github-original colored text-5xl mb-3 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10"></i>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#ffffff] transition-colors text-sm relative z-10">GitHub</span>
+                    </div>
+
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-4 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#FFB13B]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#FFB13B]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <svg class="w-12 h-12 mb-3 text-[#FFB13B] grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 drop-shadow-md relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#FFB13B] transition-colors relative z-10">Serverless Architecture</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10">Edge Computing & BaaS</span>
+                    </div>
+
                 </div>
             </div>
         </section>
