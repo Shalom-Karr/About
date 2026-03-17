@@ -154,7 +154,7 @@
 
     <!-- Main Content -->
     <main class="p-8 lg:p-14 relative z-10">
-      <header class="mb-10 reveal">
+      <header id="blog-header" class="mb-10 reveal">
         <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">Writing</h1>
         <p class="mt-2 text-gray-500 dark:text-gray-400 font-medium">Thoughts, tutorials, and deep dives.</p>
       </header>
@@ -183,18 +183,29 @@
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
             <svg class="h-4 w-4 group-focus-within:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
-          <input type="text" placeholder="Search articles..." class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm transition-all group-hover:bg-white dark:group-hover:bg-gray-800">
+          <input type="text" id="search-input" placeholder="Search articles..." class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm transition-all group-hover:bg-white dark:group-hover:bg-gray-800">
         </div>
       </div>
-    </aside>
-  </div>
+
+      <div class="mb-8 slide-in-right" style="transition-delay: 100ms;">
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Topics</h3>
+        <div id="tag-cloud" class="flex flex-wrap gap-2">
+          <!-- Tags dynamically injected here -->
+        </div>
+      </div>
+    </aside>  </div>
 
 
   
   <script type="module">import { supabase } from "/supabase-client.js"; window.supabaseClient = supabase;</script><script src="/blog/js/app.js"></script>
   <script>
+    let allPosts = [];
+
     document.addEventListener("DOMContentLoaded", async () => {
       const container = document.getElementById('posts-container');
+      const searchInput = document.getElementById('search-input');
+      const tagCloudContainer = document.getElementById('tag-cloud');
+      const headerBlock = document.getElementById('blog-header');
 
       if (!window.supabaseClient) {
           container.innerHTML = '<div class="p-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl border border-red-200 dark:border-red-800"><b>Supabase Configuration Error:</b> The environment variables SUPABASE_URL and SUPABASE_ANON_KEY are missing. Please set them in your Cloudflare Pages dashboard and trigger a new build.</div>';
@@ -209,65 +220,106 @@
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        allPosts = posts || [];
 
-        if (posts.length === 0) {
-          container.innerHTML = `
-            <div class="reveal animate-fade-in-up mt-12 mb-16 relative w-full rounded-3xl overflow-hidden bg-white/40 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 shadow-xl backdrop-blur-md flex flex-col items-center justify-center p-12 text-center group">
-              <!-- Decorative background pattern -->
-              <div class="absolute inset-0 pattern-dots opacity-20 pointer-events-none"></div>
-              
-              <!-- Floating Icon -->
-              <div class="relative mb-6 z-10 animate-float group-hover:scale-110 transition-transform duration-500">
-                <div class="absolute inset-0 bg-blue-400/20 dark:bg-blue-500/20 rounded-full blur-xl scale-150"></div>
-                <div class="h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg flex items-center justify-center rotate-3 group-hover:rotate-12 transition-transform duration-500 border border-white/20">
-                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                </div>
-              </div>
+        // Build Tag Cloud
+        const tagCounts = {};
+        allPosts.forEach(p => {
+            if(p.tags) p.tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+        });
 
-              <!-- Content -->
-              <h2 class="text-3xl font-extrabold tracking-tight mb-3 text-gray-900 dark:text-white z-10">Nothing here yet!</h2>
-              <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-8 z-10 font-medium">I'm currently writing the first few posts. Check back soon for fresh content and tutorials.</p>
-              
-              <!-- CTA Button -->
-              <a href="/blog/admin/index.html" class="z-10 relative inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
-                Go to Dashboard
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </a>
-            </div>
-          `;
-          return;
+        const sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]);
+        if(tagCloudContainer) {
+            tagCloudContainer.innerHTML = sortedTags.map(t => 
+                `<a href="?tag=${encodeURIComponent(t)}" class="text-xs font-semibold bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full hover:bg-purple-500 hover:border-purple-400 hover:text-white dark:hover:bg-purple-500 dark:hover:border-purple-400 dark:hover:text-white transition-all transform hover:scale-105 inline-flex items-center gap-2">${t} <span class="opacity-50 text-[10px]">${tagCounts[t]}</span></a>`
+            ).join('');
         }
 
-        container.innerHTML = posts.map(post => {
-          const tagsHtml = post.tags && post.tags.length > 0 
-            ? post.tags.map(t => `<span class="bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2 py-0.5 rounded-full">${t}</span>`).join(' ')
-            : '';
+        // Apply filters based on search input and URL query params
+        function applyFilters() {
+           const urlParams = new URLSearchParams(window.location.search);
+           const activeTag = urlParams.get('tag');
+           const query = searchInput ? searchInput.value.toLowerCase() : '';
 
-          return `
-          <article class="post-card reveal bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700/80 rounded-2xl p-6 relative overflow-hidden group">
-            <a href="/blog/post.html?slug=${post.slug}" class="absolute inset-0 z-10"></a>
-            
-            <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium mb-3">
-              <time datetime="${post.created_at}">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
-              ${tagsHtml ? `<div class="flex gap-1.5 z-20 relative">${tagsHtml}</div>` : ''}
-            </div>
+           let filtered = allPosts;
 
-            <h2 class="text-2xl font-bold tracking-tight mb-3 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              ${post.title}
-            </h2>
-            
-            <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-2">
-              ${post.excerpt || "Click to read the full article..."}
-            </p>
-            
-            <div class="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
-              Read article <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-            </div>
-          </article>
-        `}).join('');
+           if (activeTag) {
+               filtered = filtered.filter(p => p.tags && p.tags.includes(activeTag));
+               if(headerBlock) {
+                 headerBlock.innerHTML = `
+                   <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">#${activeTag}</h1>
+                   <p class="mt-2 text-gray-500 dark:text-gray-400 font-medium">Showing articles tagged with "${activeTag}". <a href="/blog/" class="text-purple-500 hover:underline ml-2 font-bold">Clear filter &times;</a></p>
+                 `;
+               }
+           } else if (headerBlock) {
+               headerBlock.innerHTML = `
+                 <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">Writing</h1>
+                 <p class="mt-2 text-gray-500 dark:text-gray-400 font-medium">Thoughts, tutorials, and deep dives.</p>
+               `;
+           }
 
-        // Re-initialize animations for dynamically added content
-        if (window.initScrollAnimations) window.initScrollAnimations();
+           if (query) {
+               filtered = filtered.filter(p => 
+                   p.title.toLowerCase().includes(query) || 
+                   (p.excerpt && p.excerpt.toLowerCase().includes(query)) ||
+                   (p.content_md && p.content_md.toLowerCase().includes(query))
+               );
+           }
+
+           renderPosts(filtered);
+        }
+
+        function renderPosts(filteredPosts) {
+          if (filteredPosts.length === 0) {
+            container.innerHTML = `
+              <div class="reveal animate-fade-in-up mt-12 mb-16 relative w-full rounded-3xl overflow-hidden bg-white/40 dark:bg-gray-900/40 border border-gray-200/60 dark:border-gray-800/60 shadow-xl backdrop-blur-md flex flex-col items-center justify-center p-12 text-center group">
+                <div class="absolute inset-0 pattern-dots opacity-20 pointer-events-none"></div>
+                <h2 class="text-3xl font-extrabold tracking-tight mb-3 text-gray-900 dark:text-white z-10">Nothing found!</h2>
+                <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-8 z-10 font-medium">We couldn't find any articles matching your search criteria.</p>
+                <a href="/blog/" class="z-10 relative inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-purple-600 rounded-xl hover:bg-purple-500 hover:-translate-y-1 hover:shadow-lg">
+                  Clear Filters
+                </a>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = filteredPosts.map(post => {
+            const tagsHtml = post.tags && post.tags.length > 0 
+              ? post.tags.map(t => `<a href="?tag=${encodeURIComponent(t)}" class="bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2 py-0.5 rounded-full hover:bg-purple-100 hover:text-purple-600 hover:border-purple-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-300 dark:hover:border-purple-700 transition-colors z-20 relative cursor-pointer">${t}</a>`).join(' ')
+              : '';
+
+            return `
+            <article class="post-card reveal bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700/80 rounded-2xl p-6 relative overflow-hidden group">
+              <a href="/blog/post.html?slug=${post.slug}" class="absolute inset-0 z-10"></a>
+
+              <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium mb-3">
+                <time datetime="${post.created_at}">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
+                ${tagsHtml ? `<div class="flex gap-1.5 z-20 relative">${tagsHtml}</div>` : ''}
+              </div>
+
+              <h2 class="text-2xl font-bold tracking-tight mb-3 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                ${post.title}
+              </h2>
+
+              <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-2">
+                ${post.excerpt || "Click to read the full article..."}
+              </p>
+
+              <div class="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
+                Read article <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+              </div>
+            </article>
+          `}).join('');
+
+          if (window.initScrollAnimations) window.initScrollAnimations();
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applyFilters);
+        }
+
+        applyFilters();
 
       } catch (err) {
         console.error('Error fetching posts:', err);
