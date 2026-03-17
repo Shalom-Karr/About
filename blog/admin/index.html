@@ -12,7 +12,7 @@
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
   <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     /* Basic overrides for EasyMDE dark mode compatibility */
     .dark .editor-toolbar { background: #374151; border-color: #4B5563; }
@@ -66,7 +66,7 @@
       </div>
       <div class="p-2 border-b dark:border-gray-700 flex flex-col gap-1">
         <button onclick="switchTab('editor')" id="tab-editor" class="text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300">Editor</button>
-        <button onclick="switchTab('settings')" id="tab-settings" class="text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium">Settings</button>
+        
       </div>
       <div id="post-list" class="flex-1 overflow-y-auto">
         <!-- Posts injected here -->
@@ -127,7 +127,7 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-bold mb-1">Display Name</label>
-            <input type="text" id="setting-name" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Your Name">
+            <input type="text" id="setting-name" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Shalom Karr">
           </div>
           <div>
             <label class="block text-sm font-bold mb-1">Avatar URL</label>
@@ -143,15 +143,15 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/blog/js/supabase-client.js"></script>
-  <script src="/blog/js/app.js"></script>
+
+  
+  <script type="module">import { supabase } from "/supabase-client.js"; window.supabaseClient = supabase;</script><script src="/blog/js/app.js"></script>
   <script>
     let isDevMode = false;
     let currentPostId = null;
     let easyMDE = null;
     let allPosts = [];
-    let mockSettings = { name: "Your Name", bio: "Full-stack developer building cool things on the internet.", avatar_url: "https://via.placeholder.com/150" };
+    let mockSettings = { name: "Shalom Karr", bio: "Full-stack developer building cool things on the internet.", avatar_url: "https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" };
 
     document.addEventListener("DOMContentLoaded", async () => {
       // Initialize EasyMDE
