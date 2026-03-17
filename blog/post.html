@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <title>Post · Your Name</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { 
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'] 
+          },
+          typography: (theme) => ({
+            DEFAULT: {
+              css: {
+                'code::before': { content: '""' },
+                'code::after': { content: '""' },
+                code: {
+                  backgroundColor: theme('colors.gray.100'),
+                  padding: '0.2em 0.4em',
+                  borderRadius: '0.375rem',
+                  fontWeight: '500',
+                },
+                'pre code': { backgroundColor: 'transparent', padding: '0' },
+                a: { color: theme('colors.blue.600'), '&:hover': { color: theme('colors.blue.800') } },
+              }
+            },
+            invert: {
+              css: {
+                code: { backgroundColor: theme('colors.gray.800') },
+                a: { color: theme('colors.blue.400'), '&:hover': { color: theme('colors.blue.300') } },
+              }
+            }
+          })
+        }
+      }
+    }
+  </script>
+  <style>
+    ::selection { background-color: rgba(59, 130, 246, 0.5); color: inherit; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    .glass-panel { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-right: 1px solid rgba(255, 255, 255, 0.3); }
+    .dark .glass-panel { background: rgba(17, 24, 39, 0.7); border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    
+    /* Progress Bar */
+    #progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; z-index: 100; background: transparent; }
+    #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.1s ease; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+  </style>
+
+  <!-- Highlight.js for Code Snippets -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative">
+
+  <!-- Reading Progress Bar -->
+  <div id="progress-container"><div id="progress-bar"></div></div>
+
+  <div class="max-w-7xl mx-auto min-h-screen lg:grid lg:grid-cols-[280px_1fr_280px] border-x border-gray-200/50 dark:border-gray-800/50 bg-white/40 dark:bg-gray-950/40 shadow-2xl relative z-0">
+    
+    <!-- Left Sidebar -->
+    <aside class="glass-panel p-8 flex flex-col items-center lg:items-start text-center lg:text-left sticky top-0 h-auto lg:h-screen lg:overflow-y-auto z-10">
+      <a href="/" class="block mb-6 group reveal">
+        <img src="https://via.placeholder.com/150" alt="Avatar" class="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-white dark:border-gray-800 group-hover:ring-4 ring-blue-500/30 transition-all site-avatar">
+      </a>
+      <h1 class="text-lg font-bold tracking-tight mb-6 reveal site-name">Your Name</h1>
+      
+      <nav class="flex flex-col gap-3 w-full mb-8 reveal">
+        <a href="/blog/index.html" class="group flex items-center font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
+          <svg class="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          Back to Blog
+        </a>
+      </nav>
+      
+      <button id="theme-toggle" class="mt-auto w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm transition-all reveal">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        Theme
+      </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="p-8 lg:p-14 lg:col-span-2 relative">
+      <article id="post-container" class="max-w-3xl mx-auto">
+        <!-- Skeleton -->
+        <div class="animate-pulse">
+          <div class="h-10 bg-gray-300 dark:bg-gray-700 rounded-lg w-3/4 mb-6"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/4 mb-10"></div>
+          <div class="space-y-4">
+            <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+            <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+            <div class="h-4 bg-gray-200 dark:bg-gray-800 rounded w-5/6"></div>
+          </div>
+        </div>
+      </article>
+      
+      <!-- Back to top button -->
+      <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-8 right-8 p-3 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all focus:outline-none z-50 group">
+        <svg class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+      </button>
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/blog/js/supabase-client.js"></script>
+  <script src="/blog/js/app.js"></script>
+  <script>
+    // Configure Marked with Highlight.js
+    marked.setOptions({
+      highlight: function(code, lang) {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language }).value;
+      },
+      langPrefix: 'hljs language-'
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get('slug');
+      const container = document.getElementById('post-container');
+
+      if (!window.supabaseClient) {
+          container.innerHTML = '<div class="text-center py-20"><h1 class="text-2xl font-bold text-red-500 mb-4">Configuration Error</h1><p class="text-gray-500">Supabase Environment Variables are missing.</p></div>';
+          return;
+      }
+
+      if (!slug) {
+        container.innerHTML = '<div class="text-center py-20"><h1 class="text-2xl font-bold text-gray-500">No post specified.</h1><a href="/blog/index.html" class="text-blue-600 hover:underline mt-4 inline-block">Go back to blog</a></div>';
+        return;
+      }
+
+      try {
+        const { data: post, error } = await window.supabaseClient
+          .from('posts')
+          .select('*')
+          .eq('slug', slug)
+          .eq('is_published', true)
+          .single();
+
+        if (error || !post) throw new Error('Post not found');
+
+        document.title = `${post.title} · Your Name`;
+
+        const htmlContent = marked.parse(post.content_md);
+        
+        const tagsHtml = post.tags && post.tags.length > 0 
+          ? post.tags.map(t => `<span class="bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2.5 py-1 rounded-md tracking-wide uppercase">${t}</span>`).join(' ')
+          : '';
+
+        container.innerHTML = `
+          <header class="mb-12 pb-8 border-b border-gray-200 dark:border-gray-800 reveal">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-gray-900 dark:text-gray-100">${post.title}</h1>
+            <div class="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+              <time datetime="${post.created_at}" class="flex items-center">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                ${new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              </time>
+              ${tagsHtml ? `<div class="flex gap-2 ml-auto">${tagsHtml}</div>` : ''}
+            </div>
+          </header>
+          <div class="prose dark:prose-invert prose-blue max-w-none lg:prose-lg reveal animation-delay-2000 prose-img:rounded-xl prose-img:shadow-lg prose-headings:tracking-tight prose-a:font-semibold prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-800">
+            ${htmlContent}
+          </div>
+        `;
+        
+        if (window.initScrollAnimations) window.initScrollAnimations();
+
+      } catch (err) {
+        console.error('Error fetching post:', err);
+        container.innerHTML = '<div class="text-center py-20"><h1 class="text-5xl font-extrabold mb-4 text-gray-900 dark:text-white">404</h1><p class="text-xl text-gray-500 mb-8">The post could not be found or has been removed.</p><a href="/blog/index.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors">Return to Blog</a></div>';
+      }
+    });
+  </script>
+</body>
+</html>
