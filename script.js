@@ -213,34 +213,54 @@ const loadProjects = async () => {
         }
 
         projects.forEach((project) => {
-            const card = document.createElement('a');
-            card.href = project.url;
-            card.target = '_blank';
-            // Added tilt-card and spotlight-card for advanced effects
-            card.className = 'project-card spotlight-card tilt-card bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col transition-colors duration-300 border border-gray-700 group';
+          const card = document.createElement('a');
+          card.href = project.url;
+          card.target = '_blank';
 
-            const techSpans = project.technologies.map(tech =>
-                `<span class="text-xs font-semibold bg-gray-900 text-blue-400 px-2 py-1 rounded relative z-10">${tech}</span>`
-            ).join('');
+          // Ultra-Premium Project Card Classes
+          card.className = 'project-card spotlight-card tilt-card relative bg-gray-800/40 backdrop-blur-xl rounded-2xl shadow-2xl p-8 flex flex-col transition-all duration-500 border border-gray-700/50 hover:border-blue-500/40 group overflow-hidden';
 
-            card.innerHTML = `
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold mb-3 text-white group-hover:text-blue-400 transition-colors">${project.title}</h3>
-                    <p class="text-gray-400 mb-6 leading-relaxed text-sm">${project.description}</p>
-                </div>
-                <div class="mt-auto pt-4 border-t border-gray-700 relative z-10">
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-wrap gap-2">
-                            ${techSpans}
-                        </div>
-                        <svg class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                    </div>
-                </div>
-            `;
+          const techSpans = project.technologies.map(tech =>
+              `<span class="text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full backdrop-blur-sm relative z-10 transition-colors group-hover:bg-blue-500/20 group-hover:text-blue-300 group-hover:border-blue-400/40">${tech}</span>`
+          ).join('');
 
-            projectsGrid.appendChild(card);
+          card.innerHTML = `
+              <!-- Animated Glowing Top Border -->
+              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20"></div>
+
+              <div class="relative z-10 flex flex-col h-full">
+                  <!-- Icon & Arrow Row -->
+                  <div class="flex justify-between items-start mb-6">
+                      <div class="p-3 bg-gray-900/50 rounded-xl border border-gray-700/50 shadow-inner group-hover:bg-blue-500/10 group-hover:border-blue-500/30 transition-colors duration-500">
+                          <!-- Code Icon -->
+                          <svg class="w-6 h-6 text-blue-400 opacity-80 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                          </svg>
+                      </div>
+                      <!-- External Link Arrow -->
+                      <div class="p-2 rounded-full bg-transparent group-hover:bg-gray-800/50 transition-colors duration-300">
+                          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-400 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                          </svg>
+                      </div>
+                  </div>
+
+                  <!-- Content -->
+                  <h3 class="text-2xl font-extrabold mb-4 text-gray-100 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300 tracking-tight leading-tight">${project.title}</h3>
+
+                  <p class="text-gray-400 mb-8 leading-relaxed text-sm flex-grow line-clamp-3">${project.description}</p>
+
+                  <!-- Footer Tech Tags -->
+                  <div class="mt-auto pt-6 border-t border-gray-700/40 group-hover:border-blue-500/20 transition-colors duration-500">
+                      <div class="flex flex-wrap gap-2">
+                          ${techSpans}
+                      </div>
+                  </div>
+              </div>
+          `;
+
+          projectsGrid.appendChild(card);
         });
-
         // Initialize animations on the new DOM nodes
         animateProjects();
 
