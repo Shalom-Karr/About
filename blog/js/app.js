@@ -46,16 +46,24 @@ function initScrollAnimations() {
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('animate-fade-in-up');
+                // Determine animation type based on class
+                if (entry.target.classList.contains('slide-in-left') || entry.target.classList.contains('slide-in-right')) {
+                    entry.target.classList.add('is-visible');
+                } else {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
                 entry.target.style.opacity = 1;
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Observe all elements with the 'reveal' class
-    document.querySelectorAll('.reveal').forEach(el => {
-        el.style.opacity = 0; // Hide initially
+    // Observe all elements with the 'reveal', 'slide-in-left', or 'slide-in-right' classes
+    document.querySelectorAll('.reveal, .slide-in-left, .slide-in-right').forEach(el => {
+        // Only hide reveal elements initially (slide-ins are hidden by CSS)
+        if (el.classList.contains('reveal')) {
+             el.style.opacity = 0; 
+        }
         observer.observe(el);
     });
 }

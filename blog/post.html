@@ -46,7 +46,7 @@
     }
   </script>
   <style>
-    ::selection { background-color: rgba(59, 130, 246, 0.5); color: inherit; }
+    ::selection { background-color: rgba(139, 92, 246, 0.5); color: white; }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -56,7 +56,11 @@
     
     /* Progress Bar */
     #progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; z-index: 100; background: transparent; }
-    #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.1s ease; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+    #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899); transition: width 0.1s ease; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+  
+    /* Slide In Animation Utilities */
+    .slide-in-left { opacity: 0; transform: translateX(-60px); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .is-visible { opacity: 1 !important; transform: translate(0,0) !important; }
   </style>
 
   <!-- Highlight.js for Code Snippets -->
@@ -75,20 +79,19 @@
     
     <!-- Left Sidebar -->
     <aside class="glass-panel p-8 flex flex-col items-center lg:items-start text-center lg:text-left sticky top-0 h-auto lg:h-screen lg:overflow-y-auto z-10">
-      <a href="/" class="block mb-6 group reveal">
-        <img src="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" alt="Avatar" class="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-white dark:border-gray-800 group-hover:ring-4 ring-blue-500/30 transition-all site-avatar">
+      <a href="/" class="block mb-6 group slide-in-left">
+        <img src="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" alt="Avatar" class="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-white dark:border-gray-800 group-hover:ring-4 ring-blue-500/30 transition-all site-avatar hover:scale-110">
       </a>
-      <h1 class="text-lg font-bold tracking-tight mb-6 reveal site-name">Shalom Karr</h1>
-      
-      <nav class="flex flex-col gap-3 w-full mb-8 reveal">
+      <h1 class="text-lg font-bold tracking-tight mb-6 slide-in-left site-name" style="transition-delay: 100ms;">Shalom Karr</h1>
+
+      <nav class="flex flex-col gap-3 w-full mb-8 slide-in-left" style="transition-delay: 200ms;">
         <a href="/blog/index.html" class="group flex items-center font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
           <svg class="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
           Back to Blog
         </a>
       </nav>
-      
-      <button id="theme-toggle" class="mt-auto w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm transition-all reveal">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+
+      <button id="theme-toggle" class="mt-auto w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm transition-all slide-in-left hover:scale-105" style="transition-delay: 300ms;">        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
         Theme
       </button>
     </aside>

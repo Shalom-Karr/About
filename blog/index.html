@@ -42,28 +42,80 @@
     }
   </script>
   <style>
-    ::selection { background-color: rgba(59, 130, 246, 0.5); color: inherit; }
+    ::selection { background-color: rgba(139, 92, 246, 0.5); color: white; }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
-    .glass-panel { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-right: 1px solid rgba(255, 255, 255, 0.3); }
-    .dark .glass-panel { background: rgba(17, 24, 39, 0.7); border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    
+    /* Premium Glassmorphism */
+    .glass-panel { 
+      background: rgba(255, 255, 255, 0.6); 
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px); 
+      border-right: 1px solid rgba(255, 255, 255, 0.5); 
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+    .dark .glass-panel { 
+      background: rgba(15, 23, 42, 0.7); 
+      border-right: 1px solid rgba(255, 255, 255, 0.08); 
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+    
     .animation-delay-2000 { animation-delay: 2s; }
     .animation-delay-4000 { animation-delay: 4s; }
-    
-    /* Post card hover effects */
-    .post-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .post-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border-color: rgba(59, 130, 246, 0.5); }
-    .dark .post-card:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); border-color: rgba(96, 165, 250, 0.5); background: rgba(31, 41, 55, 0.8); }
-    
+
+    /* Ultra Premium Post Card Hover Effects */
+    .post-card { 
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .post-card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      z-index: -1;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+      background-size: 300% 300%;
+      border-radius: 17px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      animation: gradientShift 4s ease infinite;
+    }
+    .post-card:hover { 
+      transform: translateY(-8px) scale(1.02) rotateX(2deg) rotateY(-1deg); 
+      box-shadow: 0 30px 40px -10px rgba(0, 0, 0, 0.15), 0 20px 20px -10px rgba(0, 0, 0, 0.1); 
+    }
+    .post-card:hover::before {
+      opacity: 1;
+    }
+    .dark .post-card:hover { 
+      box-shadow: 0 30px 40px -10px rgba(139, 92, 246, 0.3), 0 20px 20px -10px rgba(139, 92, 246, 0.2); 
+      background: rgba(15, 23, 42, 0.95); 
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     /* Empty State SVG Pattern */
     .pattern-dots {
       background-image: radial-gradient(rgba(156, 163, 175, 0.4) 1px, transparent 1px);
       background-size: 24px 24px;
     }
-  </style>
 
+    /* Slide In Animation Utilities */
+    .slide-in-left { opacity: 0; transform: translateX(-60px); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .slide-in-right { opacity: 0; transform: translateX(60px); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .is-visible { opacity: 1 !important; transform: translate(0,0) !important; }
+  </style>
 
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative overflow-x-hidden">
@@ -78,11 +130,10 @@
     
     <!-- Left Sidebar -->
     <aside class="glass-panel p-8 flex flex-col items-center lg:items-start text-center lg:text-left sticky top-0 h-auto lg:h-screen lg:overflow-y-auto">
-      <img src="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" alt="Avatar" class="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white dark:border-gray-800 mb-6 reveal site-avatar">
-      <h1 class="text-xl font-extrabold tracking-tight mb-2 reveal site-name">Shalom Karr</h1>
-      
-      <nav class="flex flex-col gap-4 w-full mb-8 mt-6 reveal">
-        <a href="/" class="group flex items-center font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+      <img src="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" alt="Avatar" class="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white dark:border-gray-800 mb-6 slide-in-left site-avatar hover:scale-110 transition-transform duration-500 cursor-pointer">
+      <h1 class="text-xl font-extrabold tracking-tight mb-2 slide-in-left site-name" style="transition-delay: 100ms;">Shalom Karr</h1>
+
+      <nav class="flex flex-col gap-4 w-full mb-8 mt-6 slide-in-left" style="transition-delay: 200ms;">        <a href="/" class="group flex items-center font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
           <span class="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg mr-3 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
           </span>
@@ -96,8 +147,7 @@
         </a>
       </nav>
       
-      <button id="theme-toggle" class="mt-auto w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm transition-all reveal">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+      <button id="theme-toggle" class="mt-auto w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm transition-all slide-in-left hover:scale-105" style="transition-delay: 300ms;">        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
         Theme
       </button>
     </aside>
@@ -127,17 +177,16 @@
 
     <!-- Right Sidebar -->
     <aside class="hidden lg:block glass-panel border-l border-r-0 p-8 sticky top-0 h-screen overflow-y-auto">
-      <div class="mb-8 reveal">
+      <div class="mb-8 slide-in-right">
         <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Search</h3>
         <div class="relative group">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <svg class="h-4 w-4 group-focus-within:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
-          <input type="text" placeholder="Search articles..." class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm transition-all group-hover:bg-white dark:group-hover:bg-gray-800">
+          <input type="text" placeholder="Search articles..." class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm transition-all group-hover:bg-white dark:group-hover:bg-gray-800">
         </div>
       </div>
     </aside>
-
   </div>
 
 
