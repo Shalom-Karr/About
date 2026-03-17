@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <title>Blog · Your Name</title>
+  <title>Blog · Shalom Karr</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,7 +64,7 @@
     }
   </style>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative overflow-x-hidden">
 
@@ -78,8 +78,8 @@
     
     <!-- Left Sidebar -->
     <aside class="glass-panel p-8 flex flex-col items-center lg:items-start text-center lg:text-left sticky top-0 h-auto lg:h-screen lg:overflow-y-auto">
-      <img src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white dark:border-gray-800 mb-6 reveal site-avatar">
-      <h1 class="text-xl font-extrabold tracking-tight mb-2 reveal site-name">Your Name</h1>
+      <img src="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" alt="Avatar" class="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-white dark:border-gray-800 mb-6 reveal site-avatar">
+      <h1 class="text-xl font-extrabold tracking-tight mb-2 reveal site-name">Shalom Karr</h1>
       
       <nav class="flex flex-col gap-4 w-full mb-8 mt-6 reveal">
         <a href="/" class="group flex items-center font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
@@ -140,9 +140,9 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/blog/js/supabase-client.js"></script>
-  <script src="/blog/js/app.js"></script>
+
+  
+  <script type="module">import { supabase } from "/supabase-client.js"; window.supabaseClient = supabase;</script><script src="/blog/js/app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const container = document.getElementById('posts-container');

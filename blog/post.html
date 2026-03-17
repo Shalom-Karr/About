@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <title>Post · Your Name</title>
+  <title>Post · Shalom Karr</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,7 +63,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative">
@@ -76,9 +76,9 @@
     <!-- Left Sidebar -->
     <aside class="glass-panel p-8 flex flex-col items-center lg:items-start text-center lg:text-left sticky top-0 h-auto lg:h-screen lg:overflow-y-auto z-10">
       <a href="/" class="block mb-6 group reveal">
-        <img src="https://via.placeholder.com/150" alt="Avatar" class="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-white dark:border-gray-800 group-hover:ring-4 ring-blue-500/30 transition-all site-avatar">
+        <img src="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" alt="Avatar" class="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-white dark:border-gray-800 group-hover:ring-4 ring-blue-500/30 transition-all site-avatar">
       </a>
-      <h1 class="text-lg font-bold tracking-tight mb-6 reveal site-name">Your Name</h1>
+      <h1 class="text-lg font-bold tracking-tight mb-6 reveal site-name">Shalom Karr</h1>
       
       <nav class="flex flex-col gap-3 w-full mb-8 reveal">
         <a href="/blog/index.html" class="group flex items-center font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
@@ -116,9 +116,9 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/blog/js/supabase-client.js"></script>
-  <script src="/blog/js/app.js"></script>
+
+  
+  <script type="module">import { supabase } from "/supabase-client.js"; window.supabaseClient = supabase;</script><script src="/blog/js/app.js"></script>
   <script>
     // Configure Marked with Highlight.js
     marked.setOptions({
@@ -154,7 +154,7 @@
 
         if (error || !post) throw new Error('Post not found');
 
-        document.title = `${post.title} · Your Name`;
+        document.title = `${post.title} · Shalom Karr`;
 
         const htmlContent = marked.parse(post.content_md);
         
