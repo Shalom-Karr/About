@@ -210,8 +210,24 @@ const initAnimations = () => {
         }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
-    // 5. Contact Animation
-    gsap.fromTo(".contact-anim", 
+    // 5. Blog Section Animations
+    gsap.fromTo("#blog-header",
+        { opacity: 0, y: 50 },
+        { scrollTrigger: { trigger: "#blog-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+    );
+
+    gsap.fromTo("#blog-features",
+        { opacity: 0, y: 50 },
+        { scrollTrigger: { trigger: "#blog-features", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "power3.out" }
+    );
+
+    gsap.fromTo("#blog-cta",
+        { opacity: 0, y: 30, scale: 0.95 },
+        { scrollTrigger: { trigger: "#blog-cta", start: "top 85%" }, opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.4, ease: "back.out(1.5)" }
+    );
+
+    // 6. Contact Animation
+    gsap.fromTo(".contact-anim",
         { opacity: 0, y: 50 },
         { scrollTrigger: { trigger: "#contact", start: "top 80%" }, opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
     );
