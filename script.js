@@ -226,10 +226,28 @@ const initAnimations = () => {
         { scrollTrigger: { trigger: "#blog-cta", start: "top 85%" }, opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.4, ease: "back.out(1.5)" }
     );
 
-    // 6. Contact Animation
-    gsap.fromTo(".contact-anim",
+    // 6. Contact Animations (multi-stage staggered)
+    gsap.fromTo("#contact-header",
         { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#contact", start: "top 80%" }, opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+        { scrollTrigger: { trigger: "#contact", start: "top 80%", onEnter: () => {
+            const el = document.querySelector('#contact-description');
+            if (el) new TextScramble(el).setText(el.innerText);
+        }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+    );
+
+    gsap.fromTo("#contact-card",
+        { opacity: 0, scale: 0.95 },
+        { scrollTrigger: { trigger: "#contact", start: "top 75%" }, opacity: 1, scale: 1, duration: 0.8, delay: 0.2, ease: "power3.out" }
+    );
+
+    gsap.fromTo(".contact-form-field",
+        { opacity: 0, x: -30 },
+        { scrollTrigger: { trigger: "#contact-card", start: "top 80%" }, opacity: 1, x: 0, duration: 0.6, stagger: 0.1, delay: 0.4, ease: "power2.out" }
+    );
+
+    gsap.fromTo(".contact-link-item",
+        { opacity: 0, x: 30 },
+        { scrollTrigger: { trigger: "#contact-card", start: "top 80%" }, opacity: 1, x: 0, duration: 0.6, stagger: 0.1, delay: 0.4, ease: "power2.out" }
     );
 };
 
@@ -605,6 +623,75 @@ const initTypingAnimation = () => {
     }
 };
 
+// --- EmailJS Contact Form ---
+const EMAILJS_PUBLIC_KEY = '6XAGlx_tFQG41xPB3';
+const EMAILJS_SERVICE_ID = 'service_wcrrkbp';
+const EMAILJS_TEMPLATE_ID = 'template_qgcjka4';
+
+const initContactForm = () => {
+    if (typeof emailjs === 'undefined') return;
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
+    const form = document.getElementById('contact-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('contact-submit');
+        const statusEl = document.getElementById('contact-status');
+
+        const from_name = form.from_name.value.trim();
+        const from_email = form.from_email.value.trim();
+        const subject = form.subject.value.trim();
+        const message = form.message.value.trim();
+
+        // Client-side validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!from_name || !from_email || !message) {
+            statusEl.textContent = 'Please fill in all required fields.';
+            statusEl.className = 'mt-4 text-sm text-center text-red-400';
+            statusEl.classList.remove('hidden');
+            return;
+        }
+        if (!emailPattern.test(from_email)) {
+            statusEl.textContent = 'Please enter a valid email address.';
+            statusEl.className = 'mt-4 text-sm text-center text-red-400';
+            statusEl.classList.remove('hidden');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        statusEl.className = 'mt-4 text-sm text-center hidden';
+        statusEl.textContent = '';
+
+        try {
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                from_name,
+                from_email,
+                subject,
+                message,
+            });
+
+            // Fire-and-forget: save to Supabase (non-blocking)
+            supabase.from('contact_messages').insert([{ name: from_name, email: from_email, subject, message }])
+                .then(({ error }) => { if (error) console.error('Supabase insert error:', error); });
+
+            statusEl.textContent = "Message sent successfully! I'll get back to you soon.";
+            statusEl.className = 'mt-4 text-sm text-center text-green-400';
+            form.reset();
+        } catch (err) {
+            console.error('EmailJS send error:', err);
+            statusEl.textContent = 'Failed to send message. Please try again or reach out directly.';
+            statusEl.className = 'mt-4 text-sm text-center text-red-400';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+            statusEl.classList.remove('hidden');
+        }
+    });
+};
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     initTypingAnimation();
@@ -617,6 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomEffects(); // Initialize new mind-blowing effects
     initParticleHero();
     initMagneticButtons();
+    initContactForm();
     
     loadProjects();
     initContactForm();
