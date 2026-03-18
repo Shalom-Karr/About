@@ -430,6 +430,14 @@
     }
 
     // --- Inbox ---
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
     let allMessages = [];
     let currentFilter = 'all';
 
@@ -485,13 +493,16 @@
 
       container.innerHTML = filtered.map(msg => {
         const isRead = msg.is_read;
-        const escapedSubject = (msg.subject || '').replace(/"/g, '&quot;');
-        const escapedName = msg.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const escapedEmail = msg.email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const escapedMessage = msg.message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        // Sanitize id to only allow safe UUID characters
+        const safeId = String(msg.id).replace(/[^a-zA-Z0-9\-_]/g, '');
+        const escapedName = escapeHtml(msg.name);
+        const escapedEmail = escapeHtml(msg.email);
+        const escapedMessage = escapeHtml(msg.message);
+        const escapedSubject = escapeHtml(msg.subject || '');
+        const mailtoSubject = encodeURIComponent('Re: ' + (msg.subject || ''));
         const preview = escapedMessage.substring(0, 100) + (msg.message.length > 100 ? '...' : '');
         return `
-          <div class="message-card p-5 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${isRead ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm'}" onclick="toggleMessage('${msg.id}')">
+          <div class="message-card p-5 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${isRead ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm'}" onclick="toggleMessage('${safeId}')">
             <div class="flex justify-between items-start mb-2">
               <div class="flex items-center gap-3">
                 ${!isRead ? '<div class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse flex-shrink-0"></div>' : ''}
@@ -502,22 +513,22 @@
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs text-gray-400">${timeAgo(msg.created_at)}</span>
-                <button onclick="event.stopPropagation(); deleteMessage('${msg.id}')" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-gray-400 hover:text-red-500 transition-colors" title="Delete">
+                <button onclick="event.stopPropagation(); deleteMessage('${safeId}')" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-gray-400 hover:text-red-500 transition-colors" title="Delete">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               </div>
             </div>
-            <p class="font-semibold text-sm mb-1 ${!isRead ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}">${msg.subject ? msg.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '(No Subject)'}</p>
-            <div id="msg-body-${msg.id}" class="hidden mt-3 pt-3 border-t dark:border-gray-700">
+            <p class="font-semibold text-sm mb-1 ${!isRead ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}">${escapedSubject || '(No Subject)'}</p>
+            <div id="msg-body-${safeId}" class="hidden mt-3 pt-3 border-t dark:border-gray-700">
               <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">${escapedMessage}</p>
               <div class="flex gap-2 mt-4">
-                <a href="mailto:${escapedEmail}?subject=Re: ${escapedSubject}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded font-bold transition-colors">Reply via Email</a>
-                <button onclick="event.stopPropagation(); toggleReadStatus('${msg.id}')" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-xs rounded font-bold transition-colors">
+                <a href="mailto:${escapedEmail}?subject=${mailtoSubject}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded font-bold transition-colors">Reply via Email</a>
+                <button onclick="event.stopPropagation(); toggleReadStatus('${safeId}')" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-xs rounded font-bold transition-colors">
                   ${isRead ? 'Mark Unread' : 'Mark Read'}
                 </button>
               </div>
             </div>
-            <p id="msg-preview-${msg.id}" class="text-xs text-gray-500 truncate">${preview}</p>
+            <p id="msg-preview-${safeId}" class="text-xs text-gray-500 truncate">${preview}</p>
           </div>`;
       }).join('');
     }
