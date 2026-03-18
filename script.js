@@ -218,8 +218,7 @@ const loadProjects = async () => {
           card.target = '_blank';
 
           // Ultra-Premium Project Card Classes
-          card.className = 'project-card spotlight-card tilt-card relative bg-gray-800/40 backdrop-blur-xl rounded-2xl shadow-2xl p-8 flex flex-col transition-all duration-500 border border-gray-700/50 hover:border-blue-500/40 group overflow-hidden';
-
+          card.className = 'project-card spotlight-card tilt-card glare-effect glow-border frosted-glass relative rounded-2xl shadow-2xl p-8 flex flex-col transition-all duration-500 border border-gray-700/50 hover:border-blue-500/40 group overflow-hidden';
           const techSpans = project.technologies.map(tech =>
               `<span class="text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full backdrop-blur-sm relative z-10 transition-colors group-hover:bg-blue-500/20 group-hover:text-blue-300 group-hover:border-blue-400/40">${tech}</span>`
           ).join('');
