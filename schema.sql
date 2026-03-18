@@ -173,3 +173,33 @@ CREATE POLICY "Allow public insert access" ON public.post_likes FOR INSERT WITH 
 
 -- Allow anonymous deletes (for unlike)
 CREATE POLICY "Allow public delete access" ON public.post_likes FOR DELETE USING (true);
+
+-- ============================================
+-- Contact Form Messages
+-- ============================================
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    is_read BOOLEAN DEFAULT false
+);
+
+-- Enable RLS
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous inserts (from the public website)
+CREATE POLICY "Allow anonymous insert" ON contact_messages
+    FOR INSERT
+    WITH CHECK (true);
+
+-- Only authenticated users (admin) can read messages
+CREATE POLICY "Only admin can read" ON contact_messages
+    FOR SELECT
+    USING (auth.role() = 'authenticated');
+
+-- Index for admin dashboard queries
+CREATE INDEX idx_contact_messages_created_at ON contact_messages(created_at DESC);
+CREATE INDEX idx_contact_messages_is_read ON contact_messages(is_read);
