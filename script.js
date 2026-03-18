@@ -210,8 +210,24 @@ const initAnimations = () => {
         }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
-    // 5. Contact Animation
-    gsap.fromTo(".contact-anim", 
+    // 5. Blog Section Animations
+    gsap.fromTo("#blog-header",
+        { opacity: 0, y: 50 },
+        { scrollTrigger: { trigger: "#blog-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+    );
+
+    gsap.fromTo("#blog-features",
+        { opacity: 0, y: 50 },
+        { scrollTrigger: { trigger: "#blog-features", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "power3.out" }
+    );
+
+    gsap.fromTo("#blog-cta",
+        { opacity: 0, y: 30, scale: 0.95 },
+        { scrollTrigger: { trigger: "#blog-cta", start: "top 85%" }, opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.4, ease: "back.out(1.5)" }
+    );
+
+    // 6. Contact Animation
+    gsap.fromTo(".contact-anim",
         { opacity: 0, y: 50 },
         { scrollTrigger: { trigger: "#contact", start: "top 80%" }, opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
     );
@@ -459,7 +475,7 @@ const loadProjects = async () => {
                   <!-- Content -->
                   <h3 class="text-2xl font-extrabold mb-4 text-gray-100 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300 tracking-tight leading-tight">${project.title}</h3>
 
-                  <p class="text-gray-400 mb-8 leading-relaxed text-sm flex-grow line-clamp-3">${project.description}</p>
+                  <p class="text-gray-400 mb-8 leading-relaxed text-sm flex-grow">${project.description}</p>
 
                   <!-- Footer Tech Tags -->
                   <div class="mt-auto pt-6 border-t border-gray-700/40 group-hover:border-blue-500/20 transition-colors duration-500">

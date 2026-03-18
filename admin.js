@@ -8,6 +8,12 @@ const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 const logoutButton = document.getElementById('logout-button');
 
+// Tab Elements
+const tabLogs = document.getElementById('tab-logs');
+const tabProjects = document.getElementById('tab-projects');
+const contentLogs = document.getElementById('content-logs');
+const contentProjects = document.getElementById('content-projects');
+
 // Projects Elements
 const projectsList = document.getElementById('projects-list');
 const addProjectButton = document.getElementById('add-project-button');
@@ -345,6 +351,31 @@ const handleAddNewTech = async (event) => {
 };
 
 
+// --- Tab Switching ---
+const switchTab = (tab) => {
+    // Update tab buttons
+    const allTabButtons = document.querySelectorAll('.tab-button');
+    allTabButtons.forEach(btn => {
+        btn.classList.remove('text-blue-400', 'border-b-2', 'border-blue-400');
+        btn.classList.add('text-gray-400');
+    });
+
+    // Update content
+    const allTabContent = document.querySelectorAll('.tab-content');
+    allTabContent.forEach(content => content.classList.add('hidden'));
+
+    if (tab === 'logs') {
+        tabLogs.classList.remove('text-gray-400');
+        tabLogs.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
+        contentLogs.classList.remove('hidden');
+    } else if (tab === 'projects') {
+        tabProjects.classList.remove('text-gray-400');
+        tabProjects.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
+        contentProjects.classList.remove('hidden');
+    }
+};
+
+
 // --- Event Listeners ---
 loginForm.addEventListener('submit', handleLogin);
 logoutButton.addEventListener('click', handleLogout);
@@ -353,6 +384,10 @@ modalClose.addEventListener('click', closeModal);
 modalCancel.addEventListener('click', closeModal);
 projectForm.addEventListener('submit', handleFormSubmit);
 refreshLogsButton.addEventListener('click', loadVisitorLogs);
+
+// Tab switching
+tabLogs.addEventListener('click', () => switchTab('logs'));
+tabProjects.addEventListener('click', () => switchTab('projects'));
 
 projectsList.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-btn')) {
