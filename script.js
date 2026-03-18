@@ -86,10 +86,12 @@ const initCustomEffects = () => {
             cursorDot.style.left = `${e.clientX}px`;
             cursorDot.style.top = `${e.clientY}px`;
             
-            // Smoothly move the ring using GSAP
+            // Smoothly move the ring using GSAP. 
+            // Note: Since we already use transform: translate(-50%, -50%) in CSS, 
+            // we must use left/top here instead of x/y to prevent transform conflicts.
             gsap.to(cursorRing, {
-                x: e.clientX,
-                y: e.clientY,
+                left: e.clientX,
+                top: e.clientY,
                 duration: 0.15,
                 ease: "power2.out"
             });
