@@ -33,7 +33,7 @@ const initAnimations = () => {
     // 3. Skills Animation (Staggered 3D Pop)
     gsap.fromTo("#skills-header", 
         { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#skills", start: "top 80%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+        { scrollTrigger: { trigger: "#skills-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
     gsap.fromTo(".skill-card", 
@@ -49,7 +49,7 @@ const initAnimations = () => {
     // 4. Projects Header Animation
     gsap.fromTo("#projects-header", 
         { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#projects", start: "top 80%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+        { scrollTrigger: { trigger: "#projects-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
     // 5. Contact Animation
