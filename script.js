@@ -183,10 +183,10 @@ const initAnimations = () => {
     );
 
     // 3. Skills Animation (Staggered 3D Pop)
-    gsap.fromTo("#skills-header", 
+    gsap.fromTo("#skills-header",
         { opacity: 0, y: 50 },
         { scrollTrigger: { trigger: "#skills-header", start: "top 85%", onEnter: () => {
-            const el = document.querySelector('#skills-header');
+            const el = document.querySelector('#skills-description');
             if (el) new TextScramble(el).setText(el.innerText);
         }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
@@ -202,10 +202,10 @@ const initAnimations = () => {
     );
 
     // 4. Projects Header Animation
-    gsap.fromTo("#projects-header", 
+    gsap.fromTo("#projects-header",
         { opacity: 0, y: 50 },
         { scrollTrigger: { trigger: "#projects-header", start: "top 85%", onEnter: () => {
-            const el = document.querySelector('#projects-header');
+            const el = document.querySelector('#projects-description');
             if (el) new TextScramble(el).setText(el.innerText);
         }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
