@@ -1,0 +1,26 @@
+<svg width="600" height="100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Importing fonts from Google Fonts -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&amp;family=Inter:wght@400;800&amp;display=swap');
+    </style>
+  </defs>
+
+  <!-- Base Background -->
+  <rect width="600" height="100" rx="8" fill="#0d1117" />
+  <rect x="2" y="2" width="596" height="96" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+  
+  <!-- Cursive Name -->
+  <text x="30" y="45" font-family="'Great Vibes', cursive" font-size="42" fill="#ffffff">Shalom Karr</text>
+  
+  <!-- Title -->
+  <text x="30" y="65" font-family="'Inter', sans-serif" font-size="12" letter-spacing="1.5" fill="#3b82f6">DIGITAL INFRASTRUCTURE &amp; AUTOMATION ARCHITECT</text>
+  
+  <!-- Footer Links -->
+  <text x="30" y="90" font-family="'Inter', sans-serif" font-size="11" fill="#8b949e">
+    🌍 shalomkarr.pages.dev  •  ✉️ shalomkarr@gmail.com  •  📱 (216) 451-6698
+  </text>
+  
+  <!-- Decorative Accent -->
+  <circle cx="560" cy="25" r="6" fill="#3b82f6" />
+</svg>
