@@ -95,42 +95,58 @@
                 <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300 shadow-lg">Logout</button>
             </header>
 
-            <!-- Stats / Visitor Logs Section -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold text-blue-400">Recent Visitor Logs</h2>
-                    <button id="refresh-logs-button" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-gray-300">Refresh</button>
-                </div>
-                <div class="overflow-x-auto custom-scroll">
-                    <table class="min-w-full text-left text-sm text-gray-300">
-                        <thead class="bg-gray-700 text-gray-100 uppercase font-medium">
-                            <tr>
-                                <th class="px-4 py-3 rounded-tl-lg">Time</th>
-                                <th class="px-4 py-3">IP Address</th>
-                                <th class="px-4 py-3">Browser / OS</th>
-                                <th class="px-4 py-3 text-right rounded-tr-lg">Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody id="visitor-logs-body" class="divide-y divide-gray-700">
-                            <!-- Logs injected via JS -->
-                            <tr>
-                                <td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading logs...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- Tab Navigation -->
+            <div class="mb-8">
+                <div class="flex border-b border-gray-700">
+                    <button id="tab-logs" class="tab-button px-6 py-3 font-semibold text-blue-400 border-b-2 border-blue-400 transition-colors">
+                        Visitor Logs
+                    </button>
+                    <button id="tab-projects" class="tab-button px-6 py-3 font-semibold text-gray-400 hover:text-gray-200 transition-colors">
+                        Manage Projects
+                    </button>
                 </div>
             </div>
 
-            <!-- Projects Manager Section -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold text-blue-400">Manage Projects</h2>
-                    <button id="add-project-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300 shadow-lg flex items-center gap-2">
-                        <span>+</span> Add Project
-                    </button>
+            <!-- Tab Content: Visitor Logs -->
+            <div id="content-logs" class="tab-content">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-blue-400">Recent Visitor Logs</h2>
+                        <button id="refresh-logs-button" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-gray-300">Refresh</button>
+                    </div>
+                    <div class="overflow-x-auto custom-scroll">
+                        <table class="min-w-full text-left text-sm text-gray-300">
+                            <thead class="bg-gray-700 text-gray-100 uppercase font-medium">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-tl-lg">Time</th>
+                                    <th class="px-4 py-3">IP Address</th>
+                                    <th class="px-4 py-3">Browser / OS</th>
+                                    <th class="px-4 py-3 text-right rounded-tr-lg">Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitor-logs-body" class="divide-y divide-gray-700">
+                                <!-- Logs injected via JS -->
+                                <tr>
+                                    <td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div id="projects-list" class="space-y-4">
-                    <!-- Projects will be loaded here -->
+            </div>
+
+            <!-- Tab Content: Projects Manager -->
+            <div id="content-projects" class="tab-content hidden">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-blue-400">Manage Projects</h2>
+                        <button id="add-project-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300 shadow-lg flex items-center gap-2">
+                            <span>+</span> Add Project
+                        </button>
+                    </div>
+                    <div id="projects-list" class="space-y-4">
+                        <!-- Projects will be loaded here -->
+                    </div>
                 </div>
             </div>
         </div>
