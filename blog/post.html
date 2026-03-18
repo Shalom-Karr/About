@@ -67,6 +67,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb" crossorigin="anonymous"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -147,6 +149,21 @@
         return;
       }
 
+      // --- Fingerprint for anonymous likes ---
+      const getFingerprint = () => {
+        const stored = localStorage.getItem('blog_fingerprint');
+        if (stored) return stored;
+        const raw = navigator.userAgent + screen.width + screen.height + (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+        let hash = 0;
+        for (let i = 0; i < raw.length; i++) {
+          hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+          hash |= 0;
+        }
+        const fp = 'fp_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+        localStorage.setItem('blog_fingerprint', fp);
+        return fp;
+      };
+
       try {
         const { data: post, error } = await window.supabaseClient
           .from('posts')
@@ -161,25 +178,129 @@
 
         const htmlContent = marked.parse(post.content_md);
         
+        const wordCount = (post.content_md || '').split(/\s+/).length;
+        const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
         const tagsHtml = post.tags && post.tags.length > 0 
           ? post.tags.map(t => `<a href="/blog/index.html?tag=${encodeURIComponent(t)}" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/60 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2.5 py-1 rounded-md tracking-wide uppercase transition-colors shadow-sm inline-block transform hover:-translate-y-0.5 cursor-pointer">${t}</a>`).join(' ')
           : '';
 
         container.innerHTML = `
-          <header class="mb-12 pb-8 border-b border-gray-200 dark:border-gray-800 reveal">
+          <header class="mb-8 pb-8 border-b border-gray-200 dark:border-gray-800 reveal">
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-gray-900 dark:text-gray-100">${post.title}</h1>
             <div class="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
               <time datetime="${post.created_at}" class="flex items-center">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 ${new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               </time>
-              ${tagsHtml ? `<div class="flex gap-2 ml-auto">${tagsHtml}</div>` : ''}
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                ${readingTime} min read
+              </span>
+              <button id="share-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-xs font-semibold">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                <span id="share-btn-text">Share</span>
+              </button>
+              ${tagsHtml ? `<div class="flex gap-2 ml-auto flex-wrap">${tagsHtml}</div>` : ''}
             </div>
           </header>
-          <div class="prose dark:prose-invert prose-blue max-w-none lg:prose-lg reveal animation-delay-2000 prose-img:rounded-xl prose-img:shadow-lg prose-headings:tracking-tight prose-a:font-semibold prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-800">
+
+          <div class="flex items-center gap-4 mt-2 mb-10" id="like-section">
+            <button id="like-btn" class="group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-gray-300 dark:border-gray-600 transition-all duration-300 font-bold text-sm text-gray-500 dark:text-gray-400 hover:border-pink-400 hover:text-pink-500">
+              <svg id="like-icon" class="w-5 h-5 transition-transform duration-300 group-hover:scale-125" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+              <span id="like-count">0</span>
+            </button>
+            <span class="text-sm text-gray-400" id="like-label">likes</span>
+          </div>
+
+          <div class="prose dark:prose-invert prose-blue max-w-none lg:prose-lg reveal animation-delay-2000 prose-img:rounded-xl prose-img:shadow-lg prose-headings:tracking-tight prose-a:font-semibold prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-800" id="prose-content">
             ${htmlContent}
           </div>
         `;
+
+        // --- Share Button ---
+        const shareBtn = document.getElementById('share-btn');
+        const shareBtnText = document.getElementById('share-btn-text');
+        if (shareBtn) {
+          shareBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+              shareBtnText.textContent = '✓ Copied!';
+              setTimeout(() => { shareBtnText.textContent = 'Share'; }, 2000);
+            });
+          });
+        }
+
+        // --- Table of Contents ---
+        const proseEl = document.getElementById('prose-content');
+        if (proseEl) {
+          const headings = proseEl.querySelectorAll('h2, h3');
+          if (headings.length > 2) {
+            headings.forEach((h, i) => {
+              if (!h.id) h.id = 'heading-' + i;
+            });
+            const tocItems = Array.from(headings).map(h => {
+              const indent = h.tagName === 'H3' ? 'pl-4 text-gray-500 dark:text-gray-400' : 'font-semibold';
+              return `<li><a href="#${h.id}" class="block py-1 text-sm ${indent} hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${h.textContent}</a></li>`;
+            }).join('');
+            const toc = document.createElement('nav');
+            toc.className = 'mb-10 p-6 rounded-2xl bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700';
+            toc.innerHTML = `<h3 class="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Table of Contents</h3><ul class="space-y-1">${tocItems}</ul>`;
+            proseEl.prepend(toc);
+          }
+        }
+
+        // --- Like Button Logic ---
+        const fp = getFingerprint();
+        const likeBtn = document.getElementById('like-btn');
+        const likeIcon = document.getElementById('like-icon');
+        const likeCountEl = document.getElementById('like-count');
+
+        // Fetch like count and user like status
+        const [{ count: totalLikes }, { data: userLike }] = await Promise.all([
+          window.supabaseClient.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+          window.supabaseClient.from('post_likes').select('id').eq('post_id', post.id).eq('fingerprint', fp).maybeSingle()
+        ]);
+
+        let liked = !!userLike;
+        let currentCount = totalLikes || 0;
+
+        const updateLikeUI = () => {
+          if (likeCountEl) likeCountEl.textContent = currentCount;
+          if (liked) {
+            likeBtn.className = 'group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-pink-500 text-pink-500 transition-all duration-300 font-bold text-sm';
+            likeIcon.setAttribute('fill', 'currentColor');
+            likeIcon.setAttribute('stroke', 'none');
+          } else {
+            likeBtn.className = 'group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 transition-all duration-300 font-bold text-sm hover:border-pink-400 hover:text-pink-500';
+            likeIcon.setAttribute('fill', 'none');
+            likeIcon.setAttribute('stroke', 'currentColor');
+          }
+        };
+
+        updateLikeUI();
+
+        if (likeBtn) {
+          likeBtn.addEventListener('click', async () => {
+            if (!liked) {
+              liked = true;
+              currentCount++;
+              updateLikeUI();
+              gsap.fromTo(likeIcon, { scale: 1 }, { scale: 1.4, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out' });
+              const { error } = await window.supabaseClient.from('post_likes').insert({ post_id: post.id, fingerprint: fp });
+              if (error) { liked = false; currentCount = Math.max(0, currentCount - 1); updateLikeUI(); }
+            } else {
+              liked = false;
+              currentCount = Math.max(0, currentCount - 1);
+              updateLikeUI();
+              const { error } = await window.supabaseClient.from('post_likes').delete().eq('post_id', post.id).eq('fingerprint', fp);
+              if (error) { liked = true; currentCount++; updateLikeUI(); }
+            }
+          });
+        }
         
         if (window.initScrollAnimations) window.initScrollAnimations();
 
