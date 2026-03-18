@@ -39,8 +39,8 @@ function initThemeToggle() {
 function initScrollAnimations() {
     const observerOptions = {
         root: null,
-        rootMargin: '0px',
-        threshold: 0.1
+        rootMargin: '100px 0px 0px 0px', // Trigger earlier so cards render immediately on load
+        threshold: 0.05
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
