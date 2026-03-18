@@ -589,19 +589,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProjects();
 });
 
-window.addEventListener('load', () => {
-    const loader = document.getElementById('page-loader');
-    if (loader) {
-        gsap.to(loader, {
-            yPercent: -100,
-            duration: 0.8,
-            ease: 'power4.inOut',
-            delay: 0.3,
-            onComplete: () => loader.remove()
-        });
-    }
-});
-
 // To-Top Button Logic
 const toTopButton = document.getElementById('to-top');
 if (toTopButton) {
