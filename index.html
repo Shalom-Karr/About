@@ -231,6 +231,11 @@
         </style></head>
 <body class="bg-gray-900 text-white overflow-x-hidden relative">
 
+    <!-- Page Loader / Curtain Reveal -->
+    <div id="page-loader" class="fixed inset-0 z-[99999] bg-gray-900 flex items-center justify-center">
+        <span class="text-2xl font-bold text-blue-400 animate-pulse tracking-widest">SK</span>
+    </div>
+
     <!-- Custom Cursor -->
     <div id="cursor-dot" class="hidden md:block"></div>
     <div id="cursor-ring" class="hidden md:block"></div>
@@ -278,6 +283,8 @@
 
     <main>
         <section id="hero" class="pt-20 min-h-screen flex items-center justify-center relative overflow-hidden">
+            <!-- Particle Canvas Background -->
+            <canvas id="hero-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
             <!-- Advanced Background decoration with floating glowing orbs -->
             <div class="absolute inset-0 bg-[#0f172a] -z-20"></div>
             <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse -z-10"></div>
@@ -308,11 +315,11 @@
                 </div>
 
                 <div class="hero-anim opacity-0 translate-y-10 mt-12 flex flex-col sm:flex-row justify-center items-center gap-6">
-                    <a href="#projects" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] hover:-translate-y-1 inline-flex items-center text-lg">
+                    <a href="#projects" class="magnetic-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] hover:-translate-y-1 inline-flex items-center text-lg">
                         View My Work
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                     </a>
-                    <a href="/blog/" class="bg-transparent border-2 border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white font-bold py-4 px-10 rounded-full transition-all duration-300 hover:-translate-y-1 inline-flex items-center text-lg">
+                    <a href="/blog/" class="magnetic-btn bg-transparent border-2 border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white font-bold py-4 px-10 rounded-full transition-all duration-300 hover:-translate-y-1 inline-flex items-center text-lg">
                         Read My Blog
                     </a>
                 </div>
