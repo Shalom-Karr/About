@@ -66,7 +66,9 @@
       </div>
       <div class="p-2 border-b dark:border-gray-700 flex flex-col gap-1">
         <button onclick="switchTab('editor')" id="tab-editor" class="text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300">Editor</button>
-        
+        <button onclick="switchTab('inbox')" id="tab-inbox" class="text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium">
+            Inbox <span id="unread-badge" class="hidden ml-1 px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full font-bold">0</span>
+        </button>
       </div>
       <div id="post-list" class="flex-1 overflow-y-auto">
         <!-- Posts injected here -->
@@ -111,6 +113,40 @@
         <div class="flex items-center gap-2 pb-10">
           <input type="checkbox" id="post-published" class="w-4 h-4">
           <label for="post-published" class="font-bold cursor-pointer">Published</label>
+        </div>
+      </div>
+    </main>
+
+    <!-- Inbox Tab -->
+    <main id="inbox-view" class="hidden flex-1 overflow-y-auto p-6 lg:p-10 bg-gray-50 dark:bg-gray-900">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Header with actions -->
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-2xl font-bold">Message Inbox</h2>
+            <p id="inbox-count" class="text-sm text-gray-500 mt-1">Loading messages...</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="refreshInbox()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold transition-colors flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              Refresh
+            </button>
+            <button onclick="markAllRead()" class="px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded text-sm font-bold transition-colors">
+              Mark All Read
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex gap-2 border-b dark:border-gray-700 pb-3">
+          <button onclick="filterInbox('all')" id="filter-all" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">All</button>
+          <button onclick="filterInbox('unread')" id="filter-unread" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">Unread</button>
+          <button onclick="filterInbox('read')" id="filter-read" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">Read</button>
+        </div>
+
+        <!-- Messages list -->
+        <div id="inbox-messages" class="space-y-3">
+          <!-- Messages dynamically injected here -->
         </div>
       </div>
     </main>
@@ -210,22 +246,28 @@
       document.getElementById('user-mode-label').innerText = devMode ? 'DEV MODE' : 'Admin';
       
       await loadPosts();
+      await loadInbox();
       await fetchSettings();
     }
 
     function switchTab(tab) {
       document.getElementById('editor-view').classList.toggle('hidden', tab !== 'editor');
+      document.getElementById('inbox-view').classList.toggle('hidden', tab !== 'inbox');
       document.getElementById('settings-view').classList.toggle('hidden', tab !== 'settings');
-      
-      const tEditor = document.getElementById('tab-editor');
-      const tSettings = document.getElementById('tab-settings');
-      
-      if (tab === 'editor') {
-        tEditor.className = "text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300";
-        tSettings.className = "text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium";
-      } else {
-        tSettings.className = "text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300";
-        tEditor.className = "text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium";
+
+      const tabs = ['editor', 'inbox'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (!el) return;
+        if (t === tab) {
+          el.className = "text-left px-3 py-2 bg-blue-50 dark:bg-blue-900 rounded text-sm font-bold text-blue-600 dark:text-blue-300";
+        } else {
+          el.className = "text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm font-medium";
+        }
+      });
+
+      if (tab === 'inbox') {
+        loadInbox();
       }
     }
 
@@ -384,6 +426,215 @@
         showMsg("settings-msg", "Error: " + error.message, "error");
       } else {
         showMsg("settings-msg", "Settings saved successfully!");
+      }
+    }
+
+    // --- Inbox ---
+    let allMessages = [];
+    let currentFilter = 'all';
+
+    async function loadInbox() {
+      if (isDevMode) {
+        allMessages = [
+          { id: 'msg-1', name: 'Jane Smith', email: 'jane@example.com', subject: 'Collaboration Opportunity', message: 'Hi Shalom! I came across your portfolio and I am really impressed with your work. I would love to discuss a potential collaboration on a web application project. Would you be available for a call next week?', created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), is_read: false },
+          { id: 'msg-2', name: 'Tech Corp HR', email: 'hr@techcorp.com', subject: 'Full-Stack Developer Position', message: 'We have an exciting opportunity for a Full-Stack Developer role that matches your skill set. The position involves JavaScript, Node.js, and PostgreSQL — right up your alley! Please let us know if you are interested.', created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), is_read: false },
+          { id: 'msg-3', name: 'Alex Johnson', email: 'alex@startup.io', subject: 'Bug Report on Your Portfolio', message: 'Hey, just wanted to let you know there is a minor visual glitch on mobile when scrolling through the skills section. Great site otherwise!', created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), is_read: true },
+        ];
+        updateUnreadBadge();
+        renderInbox();
+        return;
+      }
+
+      const { data, error } = await window.supabaseClient
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        allMessages = data;
+        updateUnreadBadge();
+        renderInbox();
+      } else if (error) {
+        console.error('Error loading messages:', error);
+        document.getElementById('inbox-count').innerText = 'Error loading messages.';
+      }
+    }
+
+    function renderInbox() {
+      const container = document.getElementById('inbox-messages');
+      const countEl = document.getElementById('inbox-count');
+
+      let filtered = allMessages;
+      if (currentFilter === 'unread') filtered = allMessages.filter(m => !m.is_read);
+      if (currentFilter === 'read') filtered = allMessages.filter(m => m.is_read);
+
+      const unreadCount = allMessages.filter(m => !m.is_read).length;
+      countEl.innerText = `${allMessages.length} message${allMessages.length !== 1 ? 's' : ''} (${unreadCount} unread)`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16">
+            <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <h3 class="font-bold text-lg text-gray-400">No messages yet</h3>
+            <p class="text-sm text-gray-500 mt-1">Messages from your contact form will appear here.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(msg => {
+        const isRead = msg.is_read;
+        const escapedSubject = (msg.subject || '').replace(/"/g, '&quot;');
+        const escapedName = msg.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const escapedEmail = msg.email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const escapedMessage = msg.message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const preview = escapedMessage.substring(0, 100) + (msg.message.length > 100 ? '...' : '');
+        return `
+          <div class="message-card p-5 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${isRead ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm'}" onclick="toggleMessage('${msg.id}')">
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex items-center gap-3">
+                ${!isRead ? '<div class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse flex-shrink-0"></div>' : ''}
+                <div>
+                  <h3 class="font-bold text-sm">${escapedName}</h3>
+                  <a href="mailto:${escapedEmail}" class="text-xs text-blue-500 hover:underline">${escapedEmail}</a>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400">${timeAgo(msg.created_at)}</span>
+                <button onclick="event.stopPropagation(); deleteMessage('${msg.id}')" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-gray-400 hover:text-red-500 transition-colors" title="Delete">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </div>
+            </div>
+            <p class="font-semibold text-sm mb-1 ${!isRead ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}">${msg.subject ? msg.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '(No Subject)'}</p>
+            <div id="msg-body-${msg.id}" class="hidden mt-3 pt-3 border-t dark:border-gray-700">
+              <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">${escapedMessage}</p>
+              <div class="flex gap-2 mt-4">
+                <a href="mailto:${escapedEmail}?subject=Re: ${escapedSubject}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded font-bold transition-colors">Reply via Email</a>
+                <button onclick="event.stopPropagation(); toggleReadStatus('${msg.id}')" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-xs rounded font-bold transition-colors">
+                  ${isRead ? 'Mark Unread' : 'Mark Read'}
+                </button>
+              </div>
+            </div>
+            <p id="msg-preview-${msg.id}" class="text-xs text-gray-500 truncate">${preview}</p>
+          </div>`;
+      }).join('');
+    }
+
+    function toggleMessage(id) {
+      const body = document.getElementById('msg-body-' + id);
+      const preview = document.getElementById('msg-preview-' + id);
+      if (!body) return;
+      const isExpanding = body.classList.contains('hidden');
+      body.classList.toggle('hidden', !isExpanding);
+      if (preview) preview.classList.toggle('hidden', isExpanding);
+      if (isExpanding) {
+        markAsRead(id);
+      }
+    }
+
+    async function markAsRead(id) {
+      const msg = allMessages.find(m => String(m.id) === String(id));
+      if (!msg || msg.is_read) return;
+
+      msg.is_read = true;
+      updateUnreadBadge();
+      renderInbox();
+
+      if (!isDevMode) {
+        await window.supabaseClient
+          .from('contact_messages')
+          .update({ is_read: true })
+          .eq('id', id);
+      }
+    }
+
+    async function toggleReadStatus(id) {
+      const msg = allMessages.find(m => String(m.id) === String(id));
+      if (!msg) return;
+      msg.is_read = !msg.is_read;
+      updateUnreadBadge();
+      renderInbox();
+
+      if (!isDevMode) {
+        await window.supabaseClient
+          .from('contact_messages')
+          .update({ is_read: msg.is_read })
+          .eq('id', id);
+      }
+    }
+
+    async function markAllRead() {
+      const unread = allMessages.filter(m => !m.is_read);
+      if (unread.length === 0) return;
+      unread.forEach(m => { m.is_read = true; });
+      updateUnreadBadge();
+      renderInbox();
+
+      if (!isDevMode) {
+        const ids = unread.map(m => m.id);
+        await window.supabaseClient
+          .from('contact_messages')
+          .update({ is_read: true })
+          .in('id', ids);
+      }
+    }
+
+    async function deleteMessage(id) {
+      if (!confirm('Delete this message? This cannot be undone.')) return;
+      allMessages = allMessages.filter(m => String(m.id) !== String(id));
+      updateUnreadBadge();
+      renderInbox();
+
+      if (!isDevMode) {
+        await window.supabaseClient
+          .from('contact_messages')
+          .delete()
+          .eq('id', id);
+      }
+    }
+
+    function filterInbox(filter) {
+      currentFilter = filter;
+      ['all', 'unread', 'read'].forEach(f => {
+        const btn = document.getElementById('filter-' + f);
+        if (!btn) return;
+        if (f === filter) {
+          btn.className = "px-3 py-1.5 rounded-lg text-sm font-bold bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800";
+        }
+      });
+      renderInbox();
+    }
+
+    async function refreshInbox() {
+      const countEl = document.getElementById('inbox-count');
+      if (countEl) countEl.innerText = 'Refreshing...';
+      await loadInbox();
+    }
+
+    function timeAgo(dateStr) {
+      const now = Date.now();
+      const then = new Date(dateStr).getTime();
+      const diff = Math.floor((now - then) / 1000);
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 86400 * 30) return Math.floor(diff / 86400) + 'd ago';
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function updateUnreadBadge() {
+      const badge = document.getElementById('unread-badge');
+      if (!badge) return;
+      const count = allMessages.filter(m => !m.is_read).length;
+      if (count > 0) {
+        badge.innerText = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
       }
     }
   </script>
