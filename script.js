@@ -382,10 +382,19 @@ const setupNavigation = () => {
 
     const toggleMenu = () => {
         burgerBtn.classList.toggle('active');
+        const body = document.body;
+
         if (burgerBtn.classList.contains('active')) {
             mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+            body.classList.add('menu-open');
+            // Add a small delay before showing menu items for better effect
+            setTimeout(() => {
+                mobileMenu.style.transform = 'scale(1)';
+            }, 10);
         } else {
             mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+            body.classList.remove('menu-open');
+            mobileMenu.style.transform = 'scale(0.95)';
         }
     };
 
