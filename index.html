@@ -149,8 +149,16 @@
         
         /* The card content needs to sit above the spotlight */
         .spotlight-card > * { position: relative; z-index: 1; }
-        
-        /* Glowing Card Borders */
+
+        /* 3D Inner Parallax Effect */
+        .spotlight-card > div, .spotlight-card > h3, .spotlight-card > p, .spotlight-card > i, .spotlight-card > span, .spotlight-card > svg {
+            transition: transform 0.5s ease;
+        }
+        .tilt-card:hover > div, .tilt-card:hover > h3, .tilt-card:hover > p, .tilt-card:hover > i, .tilt-card:hover > span, .tilt-card:hover > svg {
+            transform: translateZ(40px);
+        }
+
+        /* Glowing Card Borders with Neon Tracer */
         .glow-border {
             position: relative;
             z-index: 0;
@@ -158,19 +166,69 @@
         .glow-border::after {
             content: "";
             position: absolute;
-            inset: -2px;
+            inset: -1px;
             z-index: -1;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
-            background-size: 300% 300%;
+            background: conic-gradient(from var(--border-angle), transparent 20%, #3b82f6, #ec4899, transparent 80%);
             border-radius: inherit;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            animation: gradientShift 4s ease infinite;
+            opacity: 0.3;
+            transition: opacity 0.5s ease, inset 0.5s ease;
+            animation: spinBorder 4s linear infinite;
         }
-        .glow-border:hover::after { opacity: 1; }
+        .glow-border:hover::after { 
+            opacity: 1;
+            inset: -2px;
+            animation: spinBorder 2s linear infinite; 
+        }
 
-    </style>
-</head>
+        @keyframes spinBorder {
+            0% { --border-angle: 0deg; }
+            100% { --border-angle: 360deg; }
+        }
+
+        @property --border-angle {
+            syntax: "<angle>";
+            inherits: true;
+            initial-value: 0turn;
+        }
+
+        /* Premium Glare Effect for Project Cards */
+        .glare-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .glare-effect::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -150%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 50;
+        }
+        .glare-effect:hover::after {
+            left: 200%;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Frosted Glass Noise Overlay */
+        .frosted-glass {
+            position: relative;
+            background: rgba(31, 41, 55, 0.4) !important; /* bg-gray-800/40 */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .frosted-glass::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        </style></head>
 <body class="bg-gray-900 text-white overflow-x-hidden relative">
 
     <!-- Custom Cursor -->
