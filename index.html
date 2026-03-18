@@ -169,6 +169,24 @@
         }
         .glow-border:hover::after { opacity: 1; }
 
+        /* Premium Glare Effect for Project Cards */
+        .glare-effect {
+            position: relative;
+        }
+        .glare-effect::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 50;
+        }
+        .glare-effect:hover::after {
+            left: 200%;
+        }
+
     </style>
 </head>
 <body class="bg-gray-900 text-white overflow-x-hidden relative">
@@ -354,7 +372,7 @@
                     <!-- Cloud & Integrations (Using GitHub Badges) -->
                     <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-4 lg:col-span-3 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#4285F4]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-br from-[#4285F4]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="flex gap-3 mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 flex-wrap justify-center relative z-10">
+                        <div class="flex gap-3 mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 relative z-10 flex-wrap justify-center">
                             <img src="https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white" alt="Google Cloud" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
                             <img src="https://img.shields.io/badge/Apps_Script-0F9D58?style=for-the-badge&logo=google&logoColor=white" alt="Apps Script" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
                         </div>
@@ -367,27 +385,44 @@
                         <div class="absolute inset-0 bg-gradient-to-br from-[#EB5424]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div class="flex gap-3 mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 relative z-10 flex-wrap justify-center">
                             <img src="https://img.shields.io/badge/OAuth_2.0-323330?style=for-the-badge&logo=auth0&logoColor=white" alt="OAuth" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
-                            <img src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white" alt="Git" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
+                            <img src="https://img.shields.io/badge/Web_Security-RLS-005571?style=for-the-badge&logo=security&logoColor=white" alt="Web Security" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
                         </div>
-                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#EB5424] transition-colors relative z-10 text-center">Security & Version Control</span>
-                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10 text-center">OAuth Implementations & CI/CD</span>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#EB5424] transition-colors relative z-10 text-center">Security & Identity</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10 text-center">OAuth Implementations & Row Level Security</span>
                     </div>
 
-                    <!-- Architecture -->
-                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-6 lg:col-span-6 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#FFB13B]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                    <!-- APIs & SMTP -->
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-3 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#005571]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#005571]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="flex gap-3 mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 relative z-10 flex-wrap justify-center">
+                            <img src="https://img.shields.io/badge/REST_APIs-005571?style=for-the-badge&logo=json&logoColor=white" alt="REST API" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
+                            <img src="https://img.shields.io/badge/SMTP-Mail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="SMTP Integration" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
+                        </div>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#005571] transition-colors relative z-10 text-center">Connectivity</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10 text-center">REST Design & SMTP Integration</span>
+                    </div>
+
+                    <!-- E-Commerce & UI/UX -->
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-3 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#95BF47]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#95BF47]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="flex gap-3 mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 relative z-10 flex-wrap justify-center">
+                            <img src="https://img.shields.io/badge/E--Commerce-95BF47?style=for-the-badge&logo=shopify&logoColor=white" alt="E-Commerce" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
+                            <img src="https://img.shields.io/badge/UI/UX-FF4154?style=for-the-badge&logo=figma&logoColor=white" alt="UI/UX" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
+                        </div>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#95BF47] transition-colors relative z-10 text-center">Product Design</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10 text-center">E-Commerce Platforms & UI/UX Principles</span>
+                    </div>
+
+                    <!-- Architecture & Version Control -->
+                    <div class="skill-card spotlight-card tilt-card col-span-2 md:col-span-6 lg:col-span-2 group relative bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-500 hover:border-[#FFB13B]/50 hover:bg-gray-800/80 shadow-lg cursor-pointer overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-br from-[#FFB13B]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div class="flex gap-3 mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 relative z-10 flex-wrap justify-center">
+                            <img src="https://img.shields.io/badge/Git-F05033?style=for-the-badge&logo=git&logoColor=white" alt="Git" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
                             <img src="https://img.shields.io/badge/Serverless-FD5750?style=for-the-badge&logo=serverless&logoColor=white" alt="Serverless" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
-                            <img src="https://img.shields.io/badge/Cloudflare_Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
-                            <img src="https://img.shields.io/badge/REST_APIs-005571?style=for-the-badge&logo=json&logoColor=white" alt="REST API" class="h-8 shadow-sm group-hover:scale-105 transition-transform">
                         </div>
-                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#FFB13B] transition-colors relative z-10 text-center">Modern Architecture</span>
-                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10 text-center">Serverless Edge Computing, CDNs, & API Design</span>
+                        <span class="font-bold text-gray-400 tracking-wide group-hover:text-[#FFB13B] transition-colors relative z-10 text-center">Architecture</span>
+                        <span class="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10 text-center">Git & Serverless Infrastructure</span>
                     </div>
-
-                    </div>
-                    </div>
-                    </section>
 
         <section id="projects" class="py-24 bg-gray-900 relative overflow-hidden">
             <!-- Background grid decoration -->
