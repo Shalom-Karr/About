@@ -178,6 +178,10 @@
         </button>
       </div>
       <div id="mobile-filters-panel" class="hidden mt-3 space-y-3">
+        <select id="mobile-sort-filter" class="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 bg-white/50 dark:bg-gray-800/50">
+          <option value="recent">Most Recent</option>
+          <option value="liked">Most Liked</option>
+        </select>
         <select id="mobile-date-filter" class="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 bg-white/50 dark:bg-gray-800/50">
           <option value="">All Time</option>
         </select>
@@ -221,6 +225,19 @@
       </div>
 
       <div class="mb-8 slide-in-right" style="transition-delay: 100ms;">
+        <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Sort By</h3>
+        <div class="relative">
+          <select id="sort-filter" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-4 pr-10 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm transition-all cursor-pointer appearance-none group-hover:bg-white dark:group-hover:bg-gray-800">
+            <option value="recent">Most Recent</option>
+            <option value="liked">Most Liked</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-8 slide-in-right" style="transition-delay: 150ms;">
         <h3 class="font-bold mb-4 uppercase text-xs tracking-widest text-gray-400">Archives</h3>
         <div class="relative">
           <select id="date-filter" class="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-4 pr-10 py-2.5 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm transition-all cursor-pointer appearance-none group-hover:bg-white dark:group-hover:bg-gray-800">
@@ -246,6 +263,7 @@
   <script>
     let allPosts = [];
     let likeCountsByPost = {};
+    let currentSort = 'recent';
 
     document.addEventListener("DOMContentLoaded", async () => {
       const container = document.getElementById('posts-container');
@@ -256,6 +274,8 @@
       const headerBlock = document.getElementById('blog-header');
       const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
       const mobileFiltersPanel = document.getElementById('mobile-filters-panel');
+      const sortFilter = document.getElementById('sort-filter');
+      const mobileSortFilter = document.getElementById('mobile-sort-filter');
 
       // Mobile filter toggle
       if (mobileFilterToggle && mobileFiltersPanel) {
@@ -348,6 +368,51 @@
         populateDateFilter(dateFilter);
         populateDateFilter(mobileDateFilter);
 
+        // Sort filter event listeners
+        if (sortFilter) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const sortParam = urlParams.get('sort');
+          if (sortParam && (sortParam === 'recent' || sortParam === 'liked')) {
+            sortFilter.value = sortParam;
+            currentSort = sortParam;
+          }
+          sortFilter.addEventListener('change', () => {
+            currentSort = sortFilter.value;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (currentSort && currentSort !== 'recent') {
+              urlParams.set('sort', currentSort);
+            } else {
+              urlParams.delete('sort');
+            }
+            // Sync the mobile sort filter
+            if (mobileSortFilter) mobileSortFilter.value = currentSort;
+            window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+            applyFilters();
+          });
+        }
+
+        if (mobileSortFilter) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const sortParam = urlParams.get('sort');
+          if (sortParam && (sortParam === 'recent' || sortParam === 'liked')) {
+            mobileSortFilter.value = sortParam;
+            currentSort = sortParam;
+          }
+          mobileSortFilter.addEventListener('change', () => {
+            currentSort = mobileSortFilter.value;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (currentSort && currentSort !== 'recent') {
+              urlParams.set('sort', currentSort);
+            } else {
+              urlParams.delete('sort');
+            }
+            // Sync the desktop sort filter
+            if (sortFilter) sortFilter.value = currentSort;
+            window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+            applyFilters();
+          });
+        }
+
         // Apply filters based on search input and URL query params
         function applyFilters() {
            const urlParams = new URLSearchParams(window.location.search);
@@ -379,11 +444,23 @@
            }
 
            if (query) {
-               filtered = filtered.filter(p => 
-                   p.title.toLowerCase().includes(query) || 
+               filtered = filtered.filter(p =>
+                   p.title.toLowerCase().includes(query) ||
                    (p.excerpt && p.excerpt.toLowerCase().includes(query)) ||
                    (p.content_md && p.content_md.toLowerCase().includes(query))
                );
+           }
+
+           // Apply sorting
+           if (currentSort === 'liked') {
+               filtered.sort((a, b) => {
+                   const aLikes = likeCountsByPost[a.id] || 0;
+                   const bLikes = likeCountsByPost[b.id] || 0;
+                   return bLikes - aLikes;
+               });
+           } else {
+               // Sort by most recent (created_at desc)
+               filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
            }
 
            renderPosts(filtered);
