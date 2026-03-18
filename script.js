@@ -333,27 +333,78 @@ const loadProjects = async () => {
 };
 
 const initTypingAnimation = () => {
+    // 1. Existing Subtitle Loop
     const typedElement = document.getElementById('typed');
-    if (!typedElement) return;
+    if (typedElement) {
+        setTimeout(() => {
+            new TypeIt('#typed', {
+                speed: 50,
+                startDelay: 500,
+                loop: true,
+                cursorChar: '_',
+                waitUntilVisible: true,
+            })
+            .type("Digital Infrastructure Specialist")
+            .pause(2000).delete()
+            .type("Full-Stack Software Engineer")
+            .pause(2000).delete()
+            .type("JavaScript & Python Expert")
+            .pause(2000).delete()
+            .type("Automation Architect")
+            .pause(2000).delete()
+            .go();
+        }, 100); 
+    }
 
-    setTimeout(() => {
-        new TypeIt('#typed', {
-            speed: 50,
-            startDelay: 500,
-            loop: true,
-            cursorChar: '_',
-            waitUntilVisible: true,
-        })
-        .type("Digital Infrastructure Specialist")
-        .pause(2000).delete()
-        .type("Full-Stack Software Engineer")
-        .pause(2000).delete()
-        .type("JavaScript & Python Expert")
-        .pause(2000).delete()
-        .type("Automation Architect")
-        .pause(2000).delete()
-        .go();
-    }, 100); 
+    // 2. Advanced Terminal Injection
+    const terminalBody = document.getElementById('terminal-body');
+    if (terminalBody) {
+        setTimeout(() => {
+            new TypeIt('#terminal-body', {
+                speed: 30,
+                startDelay: 1000,
+                waitUntilVisible: true,
+                cursorChar: '█',
+                cursor: true,
+            })
+            .type('<span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
+            .pause(500)
+            .type('cat intro.txt')
+            .break()
+            .pause(300)
+            .type('<br/>') // Blank line
+            .type('I engineer high-performance web applications and digital infrastructure.<br/>')
+            .pause(500)
+            .type('Specializing in <span class="text-[#F7DF1E] font-semibold">JavaScript</span>, <span class="text-[#3ECF8E] font-semibold">Supabase</span>, and serverless architecture.<br/>')
+            .pause(800)
+            .type('<br/><span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
+            .pause(800)
+            .type('ls -la ./skills')
+            .break()
+            .pause(400)
+            .type('<br/>') // Blank line
+            .type('<span class="text-blue-300">drwxr-xr-x</span>  <span class="text-gray-400">frontend/</span>      <span class="text-gray-500">(React, Alpine, Tailwind)</span><br/>')
+            .pause(200)
+            .type('<span class="text-blue-300">drwxr-xr-x</span>  <span class="text-gray-400">backend/</span>       <span class="text-gray-500">(Node.js, Python, PostgreSQL)</span><br/>')
+            .pause(200)
+            .type('<span class="text-blue-300">drwxr-xr-x</span>  <span class="text-gray-400">integrations/</span>  <span class="text-gray-500">(GCP, OAuth 2.0, Stripe)</span><br/>')
+            .pause(800)
+            .type('<br/><span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
+            .pause(800)
+            .type('./run_deployment.sh')
+            .break()
+            .pause(300)
+            .type('<br/>') // Blank line
+            .type('<span class="text-green-500">✔</span> Compiling assets... [OK]<br/>')
+            .pause(200)
+            .type('<span class="text-green-500">✔</span> Deploying to Edge network... [OK]<br/>')
+            .pause(200)
+            .type('<span class="text-blue-400">ℹ</span> Systems online and fully operational.<br/>')
+            .pause(500)
+            .type('<br/><span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
+            .go();
+        }, 500);
+    }
 };
 
 // --- Initialization ---
