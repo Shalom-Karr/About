@@ -115,15 +115,31 @@
     .slide-in-left { opacity: 0; transform: translateX(-60px); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .slide-in-right { opacity: 0; transform: translateX(60px); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .is-visible { opacity: 1 !important; transform: translate(0,0) !important; }
+
+    /* Gradient Mesh Background */
+    .gradient-mesh {
+      background: 
+        radial-gradient(at 40% 20%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+        radial-gradient(at 80% 50%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.12) 0px, transparent 50%);
+      animation: meshShift 15s ease-in-out infinite alternate;
+    }
+    @keyframes meshShift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(30deg); }
+    }
   </style>
 
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative overflow-x-hidden">
 
   <!-- Animated Background -->
-  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none gradient-mesh">
     <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob dark:bg-purple-900 dark:opacity-20 dark:mix-blend-screen"></div>
     <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 dark:bg-blue-900 dark:opacity-20 dark:mix-blend-screen"></div>
+    <div class="absolute bottom-[-10%] left-[30%] w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 dark:bg-pink-900 dark:opacity-15 dark:mix-blend-screen"></div>
   </div>
 
   <div class="max-w-7xl mx-auto min-h-screen lg:grid lg:grid-cols-[280px_1fr_280px] border-x border-gray-200/50 dark:border-gray-800/50 bg-white/40 dark:bg-gray-950/40 shadow-2xl relative z-0">
@@ -151,6 +167,23 @@
         Theme
       </button>
     </aside>
+
+    <!-- Mobile Search & Filter Bar -->
+    <div class="lg:hidden px-4 py-3 sticky top-0 z-30 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800">
+      <div class="flex gap-2">
+        <input type="text" id="mobile-search" placeholder="Search..." 
+               class="flex-1 text-sm border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-purple-500 outline-none">
+        <button id="mobile-filter-toggle" class="px-3 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold">
+          Filters
+        </button>
+      </div>
+      <div id="mobile-filters-panel" class="hidden mt-3 space-y-3">
+        <select id="mobile-date-filter" class="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 bg-white/50 dark:bg-gray-800/50">
+          <option value="">All Time</option>
+        </select>
+        <div id="mobile-tag-cloud" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main class="p-8 lg:p-14 relative z-10">
@@ -212,12 +245,24 @@
   <script type="module">import { supabase } from "/supabase-client.js"; window.supabaseClient = supabase;</script><script src="/blog/js/app.js"></script>
   <script>
     let allPosts = [];
+    let likeCountsByPost = {};
 
     document.addEventListener("DOMContentLoaded", async () => {
       const container = document.getElementById('posts-container');
       const searchInput = document.getElementById('search-input');
+      const mobileSearchInput = document.getElementById('mobile-search');
       const tagCloudContainer = document.getElementById('tag-cloud');
+      const mobileTagCloud = document.getElementById('mobile-tag-cloud');
       const headerBlock = document.getElementById('blog-header');
+      const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+      const mobileFiltersPanel = document.getElementById('mobile-filters-panel');
+
+      // Mobile filter toggle
+      if (mobileFilterToggle && mobileFiltersPanel) {
+        mobileFilterToggle.addEventListener('click', () => {
+          mobileFiltersPanel.classList.toggle('hidden');
+        });
+      }
 
       if (!window.supabaseClient) {
           container.innerHTML = '<div class="p-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl border border-red-200 dark:border-red-800"><b>Supabase Configuration Error:</b> The environment variables SUPABASE_URL and SUPABASE_ANON_KEY are missing. Please set them in your Cloudflare Pages dashboard and trigger a new build.</div>';
@@ -234,6 +279,20 @@
         if (error) throw error;
         allPosts = posts || [];
 
+        // Fetch like counts for all posts
+        if (allPosts.length > 0) {
+          const postIds = allPosts.map(p => p.id);
+          const { data: likeCounts } = await window.supabaseClient
+            .from('post_likes')
+            .select('post_id')
+            .in('post_id', postIds);
+          if (likeCounts) {
+            likeCounts.forEach(row => {
+              likeCountsByPost[row.post_id] = (likeCountsByPost[row.post_id] || 0) + 1;
+            });
+          }
+        }
+
         // Build Tag Cloud
         const tagCounts = {};
         allPosts.forEach(p => {
@@ -241,14 +300,16 @@
         });
 
         const sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]);
-        if(tagCloudContainer) {
-            tagCloudContainer.innerHTML = sortedTags.map(t => 
-                `<a href="?tag=${encodeURIComponent(t)}" class="text-xs font-semibold bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full hover:bg-purple-500 hover:border-purple-400 hover:text-white dark:hover:bg-purple-500 dark:hover:border-purple-400 dark:hover:text-white transition-all transform hover:scale-105 inline-flex items-center gap-2">${t} <span class="opacity-50 text-[10px]">${tagCounts[t]}</span></a>`
-            ).join('');
-        }
+        const tagCloudHtml = sortedTags.map(t => 
+            `<a href="?tag=${encodeURIComponent(t)}" class="text-xs font-semibold bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full hover:bg-purple-500 hover:border-purple-400 hover:text-white dark:hover:bg-purple-500 dark:hover:border-purple-400 dark:hover:text-white transition-all transform hover:scale-105 inline-flex items-center gap-2">${t} <span class="opacity-50 text-[10px]">${tagCounts[t]}</span></a>`
+        ).join('');
+
+        if(tagCloudContainer) tagCloudContainer.innerHTML = tagCloudHtml;
+        if(mobileTagCloud) mobileTagCloud.innerHTML = tagCloudHtml;
 
         // Build Date Archives
         const dateFilter = document.getElementById('date-filter');
+        const mobileDateFilter = document.getElementById('mobile-date-filter');
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const uniqueMonths = new Set();
         allPosts.forEach(p => {
@@ -256,37 +317,45 @@
             uniqueMonths.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
         });
 
-        if (dateFilter) {
-            const sortedMonths = Array.from(uniqueMonths).sort().reverse();
-            sortedMonths.forEach(m => {
-                const [year, month] = m.split('-');
-                const option = document.createElement('option');
-                option.value = m;
-                option.textContent = `${monthNames[parseInt(month)-1]} ${year}`;
-                dateFilter.appendChild(option);
-            });
-            
-            const activeDate = new URLSearchParams(window.location.search).get('date');
-            if (activeDate) dateFilter.value = activeDate;
-            
-            dateFilter.addEventListener('change', () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                if (dateFilter.value) {
-                    urlParams.set('date', dateFilter.value);
-                } else {
-                    urlParams.delete('date');
-                }
-                window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
-                applyFilters();
-            });
-        }
+        const sortedMonths = Array.from(uniqueMonths).sort().reverse();
+
+        const populateDateFilter = (filterEl) => {
+          if (!filterEl) return;
+          sortedMonths.forEach(m => {
+            const [year, month] = m.split('-');
+            const option = document.createElement('option');
+            option.value = m;
+            option.textContent = `${monthNames[parseInt(month)-1]} ${year}`;
+            filterEl.appendChild(option);
+          });
+          const activeDate = new URLSearchParams(window.location.search).get('date');
+          if (activeDate) filterEl.value = activeDate;
+          filterEl.addEventListener('change', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (filterEl.value) {
+              urlParams.set('date', filterEl.value);
+            } else {
+              urlParams.delete('date');
+            }
+            // Sync the other date filter
+            if (filterEl === dateFilter && mobileDateFilter) mobileDateFilter.value = filterEl.value;
+            if (filterEl === mobileDateFilter && dateFilter) dateFilter.value = filterEl.value;
+            window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+            applyFilters();
+          });
+        };
+
+        populateDateFilter(dateFilter);
+        populateDateFilter(mobileDateFilter);
 
         // Apply filters based on search input and URL query params
         function applyFilters() {
            const urlParams = new URLSearchParams(window.location.search);
            const activeTag = urlParams.get('tag');
            const activeDate = urlParams.get('date');
-           const query = searchInput ? searchInput.value.toLowerCase() : '';
+           const desktopQuery = searchInput ? searchInput.value.toLowerCase() : '';
+           const mobileQuery = mobileSearchInput ? mobileSearchInput.value.toLowerCase() : '';
+           const query = desktopQuery || mobileQuery;
 
            let filtered = allPosts;
 
@@ -340,12 +409,28 @@
               ? post.tags.map(t => `<a href="?tag=${encodeURIComponent(t)}" class="bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2 py-0.5 rounded-full hover:bg-purple-100 hover:text-purple-600 hover:border-purple-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-300 dark:hover:border-purple-700 transition-colors z-20 relative cursor-pointer">${t}</a>`).join(' ')
               : '';
 
+            const wordCount = (post.content_md || '').split(/\s+/).length;
+            const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+            const likeCount = likeCountsByPost[post.id] || 0;
+
             return `
             <article class="post-card reveal bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700/80 rounded-2xl p-6 relative overflow-hidden group">
               <a href="/blog/post.html?slug=${post.slug}" class="absolute inset-0 z-10"></a>
 
               <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium mb-3">
                 <time datetime="${post.created_at}">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  ${readingTime} min read
+                </span>
+                <span class="flex items-center gap-1 text-pink-500">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                  </svg>
+                  ${likeCount}
+                </span>
                 ${tagsHtml ? `<div class="flex gap-1.5 z-20 relative">${tagsHtml}</div>` : ''}
               </div>
 
@@ -368,6 +453,9 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', applyFilters);
+        }
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', applyFilters);
         }
 
         applyFilters();

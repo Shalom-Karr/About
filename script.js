@@ -5,6 +5,155 @@ import { supabase } from './supabase-client.js';
 // --- GSAP Animations ---
 gsap.registerPlugin(ScrollTrigger);
 
+// --- Particle Hero Canvas ---
+const initParticleHero = () => {
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let mouse = { x: null, y: null };
+    const PARTICLE_COUNT = 120;  // Number of drifting particles
+    const LINK_DISTANCE = 120;   // Max px between particles to draw a connecting line
+    const MOUSE_DISTANCE = 150;  // Max px from cursor to draw a mouse connection line
+
+    const resize = () => {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    canvas.parentElement.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+    });
+    canvas.parentElement.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 1,
+    }));
+
+    const animate = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
+            ctx.fill();
+        });
+
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < LINK_DISTANCE) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(96, 165, 250, ${1 - dist / LINK_DISTANCE})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+            if (mouse.x !== null) {
+                const dx = particles[i].x - mouse.x;
+                const dy = particles[i].y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < MOUSE_DISTANCE) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(mouse.x, mouse.y);
+                    ctx.strokeStyle = `rgba(139, 92, 246, ${1 - dist / MOUSE_DISTANCE})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    };
+    animate();
+};
+
+// --- Magnetic Buttons ---
+const initMagneticButtons = () => {
+    document.querySelectorAll('.magnetic-btn').forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: 'power2.out' });
+        });
+        btn.addEventListener('mouseleave', () => {
+            gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.3)' });
+        });
+    });
+};
+
+// --- Text Scramble ---
+class TextScramble {
+    constructor(el) {
+        this.el = el;
+        this.chars = '!<>-_\\/[]{}—=+*^?#________';
+        this.update = this.update.bind(this);
+    }
+    setText(newText) {
+        const old = this.el.innerText;
+        const length = Math.max(old.length, newText.length);
+        const promise = new Promise(resolve => this.resolve = resolve);
+        this.queue = [];
+        for (let i = 0; i < length; i++) {
+            const from = old[i] || '';
+            const to = newText[i] || '';
+            const start = Math.floor(Math.random() * 10);
+            const end = start + Math.floor(Math.random() * 15);
+            this.queue.push({ from, to, start, end });
+        }
+        cancelAnimationFrame(this.frameRequest);
+        this.frame = 0;
+        this.update();
+        return promise;
+    }
+    update() {
+        let output = '';
+        let complete = 0;
+        for (let i = 0; i < this.queue.length; i++) {
+            let { from, to, start, end, char } = this.queue[i];
+            if (this.frame >= end) {
+                complete++;
+                output += to;
+            } else if (this.frame >= start) {
+                if (!char || Math.random() < 0.28) {
+                    char = this.randomChar();
+                    this.queue[i].char = char;
+                }
+                output += `<span style="opacity:0.4">${char}</span>`;
+            } else {
+                output += from;
+            }
+        }
+        this.el.innerHTML = output;
+        if (complete === this.queue.length) {
+            this.resolve();
+        } else {
+            this.frameRequest = requestAnimationFrame(this.update);
+            this.frame++;
+        }
+    }
+    randomChar() {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+    }
+}
+
 const initAnimations = () => {
     // 1. Advanced Hero Animations
     const heroTl = gsap.timeline({ defaults: { ease: "back.out(1.7)" } });
@@ -17,7 +166,10 @@ const initAnimations = () => {
     // 2. About Section Animation
     gsap.fromTo(".section-title", 
         { opacity: 0, y: 40, scale: 0.8 },
-        { scrollTrigger: { trigger: "#about", start: "top 80%" }, opacity: 1, y: 0, scale: 1, duration: 1, ease: "power3.out" }
+        { scrollTrigger: { trigger: "#about", start: "top 80%", onEnter: () => {
+            const el = document.querySelector('.section-title');
+            if (el) new TextScramble(el).setText(el.innerText);
+        }}, opacity: 1, y: 0, scale: 1, duration: 1, ease: "power3.out" }
     );
 
     gsap.fromTo(".about-text", 
@@ -33,7 +185,10 @@ const initAnimations = () => {
     // 3. Skills Animation (Staggered 3D Pop)
     gsap.fromTo("#skills-header", 
         { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#skills-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+        { scrollTrigger: { trigger: "#skills-header", start: "top 85%", onEnter: () => {
+            const el = document.querySelector('#skills-header');
+            if (el) new TextScramble(el).setText(el.innerText);
+        }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
     gsap.fromTo(".skill-card", 
@@ -49,7 +204,10 @@ const initAnimations = () => {
     // 4. Projects Header Animation
     gsap.fromTo("#projects-header", 
         { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#projects-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+        { scrollTrigger: { trigger: "#projects-header", start: "top 85%", onEnter: () => {
+            const el = document.querySelector('#projects-header');
+            if (el) new TextScramble(el).setText(el.innerText);
+        }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
     );
 
     // 5. Contact Animation
@@ -425,8 +583,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initAnimations();
     initCustomEffects(); // Initialize new mind-blowing effects
+    initParticleHero();
+    initMagneticButtons();
     
     loadProjects();
+});
+
+window.addEventListener('load', () => {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        gsap.to(loader, {
+            yPercent: -100,
+            duration: 0.8,
+            ease: 'power4.inOut',
+            delay: 0.3,
+            onComplete: () => loader.remove()
+        });
+    }
 });
 
 // To-Top Button Logic
