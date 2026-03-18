@@ -299,19 +299,25 @@
                 <li><a href="/blog/" class="relative group py-2 text-blue-400 hover:text-blue-300 font-medium transition-colors">Blog<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span></a></li>
                 <li><a href="#contact" class="nav-link bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-medium transition-transform hover:scale-105 shadow-lg shadow-blue-500/30">Contact</a></li>       
             </ul>
-            <!-- Mobile Burger Button -->
-            <div class="md:hidden fixed top-4 right-6 z-[110]">
-                <button id="mobile-menu-btn" class="text-white focus:outline-none w-10 h-10 flex flex-col justify-center items-center gap-1.5 hover:bg-white/10 rounded-lg transition-all duration-300">
-                    <span class="hamburger-line line-top w-6 h-0.5 bg-white rounded-full"></span>
-                    <span class="hamburger-line line-middle w-6 h-0.5 bg-white rounded-full"></span>
-                    <span class="hamburger-line line-bottom w-6 h-0.5 bg-white rounded-full"></span>
-                </button>
-            </div>
         </nav>
     </header>
 
+    <!-- Mobile Burger Button -->
+    <div class="md:hidden fixed top-4 right-4 z-[110]">
+        <button id="mobile-menu-btn" class="text-white focus:outline-none w-10 h-10 flex flex-col justify-center items-center gap-1.5 hover:bg-white/10 rounded-lg transition-all duration-300" aria-label="Toggle menu">
+            <span class="hamburger-line line-top w-6 h-0.5 bg-white rounded-full"></span>
+            <span class="hamburger-line line-middle w-6 h-0.5 bg-white rounded-full"></span>
+            <span class="hamburger-line line-bottom w-6 h-0.5 bg-white rounded-full"></span>
+        </button>
+    </div>
+
     <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="fixed inset-0 bg-gradient-to-br from-gray-900/98 via-gray-900/98 to-blue-900/98 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center gap-6 opacity-0 pointer-events-none transition-all duration-500 ease-out">
+    <div id="mobile-menu" class="fixed inset-0 bg-gradient-to-br from-gray-900/98 via-gray-900/98 to-blue-900/98 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center gap-6 opacity-0 pointer-events-none transition-all duration-500 ease-out overflow-y-auto px-6 py-16">
+        <button id="mobile-menu-close" class="absolute top-4 right-4 text-white hover:text-blue-400 transition-colors duration-300 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 z-[110]" aria-label="Close menu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
         <a href="#hero" class="mobile-link text-3xl font-bold text-white hover:text-blue-400 transition-all duration-300 hover:scale-110 transform">Home</a>
         <a href="#about" class="mobile-link text-3xl font-bold text-white hover:text-blue-400 transition-all duration-300 hover:scale-110 transform">About</a>
         <a href="#skills" class="mobile-link text-3xl font-bold text-white hover:text-blue-400 transition-all duration-300 hover:scale-110 transform">Skills</a>
