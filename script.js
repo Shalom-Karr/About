@@ -143,13 +143,54 @@ const setupNavigation = () => {
     const burgerBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileLinks = document.querySelectorAll('.mobile-link');
+    
+    // Elements for ScrollSpy
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
 
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 20) {
+        const scrollY = window.scrollY;
+        
+        // 1. Glass Nav background
+        if (scrollY > 20) {
             header.classList.add('scrolled-nav');
         } else {
             header.classList.remove('scrolled-nav');
         }
+        
+        // 2. ScrollSpy Logic
+        let currentSectionId = '';
+        
+        // Use an offset so it highlights before you perfectly hit the top
+        const spyOffset = scrollY + 150;
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            
+            if (spyOffset >= sectionTop && spyOffset < sectionTop + sectionHeight) {
+                currentSectionId = section.getAttribute('id');
+            }
+        });
+
+        // Loop through desktop links to apply active styling
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href.startsWith('#')) return; // Skip external links like /blog/
+            
+            const targetId = href.substring(1);
+            const indicator = link.querySelector('.nav-indicator');
+            
+            if (targetId === currentSectionId) {
+                link.classList.remove('text-gray-300');
+                link.classList.add('text-white');
+                if(indicator) indicator.classList.add('w-full');
+            } else {
+                link.classList.add('text-gray-300');
+                link.classList.remove('text-white');
+                if(indicator) indicator.classList.remove('w-full');
+            }
+        });
     });
 
     const toggleMenu = () => {
