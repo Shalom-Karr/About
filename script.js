@@ -400,6 +400,13 @@ const setupNavigation = () => {
 
     if(burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
 
+    const closeBtn = document.getElementById('mobile-menu-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            if (burgerBtn && burgerBtn.classList.contains('active')) toggleMenu();
+        });
+    }
+
     mobileLinks.forEach(link => {
         link.addEventListener('click', () => {
             if (burgerBtn.classList.contains('active')) toggleMenu();
