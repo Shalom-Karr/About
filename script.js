@@ -275,22 +275,21 @@ const animateProjects = () => {
         const totalWidth = projectsGrid.scrollWidth;
 
         // Create horizontal scroll animation with ID
-        const horizontalScrollTrigger = gsap.to(projectsGrid, {
-            x: () => -(totalWidth - projectsScrollContainer.offsetWidth),
-            ease: "none",
-            scrollTrigger: {
-                id: 'projects-horizontal',
-                trigger: "#projects",
-                start: "top top",
-                end: () => `+=${totalWidth}`,
-                scrub: 1,
-                pin: true,
-                anticipatePin: 1,
-                invalidateOnRefresh: true
-            }
+        const mainScrollTrigger = ScrollTrigger.create({
+            trigger: "#projects",
+            start: "top top",
+            end: () => `+=${totalWidth}`,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            animation: gsap.to(projectsGrid, {
+                x: () => -(totalWidth - projectsScrollContainer.offsetWidth),
+                ease: "none"
+            }),
+            scrub: 1
         });
 
-        // Animate individual cards on entry
+        // Animate individual cards on entry (simplified without containerAnimation)
         cards.forEach((card, i) => {
             gsap.fromTo(card,
                 { opacity: 0, y: 50, scale: 0.95 },
@@ -301,10 +300,9 @@ const animateProjects = () => {
                     duration: 0.6,
                     ease: "back.out(1.2)",
                     scrollTrigger: {
-                        trigger: card,
-                        containerAnimation: horizontalScrollTrigger.scrollTrigger,
-                        start: "left 80%",
-                        toggleActions: "play none none reverse"
+                        trigger: "#projects",
+                        start: "top 80%",
+                        toggleActions: "play none none none"
                     }
                 }
             );
