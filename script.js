@@ -3,7 +3,12 @@ import { initTracker } from './tracker.js';
 import { supabase } from './supabase-client.js';
 
 // --- GSAP Animations ---
-gsap.registerPlugin(ScrollTrigger);
+// Wait for GSAP to be loaded before registering plugin (handles module vs global script timing)
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+} else {
+    console.warn('GSAP or ScrollTrigger not loaded yet. Will register on DOMContentLoaded.');
+}
 
 // --- Particle Hero Canvas ---
 const initParticleHero = () => {
@@ -748,6 +753,13 @@ const initContactForm = () => {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure GSAP ScrollTrigger is registered (handles timing issues with module loading)
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+    } else {
+        console.error('GSAP or ScrollTrigger not available. Animations may not work.');
+    }
+
     initTypingAnimation();
     setupNavigation();
     smoothScroll();

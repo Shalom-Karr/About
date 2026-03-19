@@ -762,7 +762,17 @@
     <!-- Amplitude -->
     <script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script>
     <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz"></script>
-    <script>window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});</script>
+    <script>
+        // Wrap Amplitude in try-catch to handle tracking prevention gracefully
+        try {
+            if (window.amplitude && window.sessionReplay) {
+                window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
+                window.amplitude.init('1c885336c34e4a886e13e859363a199a', {"autocapture":{"elementInteractions":true}});
+            }
+        } catch (e) {
+            console.log('Analytics blocked by tracking prevention or privacy settings');
+        }
+    </script>
 
     <!-- To Top Button -->
     <a href="#hero" id="to-top" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full hidden shadow-xl z-50 transition-all duration-300 hover:-translate-y-1">
