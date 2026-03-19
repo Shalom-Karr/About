@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
+  <!-- Canonical URL (dynamically set based on post) -->
+  <link rel="canonical" id="canonical-url" href="https://shalomkarr.pages.dev/blog/post.html">
+
   <!-- URL Redirect Check -->
   <script>
     // Check if current hostname is netlify.app and redirect to pages.dev
@@ -187,6 +190,12 @@
         if (error || !post) throw new Error('Post not found');
 
         document.title = `${post.title} · Shalom Karr`;
+
+        // Update canonical URL with the post slug
+        const canonicalLink = document.getElementById('canonical-url');
+        if (canonicalLink) {
+          canonicalLink.href = `https://shalomkarr.pages.dev/blog/post.html?slug=${slug}`;
+        }
 
         const htmlContent = marked.parse(post.content_md);
         
