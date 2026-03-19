@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Features | Shalom Karr</title>
+    <meta name="description" content="Explore Shalom Karr's GitHub activity and interactive terminal">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- xterm.js for terminal -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+
+        .glow-card {
+            position: relative;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glow-card:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .terminal-container {
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-header {
+            background: #2d2d2d;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .btn-close { background: #ff5f56; }
+        .btn-minimize { background: #ffbd2e; }
+        .btn-maximize { background: #27c93f; }
+
+        .contribution-day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+
+        .contribution-day:hover {
+            transform: scale(1.5);
+            z-index: 10;
+        }
+
+        .command-btn {
+            transition: all 0.3s ease;
+        }
+
+        .command-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Constrain card heights for better layout */
+        .github-activity-card {
+            max-height: 450px;
+        }
+
+        .github-activity-card .overflow-x-auto {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Make heatmap more compact */
+        #contribution-heatmap {
+            max-height: 250px;
+        }
+
+        #heatmap-grid {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-900/90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-400 hover:text-blue-300 transition">← Back to Portfolio</a>
+            <h1 class="text-2xl font-bold">Future Features Lab</h1>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-12">
+        <!-- GitHub Activity Feed Section -->
+        <section class="container mx-auto px-6 mb-16">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                    Real-Time GitHub Activity
+                </h2>
+                <p class="text-gray-400 text-lg">Live feed of contributions, languages, and repository metrics</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <!-- Contribution Heatmap -->
+                <div class="glow-card github-activity-card rounded-xl p-6">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                        Contribution Heatmap
+                    </h3>
+                    <div id="contribution-heatmap" class="overflow-x-auto">
+                        <div class="inline-flex gap-1 flex-wrap" id="heatmap-grid"></div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-4 text-sm text-gray-400">
+                        <span>Less</span>
+                        <div class="flex gap-1">
+                            <div class="contribution-day" style="background: #0e4429"></div>
+                            <div class="contribution-day" style="background: #006d32"></div>
+                            <div class="contribution-day" style="background: #26a641"></div>
+                            <div class="contribution-day" style="background: #39d353"></div>
+                        </div>
+                        <span>More</span>
+                    </div>
+                </div>
+
+                <!-- Language Breakdown -->
+                <div class="glow-card github-activity-card rounded-xl p-6">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                        </svg>
+                        Language Breakdown
+                    </h3>
+                    <canvas id="languageChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="glow-card rounded-xl p-6 mb-8">
+                <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                    </svg>
+                    Recent Activity
+                </h3>
+                <div id="activity-feed" class="space-y-4"></div>
+            </div>
+
+            <!-- Repository Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glow-card rounded-xl p-6 text-center">
+                    <div class="text-4xl font-bold text-yellow-400 mb-2" id="total-stars">-</div>
+                    <div class="text-gray-400">Total Stars</div>
+                </div>
+                <div class="glow-card rounded-xl p-6 text-center">
+                    <div class="text-4xl font-bold text-blue-400 mb-2" id="total-forks">-</div>
+                    <div class="text-gray-400">Total Forks</div>
+                </div>
+                <div class="glow-card rounded-xl p-6 text-center">
+                    <div class="text-4xl font-bold text-green-400 mb-2" id="total-repos">-</div>
+                    <div class="text-gray-400">Public Repos</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Terminal Section -->
+        <section class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-cyan-400">
+                    Interactive Terminal
+                </h2>
+                <p class="text-gray-400 text-lg">Explore my skills and projects through a command-line interface</p>
+            </div>
+
+            <!-- Command Buttons -->
+            <div class="mb-6 flex flex-wrap gap-3 justify-center">
+                <button onclick="runCommand('ls ./projects')" class="command-btn bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-mono text-sm">
+                    ls ./projects
+                </button>
+                <button onclick="runCommand('cat skills.json')" class="command-btn bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-mono text-sm">
+                    cat skills.json
+                </button>
+                <button onclick="runCommand('./deploy.sh')" class="command-btn bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-mono text-sm">
+                    ./deploy.sh
+                </button>
+                <button onclick="runCommand('help')" class="command-btn bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg font-mono text-sm">
+                    help
+                </button>
+                <button onclick="runCommand('clear')" class="command-btn bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-lg font-mono text-sm">
+                    clear
+                </button>
+            </div>
+
+            <!-- Terminal -->
+            <div class="terminal-container max-w-4xl mx-auto">
+                <div class="terminal-header">
+                    <div class="terminal-button btn-close"></div>
+                    <div class="terminal-button btn-minimize"></div>
+                    <div class="terminal-button btn-maximize"></div>
+                    <span class="ml-4 text-gray-400 text-sm">shalom@portfolio ~ %</span>
+                </div>
+                <div id="terminal" style="height: 500px; padding: 15px;"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-16 py-8 border-t border-gray-800 text-center text-gray-500">
+        <p>© 2026 Shalom Karr. Built with curiosity and code.</p>
+    </footer>
+
+    <script>
+        // Initialize Terminal
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 14,
+            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+            theme: {
+                background: '#1a1a1a',
+                foreground: '#00ff00',
+                cursor: '#00ff00',
+                selection: 'rgba(255, 255, 255, 0.3)',
+            }
+        });
+
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(document.getElementById('terminal'));
+        fitAddon.fit();
+
+        // Terminal state
+        let currentLine = '';
+        let commandHistory = [];
+        let historyIndex = -1;
+
+        // Welcome message
+        term.writeln('\x1b[1;32m╔══════════════════════════════════════════════════════════╗');
+        term.writeln('║     Welcome to Shalom Karr\'s Interactive Terminal      ║');
+        term.writeln('╚══════════════════════════════════════════════════════════╝\x1b[0m');
+        term.writeln('');
+        term.writeln('Type \x1b[1;36mhelp\x1b[0m to see available commands or use the buttons above.');
+        term.writeln('');
+        prompt();
+
+        function prompt() {
+            term.write('\r\n\x1b[1;34mshalom@portfolio\x1b[0m:\x1b[1;32m~\x1b[0m$ ');
+        }
+
+        // Command definitions
+        const commands = {
+            'ls ./projects': async () => {
+                term.writeln('\r\n\x1b[1;36mProjects Directory:\x1b[0m');
+                const projects = [
+                    { name: 'portfolio-website', lang: 'JavaScript', desc: 'Personal portfolio with GSAP animations' },
+                    { name: 'supabase-blog', lang: 'TypeScript', desc: 'Full-stack blog with Supabase backend' },
+                    { name: 'automation-scripts', lang: 'Python', desc: 'Collection of workflow automation tools' },
+                    { name: 'api-proxy', lang: 'Node.js', desc: 'Serverless API proxy with caching' },
+                ];
+                projects.forEach(p => {
+                    term.writeln(`  \x1b[1;33m${p.name.padEnd(25)}\x1b[0m \x1b[90m[${p.lang}]\x1b[0m - ${p.desc}`);
+                });
+            },
+
+            'cat skills.json': async () => {
+                term.writeln('\r\n\x1b[1;36m{');
+                term.writeln('  "frontend": ["JavaScript", "React", "Tailwind CSS", "Alpine.js"],');
+                term.writeln('  "backend": ["Node.js", "Python", "Supabase", "PostgreSQL"],');
+                term.writeln('  "tools": ["Git", "npm", "Vite", "Cloudflare Pages"],');
+                term.writeln('  "specialties": ["Serverless", "Web Automation", "API Integration"],');
+                term.writeln('  "currentlyLearning": ["GraphQL", "D3.js", "WebAssembly"]');
+                term.writeln('}\x1b[0m');
+            },
+
+            './deploy.sh': async () => {
+                term.writeln('\r\n\x1b[1;35m▶ Starting deployment...\x1b[0m');
+                await sleep(500);
+                term.writeln('\x1b[32m✓\x1b[0m Building assets...');
+                await sleep(700);
+                term.writeln('\x1b[32m✓\x1b[0m Running tests...');
+                await sleep(600);
+                term.writeln('\x1b[32m✓\x1b[0m Optimizing images...');
+                await sleep(500);
+                term.writeln('\x1b[32m✓\x1b[0m Deploying to Cloudflare Pages...');
+                await sleep(800);
+                term.writeln('\x1b[1;32m✓ Deployment successful!\x1b[0m');
+                term.writeln('\x1b[36m→ https://shalomkarr.pages.dev\x1b[0m');
+            },
+
+            'help': async () => {
+                term.writeln('\r\n\x1b[1;36mAvailable Commands:\x1b[0m');
+                term.writeln('  \x1b[1;33mls ./projects\x1b[0m    - List all projects');
+                term.writeln('  \x1b[1;33mcat skills.json\x1b[0m  - Display technical skills');
+                term.writeln('  \x1b[1;33m./deploy.sh\x1b[0m      - Run deployment simulation');
+                term.writeln('  \x1b[1;33mhelp\x1b[0m             - Show this help message');
+                term.writeln('  \x1b[1;33mclear\x1b[0m            - Clear terminal screen');
+            },
+
+            'clear': async () => {
+                term.clear();
+            }
+        };
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function runCommand(cmd) {
+            currentLine = cmd;
+            term.write(cmd);
+            await executeCommand(cmd);
+            currentLine = '';
+            prompt();
+        }
+
+        async function executeCommand(cmd) {
+            const trimmed = cmd.trim();
+
+            if (trimmed === '') {
+                return;
+            }
+
+            commandHistory.push(trimmed);
+            historyIndex = commandHistory.length;
+
+            if (commands[trimmed]) {
+                await commands[trimmed]();
+            } else {
+                term.writeln(`\r\n\x1b[31mCommand not found: ${trimmed}\x1b[0m`);
+                term.writeln('Type \x1b[1;36mhelp\x1b[0m to see available commands.');
+            }
+        }
+
+        term.onData(e => {
+            switch (e) {
+                case '\r': // Enter
+                    executeCommand(currentLine).then(() => {
+                        currentLine = '';
+                        prompt();
+                    });
+                    break;
+                case '\u007F': // Backspace
+                    if (currentLine.length > 0) {
+                        currentLine = currentLine.slice(0, -1);
+                        term.write('\b \b');
+                    }
+                    break;
+                case '\u0003': // Ctrl+C
+                    term.writeln('^C');
+                    currentLine = '';
+                    prompt();
+                    break;
+                default:
+                    if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E)) {
+                        currentLine += e;
+                        term.write(e);
+                    }
+            }
+        });
+
+        // GitHub Activity Feed
+        const GITHUB_USERNAME = 'Shalom-Karr';
+
+        async function fetchGitHubData() {
+            try {
+                // Fetch user data
+                const userResponse = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`);
+                const userData = await userResponse.json();
+
+                document.getElementById('total-repos').textContent = userData.public_repos;
+
+                // Fetch repositories
+                const reposResponse = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=10`);
+                const repos = await reposResponse.json();
+
+                // Calculate stars and forks
+                const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+                const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
+
+                document.getElementById('total-stars').textContent = totalStars;
+                document.getElementById('total-forks').textContent = totalForks;
+
+                // Display recent activity
+                displayRecentActivity(repos);
+
+                // Generate language breakdown
+                generateLanguageChart(repos);
+
+                // Generate contribution heatmap (mock data)
+                generateContributionHeatmap();
+
+            } catch (error) {
+                console.error('Error fetching GitHub data:', error);
+                document.getElementById('activity-feed').innerHTML = '<p class="text-red-400">Unable to load GitHub data. Please try again later.</p>';
+            }
+        }
+
+        function displayRecentActivity(repos) {
+            const feed = document.getElementById('activity-feed');
+            const activities = repos.slice(0, 5).map(repo => {
+                const date = new Date(repo.updated_at).toLocaleDateString();
+                return `
+                    <div class="flex items-start gap-4 p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition">
+                        <div class="text-2xl">📦</div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <a href="${repo.html_url}" target="_blank" class="text-blue-400 hover:text-blue-300 font-semibold">${repo.name}</a>
+                                <span class="text-gray-500 text-sm">${date}</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">${repo.description || 'No description provided'}</p>
+                            <div class="flex gap-4 mt-2 text-sm text-gray-500">
+                                <span>⭐ ${repo.stargazers_count}</span>
+                                <span>🔀 ${repo.forks_count}</span>
+                                ${repo.language ? `<span>💻 ${repo.language}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            feed.innerHTML = activities;
+        }
+
+        function generateLanguageChart(repos) {
+            const languages = {};
+            repos.forEach(repo => {
+                if (repo.language) {
+                    languages[repo.language] = (languages[repo.language] || 0) + 1;
+                }
+            });
+
+            const sortedLanguages = Object.entries(languages).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            const ctx = document.getElementById('languageChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedLanguages.map(l => l[0]),
+                    datasets: [{
+                        data: sortedLanguages.map(l => l[1]),
+                        backgroundColor: [
+                            '#3b82f6', // blue
+                            '#8b5cf6', // purple
+                            '#ec4899', // pink
+                            '#10b981', // green
+                            '#f59e0b'  // yellow
+                        ],
+                        borderColor: '#1e293b',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#9ca3af',
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateContributionHeatmap() {
+            const grid = document.getElementById('heatmap-grid');
+            const colors = ['#0e4429', '#006d32', '#26a641', '#39d353'];
+
+            // Generate 365 days of contributions (mock data)
+            for (let i = 0; i < 365; i++) {
+                const intensity = Math.floor(Math.random() * 5);
+                const color = intensity === 0 ? '#161b22' : colors[Math.min(intensity - 1, 3)];
+                const day = document.createElement('div');
+                day.className = 'contribution-day';
+                day.style.background = color;
+                day.title = `${intensity} contributions`;
+                grid.appendChild(day);
+            }
+        }
+
+        // Load data on page load
+        fetchGitHubData();
+
+        // Resize terminal on window resize
+        window.addEventListener('resize', () => {
+            fitAddon.fit();
+        });
+    </script>
+</body>
+</html>
