@@ -566,7 +566,7 @@ const loadProjects = async () => {
                   <!-- Content -->
                   <h3 class="text-2xl font-extrabold mb-4 text-gray-100 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300 tracking-tight leading-tight">${project.title}</h3>
 
-                  <p class="text-gray-400 mb-8 leading-relaxed text-sm flex-grow">${project.description}</p>
+                  <p class="text-gray-400 mb-8 leading-relaxed text-sm flex-grow overflow-hidden" style="-webkit-line-clamp: 9; display: -webkit-box; -webkit-box-orient: vertical;">${project.description}</p>
 
                   <!-- Footer Tech Tags -->
                   <div class="mt-auto pt-6 border-t border-gray-700/40 group-hover:border-blue-500/20 transition-colors duration-500">
