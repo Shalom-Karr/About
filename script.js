@@ -255,13 +255,67 @@ const initAnimations = () => {
 const animateProjects = () => {
     ScrollTrigger.getAll().filter(t => t.trigger && t.trigger.id === 'projects').forEach(t => t.kill());
 
-    gsap.fromTo(".project-card", 
-        { opacity: 0, y: 80, scale: 0.9 }, 
-        {
-            opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.2)",
-            scrollTrigger: { id: 'projects', trigger: "#projects-grid", start: "top 85%" }
-        }
-    );
+    const projectsGrid = document.getElementById('projects-grid');
+    const projectsScrollContainer = document.getElementById('projects-scroll-container');
+
+    // Check if we're on mobile
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    if (!isMobile && projectsGrid && projectsScrollContainer) {
+        // Add horizontal-scroll class for desktop
+        projectsGrid.classList.add('horizontal-scroll');
+
+        // Calculate total scroll width
+        const cards = gsap.utils.toArray('.project-card');
+        const totalWidth = projectsGrid.scrollWidth;
+
+        // Create horizontal scroll animation with ID
+        const horizontalScrollTrigger = gsap.to(projectsGrid, {
+            x: () => -(totalWidth - projectsScrollContainer.offsetWidth),
+            ease: "none",
+            scrollTrigger: {
+                id: 'projects-horizontal',
+                trigger: "#projects",
+                start: "top top",
+                end: () => `+=${totalWidth}`,
+                scrub: 1,
+                pin: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true
+            }
+        });
+
+        // Animate individual cards on entry
+        cards.forEach((card, i) => {
+            gsap.fromTo(card,
+                { opacity: 0, y: 50, scale: 0.95 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.6,
+                    ease: "back.out(1.2)",
+                    scrollTrigger: {
+                        trigger: card,
+                        containerAnimation: horizontalScrollTrigger.scrollTrigger,
+                        start: "left 80%",
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+    } else {
+        // Mobile: Use vertical stagger animation
+        projectsGrid.classList.remove('horizontal-scroll');
+
+        gsap.fromTo(".project-card",
+            { opacity: 0, y: 80, scale: 0.9 },
+            {
+                opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.2)",
+                scrollTrigger: { id: 'projects', trigger: "#projects-grid", start: "top 85%" }
+            }
+        );
+    }
 };
 
 
@@ -695,11 +749,11 @@ const initContactForm = () => {
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     initTypingAnimation();
-    setupNavigation(); 
+    setupNavigation();
     smoothScroll();
     setDynamicYear();
     initTracker();
-    
+
     initAnimations();
     initCustomEffects(); // Initialize new mind-blowing effects
     initParticleHero();
@@ -707,6 +761,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
 
     loadProjects();
+
+    // Re-initialize animations on window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const projectsGrid = document.getElementById('projects-grid');
+            if (projectsGrid && projectsGrid.children.length > 0) {
+                animateProjects();
+            }
+        }, 250);
+    });
 });
 
 // To-Top Button Logic

@@ -283,6 +283,38 @@
             height: 100%;
         }
 
+        /* Horizontal Scrolling Projects Section */
+        #projects-scroll-container {
+            overflow: visible;
+        }
+
+        #projects-grid.horizontal-scroll {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2rem;
+            width: max-content;
+        }
+
+        #projects-grid.horizontal-scroll .project-card {
+            width: 400px;
+            min-width: 400px;
+            flex-shrink: 0;
+        }
+
+        /* Mobile responsive - vertical scroll on small screens */
+        @media (max-width: 768px) {
+            #projects-grid.horizontal-scroll {
+                display: grid;
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+
+            #projects-grid.horizontal-scroll .project-card {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+
         </style></head>
 <body class="bg-gray-900 text-white overflow-x-hidden relative">
 
@@ -546,12 +578,15 @@
                 <div class="text-center mb-16 opacity-0 translate-y-10" id="projects-header">
                     <h2 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-4 inline-block">Projects</h2>
                     <p id="projects-description" class="text-gray-400 max-w-2xl mx-auto text-lg">A selection of tools, platforms, and infrastructure I have engineered.</p>
+                    <p class="text-gray-500 text-sm mt-2">Scroll down to explore &rarr;</p>
                 </div>
-                <div id="projects-grid" class="gap-8 min-h-[300px]">
-                    <!-- Loading State -->
-                    <div class="col-span-full flex flex-col justify-center items-center h-64">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                        <p class="text-gray-400 font-medium tracking-wide">Fetching Projects...</p>
+                <div id="projects-scroll-container" class="relative">
+                    <div id="projects-grid" class="gap-8 min-h-[300px]">
+                        <!-- Loading State -->
+                        <div class="col-span-full flex flex-col justify-center items-center h-64">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                            <p class="text-gray-400 font-medium tracking-wide">Fetching Projects...</p>
+                        </div>
                     </div>
                 </div>
             </div>
