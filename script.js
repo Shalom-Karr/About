@@ -705,9 +705,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initParticleHero();
     initMagneticButtons();
     initContactForm();
-    
+
     loadProjects();
-    initContactForm();
 });
 
 // To-Top Button Logic
@@ -718,66 +717,6 @@ if (toTopButton) {
             toTopButton.classList.remove('hidden');
         } else {
             toTopButton.classList.add('hidden');
-        }
-    });
-}
-// --- EmailJS Contact Form ---
-const EMAILJS_PUBLIC_KEY = '6XAGlx_tFQG41xPB3';
-const EMAILJS_SERVICE_ID = 'service_wcrrkbp';
-const EMAILJS_TEMPLATE_ID = 'template_qgcjka4';
-
-function initContactForm() {
-    if (typeof emailjs !== 'undefined') {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-    }
-
-    const form = document.getElementById('contact-form');
-    if (!form) return;
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const name = document.getElementById('contact-name').value.trim();
-        const email = document.getElementById('contact-email').value.trim();
-        const subject = document.getElementById('contact-subject').value.trim();
-        const message = document.getElementById('contact-message').value.trim();
-        const statusEl = document.getElementById('contact-status');
-        const submitBtn = form.querySelector('button[type="submit"]');
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-        if (statusEl) statusEl.innerText = '';
-
-        try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                from_name: name,
-                from_email: email,
-                subject,
-                message,
-            });
-
-            // Also store in Supabase
-            if (window.supabaseClient) {
-                const { error: dbError } = await window.supabaseClient.from('contact_messages').insert([{ name, email, subject, message }]);
-                if (dbError) {
-                    console.error('Supabase insert error:', dbError);
-                }
-            }
-
-            if (statusEl) {
-                statusEl.innerText = 'Message sent! I\'ll get back to you soon.';
-                statusEl.className = 'text-green-400 text-sm mt-2';
-            }
-            form.reset();
-        } catch (err) {
-            console.error('EmailJS error:', err);
-            if (statusEl) {
-                statusEl.innerText = 'Failed to send message. Please try again or contact me directly.';
-                statusEl.className = 'text-red-400 text-sm mt-2';
-            }
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
         }
     });
 }
