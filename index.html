@@ -315,9 +315,29 @@
         #projects-grid.horizontal-scroll .project-card {
             width: 400px;
             min-width: 400px;
-            height: 500px;
-            min-height: 500px;
+            height: 600px;
+            min-height: 600px;
             flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar for project cards */
+        #projects-grid.horizontal-scroll .project-card::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #projects-grid.horizontal-scroll .project-card::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.3);
+            border-radius: 3px;
+        }
+
+        #projects-grid.horizontal-scroll .project-card::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.5);
+            border-radius: 3px;
+        }
+
+        #projects-grid.horizontal-scroll .project-card::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.7);
         }
 
         /* Mobile responsive - vertical scroll on small screens */
