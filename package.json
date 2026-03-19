@@ -5,7 +5,8 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node ./scripts/inject-env.js && postcss ./tailwind.css -o ./output.css"
+    "build": "node ./scripts/inject-env.js && postcss ./tailwind.css -o ./output.css",
+    "generate-sitemap": "node ./scripts/generate-sitemap.js"
   },
   "repository": {
     "type": "git",
