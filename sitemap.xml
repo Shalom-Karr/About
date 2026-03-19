@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Generating Sitemap...</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/scripts/inject-env.js"></script>
+  <script src="/blog/js/supabase-client.js"></script>
+</head>
+<body>
+  <script>
+    // Set the content type to XML
+    document.contentType = 'application/xml';
+
+    async function generateSitemap() {
+      const baseUrl = 'https://shalomkarr.pages.dev';
+      const today = new Date().toISOString().split('T')[0];
+
+      // Static pages with priority and change frequency
+      const staticPages = [
+        { url: '/', changefreq: 'monthly', priority: '1.0', lastmod: today },
+        { url: '/blog/', changefreq: 'daily', priority: '0.9', lastmod: today },
+        { url: '/blog/contact/', changefreq: 'monthly', priority: '0.7', lastmod: today },
+      ];
+
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+      // Add static pages
+      staticPages.forEach(page => {
+        xml += '  <url>\n';
+        xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
+        xml += `    <lastmod>${page.lastmod}</lastmod>\n`;
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+        xml += `    <priority>${page.priority}</priority>\n`;
+        xml += '  </url>\n';
+      });
+
+      // Fetch and add blog posts
+      if (window.supabaseClient) {
+        try {
+          const { data: posts, error } = await window.supabaseClient
+            .from('posts')
+            .select('slug, updated_at, created_at')
+            .eq('is_published', true)
+            .order('created_at', { ascending: false });
+
+          if (!error && posts) {
+            posts.forEach(post => {
+              const lastmod = post.updated_at || post.created_at;
+              const formattedDate = new Date(lastmod).toISOString().split('T')[0];
+
+              xml += '  <url>\n';
+              xml += `    <loc>${baseUrl}/blog/post.html?slug=${encodeURIComponent(post.slug)}</loc>\n`;
+              xml += `    <lastmod>${formattedDate}</lastmod>\n`;
+              xml += `    <changefreq>weekly</changefreq>\n`;
+              xml += `    <priority>0.8</priority>\n`;
+              xml += '  </url>\n';
+            });
+          }
+        } catch (e) {
+          console.error('Error fetching posts:', e);
+        }
+      }
+
+      xml += '</urlset>';
+
+      // Output the XML
+      document.open();
+      document.write(xml);
+      document.close();
+    }
+
+    // Wait for Supabase client to be initialized
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', generateSitemap);
+    } else {
+      generateSitemap();
+    }
+  </script>
+</body>
+</html>
