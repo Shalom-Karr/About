@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <title>Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- URL Redirect Check -->
+  <script>
+    // Check if current hostname is netlify.app and redirect to pages.dev
+    if (window.location.hostname === 'shalomkarr.netlify.app') {
+      window.location.replace(window.location.href.replace('shalomkarr.netlify.app', 'shalomkarr.pages.dev'));
+    }
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
