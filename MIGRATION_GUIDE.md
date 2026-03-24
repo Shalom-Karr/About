@@ -2,7 +2,7 @@
 
 ## Applying Schema Changes to Supabase
 
-If you're encountering a **400 Bad Request** error related to `site_settings`, it means the `site_settings` table doesn't exist in your Supabase database yet.
+If you're encountering a **400 Bad Request** error related to `sitesettings`, it means the `sitesettings` table doesn't exist in your Supabase database yet.
 
 ### Steps to Fix
 
@@ -18,7 +18,7 @@ If you're encountering a **400 Bad Request** error related to `site_settings`, i
    -- ============================================
    -- Site Settings
    -- ============================================
-   CREATE TABLE IF NOT EXISTS site_settings (
+   CREATE TABLE IF NOT EXISTS sitesettings (
        id INTEGER PRIMARY KEY,
        name TEXT NOT NULL,
        bio TEXT,
@@ -28,25 +28,25 @@ If you're encountering a **400 Bad Request** error related to `site_settings`, i
    );
 
    -- Enable RLS
-   ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE sitesettings ENABLE ROW LEVEL SECURITY;
 
    -- Allow public read access (for displaying on the site)
-   CREATE POLICY "Allow public read access" ON site_settings
+   CREATE POLICY "Allow public read access" ON sitesettings
        FOR SELECT
        USING (true);
 
    -- Only authenticated users (admin) can update settings
-   CREATE POLICY "Only admin can update" ON site_settings
+   CREATE POLICY "Only admin can update" ON sitesettings
        FOR UPDATE
        USING (auth.role() = 'authenticated');
 
    -- Only authenticated users (admin) can insert settings
-   CREATE POLICY "Only admin can insert" ON site_settings
+   CREATE POLICY "Only admin can insert" ON sitesettings
        FOR INSERT
        WITH CHECK (auth.role() = 'authenticated');
 
    -- Insert default settings row
-   INSERT INTO site_settings (id, name, bio, avatar_url)
+   INSERT INTO sitesettings (id, name, bio, avatar_url)
    VALUES (
        1,
        'Shalom Karr',
@@ -60,7 +60,7 @@ If you're encountering a **400 Bad Request** error related to `site_settings`, i
 
    Run this query to confirm:
    ```sql
-   SELECT * FROM site_settings;
+   SELECT * FROM sitesettings;
    ```
 
    You should see one row with id=1 and your default settings.
@@ -73,7 +73,7 @@ If you're encountering a **400 Bad Request** error related to `site_settings`, i
 
 ### What This Does
 
-- **Creates the `site_settings` table** with columns for name, bio, and avatar URL
+- **Creates the `sitesettings` table** with columns for name, bio, and avatar URL
 - **Sets up Row Level Security (RLS)** to ensure only admins can modify settings
 - **Allows public read access** so the settings can be displayed on your site
 - **Inserts a default row** with id=1 containing initial settings

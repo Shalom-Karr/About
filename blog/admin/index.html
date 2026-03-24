@@ -411,7 +411,7 @@
         document.getElementById('setting-avatar').value = mockSettings.avatar_url;
         return;
       }
-      const { data, error } = await window.supabaseClient.from('site_settings').select('*').eq('id', 1).single();
+      const { data, error } = await window.supabaseClient.from('sitesettings').select('*').eq('id', 1).single();
       if (data) {
         document.getElementById('setting-name').value = data.name;
         document.getElementById('setting-bio').value = data.bio;
@@ -430,7 +430,7 @@
         return;
       }
 
-      const { error } = await window.supabaseClient.from('site_settings').upsert({ id: 1, name, bio, avatar_url });
+      const { error } = await window.supabaseClient.from('sitesettings').upsert({ id: 1, name, bio, avatar_url });
       if (error) {
         showMsg("settings-msg", "Error: " + error.message, "error");
       } else {
