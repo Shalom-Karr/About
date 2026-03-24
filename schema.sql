@@ -207,7 +207,7 @@ CREATE INDEX idx_contact_messages_is_read ON contact_messages(is_read);
 -- ============================================
 -- Site Settings
 -- ============================================
-CREATE TABLE IF NOT EXISTS site_settings (
+CREATE TABLE IF NOT EXISTS sitesettings (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     bio TEXT,
@@ -217,25 +217,25 @@ CREATE TABLE IF NOT EXISTS site_settings (
 );
 
 -- Enable RLS
-ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sitesettings ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access (for displaying on the site)
-CREATE POLICY "Allow public read access" ON site_settings
+CREATE POLICY "Allow public read access" ON sitesettings
     FOR SELECT
     USING (true);
 
 -- Only authenticated users (admin) can update settings
-CREATE POLICY "Only admin can update" ON site_settings
+CREATE POLICY "Only admin can update" ON sitesettings
     FOR UPDATE
     USING (auth.role() = 'authenticated');
 
 -- Only authenticated users (admin) can insert settings
-CREATE POLICY "Only admin can insert" ON site_settings
+CREATE POLICY "Only admin can insert" ON sitesettings
     FOR INSERT
     WITH CHECK (auth.role() = 'authenticated');
 
 -- Insert default settings row
-INSERT INTO site_settings (id, name, bio, avatar_url)
+INSERT INTO sitesettings (id, name, bio, avatar_url)
 VALUES (
     1,
     'Shalom Karr',
