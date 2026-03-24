@@ -1,0 +1,247 @@
+-- ============================================
+-- Blog Post Tracking Tables
+-- ============================================
+-- This schema adds comprehensive tracking for blog posts including:
+-- 1. Views per post (with fingerprint-based session tracking)
+-- 2. Clicks per post (tracking external link clicks and interactions)
+-- 3. Aggregated analytics views for easy reporting
+--
+-- NOTE: This version uses UUID for post_id to match posts.id column type
+
+-- ============================================
+-- Table: blog_post_views
+-- Purpose: Track each view/visit to a blog post
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.blog_post_views (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+    post_slug TEXT NOT NULL,
+    fingerprint TEXT NULL, -- Browser fingerprint for anonymous session tracking
+    ip_address TEXT NULL, -- Optional: IP address (can be anonymized)
+    user_agent TEXT NULL, -- Browser user agent string
+    referrer TEXT NULL, -- Where the user came from
+    view_duration_seconds BIGINT NULL, -- How long they stayed on the page
+    scroll_depth_percent INTEGER NULL, -- How far they scrolled (0-100)
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NULL -- For updating duration/scroll depth
+);
+
+-- ============================================
+-- Table: blog_post_clicks
+-- Purpose: Track clicks on links within blog posts
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.blog_post_clicks (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+    post_slug TEXT NOT NULL,
+    fingerprint TEXT NULL, -- Same fingerprint as views for session correlation
+    click_type TEXT NOT NULL, -- e.g., 'external_link', 'tag', 'share', 'like'
+    click_target TEXT NULL, -- URL or identifier of what was clicked
+    click_text TEXT NULL, -- Link text or button label
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- ============================================
+-- Indexes for Performance
+-- ============================================
+
+-- Indexes for blog_post_views
+CREATE INDEX IF NOT EXISTS idx_blog_post_views_post_id ON public.blog_post_views(post_id);
+CREATE INDEX IF NOT EXISTS idx_blog_post_views_post_slug ON public.blog_post_views(post_slug);
+CREATE INDEX IF NOT EXISTS idx_blog_post_views_fingerprint ON public.blog_post_views(fingerprint);
+CREATE INDEX IF NOT EXISTS idx_blog_post_views_created_at ON public.blog_post_views(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_blog_post_views_post_created ON public.blog_post_views(post_id, created_at DESC);
+
+-- Indexes for blog_post_clicks
+CREATE INDEX IF NOT EXISTS idx_blog_post_clicks_post_id ON public.blog_post_clicks(post_id);
+CREATE INDEX IF NOT EXISTS idx_blog_post_clicks_post_slug ON public.blog_post_clicks(post_slug);
+CREATE INDEX IF NOT EXISTS idx_blog_post_clicks_fingerprint ON public.blog_post_clicks(fingerprint);
+CREATE INDEX IF NOT EXISTS idx_blog_post_clicks_created_at ON public.blog_post_clicks(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_blog_post_clicks_type ON public.blog_post_clicks(click_type);
+CREATE INDEX IF NOT EXISTS idx_blog_post_clicks_post_type ON public.blog_post_clicks(post_id, click_type);
+
+-- ============================================
+-- Row Level Security (RLS)
+-- ============================================
+
+-- Enable RLS on both tables
+ALTER TABLE public.blog_post_views ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog_post_clicks ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous reads (for analytics dashboard)
+CREATE POLICY "Allow public read access to views"
+    ON public.blog_post_views
+    FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow public read access to clicks"
+    ON public.blog_post_clicks
+    FOR SELECT
+    USING (true);
+
+-- Allow anonymous inserts (so website can track views/clicks)
+CREATE POLICY "Allow public insert access to views"
+    ON public.blog_post_views
+    FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public insert access to clicks"
+    ON public.blog_post_clicks
+    FOR INSERT
+    WITH CHECK (true);
+
+-- Allow updates to views (for updating duration and scroll depth)
+CREATE POLICY "Allow public update access to views"
+    ON public.blog_post_views
+    FOR UPDATE
+    USING (true)
+    WITH CHECK (true);
+
+-- ============================================
+-- Analytics Views for Easy Reporting
+-- ============================================
+
+-- View: Blog post analytics summary
+-- Purpose: Get aggregated stats for each blog post
+CREATE OR REPLACE VIEW public.blog_post_analytics AS
+SELECT
+    p.id,
+    p.slug,
+    p.title,
+    p.created_at,
+    COUNT(DISTINCT l.id) as likes_count,
+
+    -- View metrics
+    COUNT(DISTINCT v.id) as total_views,
+    COUNT(DISTINCT v.fingerprint) as unique_visitors,
+    AVG(v.view_duration_seconds)::INTEGER as avg_duration_seconds,
+    AVG(v.scroll_depth_percent)::INTEGER as avg_scroll_depth_percent,
+    MAX(v.created_at) as last_viewed_at,
+
+    -- Click metrics
+    COUNT(DISTINCT c.id) as total_clicks,
+    COUNT(DISTINCT CASE WHEN c.click_type = 'external_link' THEN c.id END) as external_link_clicks,
+    COUNT(DISTINCT CASE WHEN c.click_type = 'tag' THEN c.id END) as tag_clicks,
+    COUNT(DISTINCT CASE WHEN c.click_type = 'share' THEN c.id END) as share_clicks,
+
+    -- Engagement metrics
+    CASE
+        WHEN COUNT(DISTINCT v.id) > 0
+        THEN (COUNT(DISTINCT c.id)::FLOAT / COUNT(DISTINCT v.id)::FLOAT)::NUMERIC(5,2)
+        ELSE 0
+    END as clicks_per_view,
+
+    CASE
+        WHEN COUNT(DISTINCT v.id) > 0
+        THEN (COUNT(DISTINCT l.id)::FLOAT / COUNT(DISTINCT v.id)::FLOAT * 100)::NUMERIC(5,2)
+        ELSE 0
+    END as like_rate_percent
+
+FROM public.posts p
+LEFT JOIN public.blog_post_views v ON p.id = v.post_id
+LEFT JOIN public.blog_post_clicks c ON p.id = c.post_id
+LEFT JOIN public.post_likes l ON p.id = l.post_id
+WHERE p.is_published = true
+GROUP BY p.id, p.slug, p.title, p.created_at;
+
+-- View: Blog post analytics by date
+-- Purpose: Get daily analytics for trending analysis
+CREATE OR REPLACE VIEW public.blog_post_analytics_by_date AS
+SELECT
+    p.id as post_id,
+    p.slug,
+    p.title,
+    DATE(v.created_at) as view_date,
+    COUNT(DISTINCT v.id) as views_count,
+    COUNT(DISTINCT v.fingerprint) as unique_visitors_count,
+    AVG(v.view_duration_seconds)::INTEGER as avg_duration_seconds,
+    COUNT(DISTINCT c.id) as clicks_count
+FROM public.posts p
+LEFT JOIN public.blog_post_views v ON p.id = v.post_id
+LEFT JOIN public.blog_post_clicks c ON p.id = c.post_id AND DATE(c.created_at) = DATE(v.created_at)
+WHERE p.is_published = true AND v.created_at IS NOT NULL
+GROUP BY p.id, p.slug, p.title, DATE(v.created_at)
+ORDER BY view_date DESC, views_count DESC;
+
+-- View: Top referrers by post
+-- Purpose: See where traffic is coming from
+CREATE OR REPLACE VIEW public.blog_post_referrers AS
+SELECT
+    p.id as post_id,
+    p.slug,
+    p.title,
+    v.referrer,
+    COUNT(*) as referral_count,
+    COUNT(DISTINCT v.fingerprint) as unique_visitors
+FROM public.posts p
+JOIN public.blog_post_views v ON p.id = v.post_id
+WHERE p.is_published = true
+    AND v.referrer IS NOT NULL
+    AND v.referrer != ''
+GROUP BY p.id, p.slug, p.title, v.referrer
+ORDER BY referral_count DESC;
+
+-- ============================================
+-- Useful Queries (as comments for reference)
+-- ============================================
+
+-- Query 1: Get top performing posts by views
+-- SELECT * FROM public.blog_post_analytics
+-- ORDER BY total_views DESC
+-- LIMIT 10;
+
+-- Query 2: Get posts with best engagement (clicks per view)
+-- SELECT * FROM public.blog_post_analytics
+-- WHERE total_views > 10
+-- ORDER BY clicks_per_view DESC
+-- LIMIT 10;
+
+-- Query 3: Get recent view activity (last 7 days)
+-- SELECT * FROM public.blog_post_analytics_by_date
+-- WHERE view_date >= CURRENT_DATE - INTERVAL '7 days'
+-- ORDER BY view_date DESC, views_count DESC;
+
+-- Query 4: Get all views for a specific post
+-- SELECT * FROM public.blog_post_views
+-- WHERE post_slug = 'your-post-slug'
+-- ORDER BY created_at DESC;
+
+-- Query 5: Get click breakdown by type for a specific post
+-- SELECT
+--     click_type,
+--     COUNT(*) as click_count,
+--     COUNT(DISTINCT fingerprint) as unique_users
+-- FROM public.blog_post_clicks
+-- WHERE post_slug = 'your-post-slug'
+-- GROUP BY click_type
+-- ORDER BY click_count DESC;
+
+-- Query 6: Get viewing patterns (hourly distribution)
+-- SELECT
+--     EXTRACT(HOUR FROM created_at) as hour_of_day,
+--     COUNT(*) as views,
+--     COUNT(DISTINCT fingerprint) as unique_visitors
+-- FROM public.blog_post_views
+-- WHERE created_at >= NOW() - INTERVAL '30 days'
+-- GROUP BY EXTRACT(HOUR FROM created_at)
+-- ORDER BY hour_of_day;
+
+-- Query 7: Calculate bounce rate (views with duration < 10 seconds or scroll < 25%)
+-- SELECT
+--     p.slug,
+--     p.title,
+--     COUNT(*) as total_views,
+--     COUNT(CASE
+--         WHEN v.view_duration_seconds < 10 OR v.scroll_depth_percent < 25
+--         THEN 1
+--     END) as bounces,
+--     (COUNT(CASE
+--         WHEN v.view_duration_seconds < 10 OR v.scroll_depth_percent < 25
+--         THEN 1
+--     END)::FLOAT / COUNT(*)::FLOAT * 100)::NUMERIC(5,2) as bounce_rate_percent
+-- FROM public.posts p
+-- JOIN public.blog_post_views v ON p.id = v.post_id
+-- WHERE p.is_published = true
+-- GROUP BY p.id, p.slug, p.title
+-- HAVING COUNT(*) > 5
+-- ORDER BY bounce_rate_percent ASC;

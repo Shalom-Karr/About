@@ -232,14 +232,26 @@
             ${htmlContent}
           </div>
 
-          <div class="flex items-center gap-4 mt-12 pt-8 border-t border-gray-200 dark:border-gray-800" id="like-section">
-            <button id="like-btn" class="group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-gray-300 dark:border-gray-600 transition-all duration-300 font-bold text-sm text-gray-500 dark:text-gray-400 hover:border-pink-400 hover:text-pink-500">
-              <svg id="like-icon" class="w-5 h-5 transition-transform duration-300 group-hover:scale-125" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-              </svg>
-              <span id="like-count">0</span>
-            </button>
-            <span class="text-sm text-gray-400" id="like-label">likes</span>
+          <div class="flex items-center gap-6 mt-12 pt-8 border-t border-gray-200 dark:border-gray-800" id="like-section">
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1 text-blue-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <span id="view-count" class="font-semibold">0</span>
+              </div>
+              <span class="text-sm text-gray-400">views</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="like-btn" class="group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-gray-300 dark:border-gray-600 transition-all duration-300 font-bold text-sm text-gray-500 dark:text-gray-400 hover:border-pink-400 hover:text-pink-500">
+                <svg id="like-icon" class="w-5 h-5 transition-transform duration-300 group-hover:scale-125" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                <span id="like-count">0</span>
+              </button>
+              <span class="text-sm text-gray-400" id="like-label">likes</span>
+            </div>
           </div>
         `;
 
@@ -274,20 +286,28 @@
           }
         }
 
-        // --- Like Button Logic ---
+        // --- Like Button and View Count Logic ---
         const fp = getFingerprint();
         const likeBtn = document.getElementById('like-btn');
         const likeIcon = document.getElementById('like-icon');
         const likeCountEl = document.getElementById('like-count');
+        const viewCountEl = document.getElementById('view-count');
 
-        // Fetch like count and user like status
-        const [{ count: totalLikes }, { data: userLike }] = await Promise.all([
+        // Fetch like count, user like status, and view count
+        const [{ count: totalLikes }, { data: userLike }, { data: analytics }] = await Promise.all([
           window.supabaseClient.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
-          window.supabaseClient.from('post_likes').select('id').eq('post_id', post.id).eq('fingerprint', fp).maybeSingle()
+          window.supabaseClient.from('post_likes').select('id').eq('post_id', post.id).eq('fingerprint', fp).maybeSingle(),
+          window.supabaseClient.from('blog_post_analytics').select('total_views').eq('id', post.id).maybeSingle()
         ]);
 
         let liked = !!userLike;
         let currentCount = totalLikes || 0;
+        const totalViews = analytics?.total_views || 0;
+
+        // Update view count display
+        if (viewCountEl) {
+          viewCountEl.textContent = totalViews.toLocaleString();
+        }
 
         const updateLikeUI = () => {
           if (likeCountEl) likeCountEl.textContent = currentCount;

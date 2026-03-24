@@ -113,6 +113,9 @@
                     <button id="tab-projects" class="tab-button px-6 py-3 font-semibold text-gray-400 hover:text-gray-200 transition-colors">
                         Manage Projects
                     </button>
+                    <button id="tab-analytics" class="tab-button px-6 py-3 font-semibold text-gray-400 hover:text-gray-200 transition-colors">
+                        Blog Analytics
+                    </button>
                 </div>
             </div>
 
@@ -155,6 +158,79 @@
                     </div>
                     <div id="projects-list" class="space-y-4">
                         <!-- Projects will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Blog Analytics -->
+            <div id="content-analytics" class="tab-content hidden">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-blue-400">Blog Analytics</h2>
+                        <button id="refresh-analytics-button" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-gray-300">Refresh</button>
+                    </div>
+
+                    <!-- Summary Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gray-700 p-4 rounded-lg border border-gray-600">
+                            <div class="text-sm text-gray-400 mb-1">Total Views</div>
+                            <div id="total-views" class="text-3xl font-bold text-blue-400">-</div>
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-lg border border-gray-600">
+                            <div class="text-sm text-gray-400 mb-1">Total Clicks</div>
+                            <div id="total-clicks" class="text-3xl font-bold text-green-400">-</div>
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-lg border border-gray-600">
+                            <div class="text-sm text-gray-400 mb-1">Avg. Engagement</div>
+                            <div id="avg-engagement" class="text-3xl font-bold text-purple-400">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Views & Clicks by Day -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-gray-300 mb-3">Daily Activity (Last 30 Days)</h3>
+                        <div class="overflow-x-auto custom-scroll">
+                            <table class="min-w-full text-left text-sm text-gray-300">
+                                <thead class="bg-gray-700 text-gray-100 uppercase font-medium">
+                                    <tr>
+                                        <th class="px-4 py-3 rounded-tl-lg">Date</th>
+                                        <th class="px-4 py-3 text-right">Views</th>
+                                        <th class="px-4 py-3 text-right">Unique Visitors</th>
+                                        <th class="px-4 py-3 text-right">Clicks</th>
+                                        <th class="px-4 py-3 text-right rounded-tr-lg">Avg. Duration (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="daily-analytics-body" class="divide-y divide-gray-700">
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">Loading analytics...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Post Performance -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-300 mb-3">Post Performance</h3>
+                        <div class="overflow-x-auto custom-scroll">
+                            <table class="min-w-full text-left text-sm text-gray-300">
+                                <thead class="bg-gray-700 text-gray-100 uppercase font-medium">
+                                    <tr>
+                                        <th class="px-4 py-3 rounded-tl-lg">Post Title</th>
+                                        <th class="px-4 py-3 text-right">Total Views</th>
+                                        <th class="px-4 py-3 text-right">Unique Visitors</th>
+                                        <th class="px-4 py-3 text-right">Total Clicks</th>
+                                        <th class="px-4 py-3 text-right">Likes</th>
+                                        <th class="px-4 py-3 text-right rounded-tr-lg">Avg. Duration (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="post-analytics-body" class="divide-y divide-gray-700">
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-4 text-center text-gray-500">Loading post analytics...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
