@@ -203,3 +203,43 @@ CREATE POLICY "Only admin can read" ON contact_messages
 -- Index for admin dashboard queries
 CREATE INDEX idx_contact_messages_created_at ON contact_messages(created_at DESC);
 CREATE INDEX idx_contact_messages_is_read ON contact_messages(is_read);
+
+-- ============================================
+-- Site Settings
+-- ============================================
+CREATE TABLE IF NOT EXISTS site_settings (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    bio TEXT,
+    avatar_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Enable RLS
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access (for displaying on the site)
+CREATE POLICY "Allow public read access" ON site_settings
+    FOR SELECT
+    USING (true);
+
+-- Only authenticated users (admin) can update settings
+CREATE POLICY "Only admin can update" ON site_settings
+    FOR UPDATE
+    USING (auth.role() = 'authenticated');
+
+-- Only authenticated users (admin) can insert settings
+CREATE POLICY "Only admin can insert" ON site_settings
+    FOR INSERT
+    WITH CHECK (auth.role() = 'authenticated');
+
+-- Insert default settings row
+INSERT INTO site_settings (id, name, bio, avatar_url)
+VALUES (
+    1,
+    'Shalom Karr',
+    'Full-stack developer passionate about creating elegant solutions to complex problems.',
+    ''
+)
+ON CONFLICT (id) DO NOTHING;
