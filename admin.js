@@ -11,8 +11,10 @@ const logoutButton = document.getElementById('logout-button');
 // Tab Elements
 const tabLogs = document.getElementById('tab-logs');
 const tabProjects = document.getElementById('tab-projects');
+const tabAnalytics = document.getElementById('tab-analytics');
 const contentLogs = document.getElementById('content-logs');
 const contentProjects = document.getElementById('content-projects');
+const contentAnalytics = document.getElementById('content-analytics');
 
 // Projects Elements
 const projectsList = document.getElementById('projects-list');
@@ -33,6 +35,14 @@ const newTechInput = document.getElementById('new-tech-input');
 // Visitor Logs Elements
 const visitorLogsBody = document.getElementById('visitor-logs-body');
 const refreshLogsButton = document.getElementById('refresh-logs-button');
+
+// Analytics Elements
+const totalViewsEl = document.getElementById('total-views');
+const totalClicksEl = document.getElementById('total-clicks');
+const avgEngagementEl = document.getElementById('avg-engagement');
+const dailyAnalyticsBody = document.getElementById('daily-analytics-body');
+const postAnalyticsBody = document.getElementById('post-analytics-body');
+const refreshAnalyticsButton = document.getElementById('refresh-analytics-button');
 
 
 // --- State ---
@@ -149,6 +159,122 @@ const loadVisitorLogs = async () => {
     }
 
     renderVisitorLogs(data);
+};
+
+const loadBlogAnalytics = async () => {
+    // Load summary stats and post analytics
+    const { data: postAnalytics, error: postError } = await supabase
+        .from('blog_post_analytics')
+        .select('*')
+        .order('total_views', { ascending: false });
+
+    if (postError) {
+        console.error('Error loading post analytics:', postError);
+        postAnalyticsBody.innerHTML = `<tr><td colspan="6" class="px-4 py-4 text-center text-red-500">Error: ${postError.message}</td></tr>`;
+    } else {
+        renderPostAnalytics(postAnalytics || []);
+
+        // Calculate and display summary stats
+        const totalViews = postAnalytics?.reduce((sum, p) => sum + (p.total_views || 0), 0) || 0;
+        const totalClicks = postAnalytics?.reduce((sum, p) => sum + (p.total_clicks || 0), 0) || 0;
+        const avgEngagement = totalViews > 0 ? (totalClicks / totalViews * 100).toFixed(1) : 0;
+
+        totalViewsEl.textContent = totalViews.toLocaleString();
+        totalClicksEl.textContent = totalClicks.toLocaleString();
+        avgEngagementEl.textContent = `${avgEngagement}%`;
+    }
+
+    // Load daily analytics (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { data: dailyData, error: dailyError } = await supabase
+        .from('blog_post_analytics_by_date')
+        .select('*')
+        .gte('view_date', thirtyDaysAgo.toISOString().split('T')[0])
+        .order('view_date', { ascending: false });
+
+    if (dailyError) {
+        console.error('Error loading daily analytics:', dailyError);
+        dailyAnalyticsBody.innerHTML = `<tr><td colspan="5" class="px-4 py-4 text-center text-red-500">Error: ${dailyError.message}</td></tr>`;
+    } else {
+        // Aggregate by date
+        const dailyTotals = {};
+        (dailyData || []).forEach(row => {
+            const date = row.view_date;
+            if (!dailyTotals[date]) {
+                dailyTotals[date] = {
+                    views: 0,
+                    uniqueVisitors: 0,
+                    clicks: 0,
+                    avgDuration: []
+                };
+            }
+            dailyTotals[date].views += row.views_count || 0;
+            dailyTotals[date].uniqueVisitors += row.unique_visitors_count || 0;
+            dailyTotals[date].clicks += row.clicks_count || 0;
+            if (row.avg_duration_seconds) {
+                dailyTotals[date].avgDuration.push(row.avg_duration_seconds);
+            }
+        });
+
+        renderDailyAnalytics(dailyTotals);
+    }
+};
+
+const renderDailyAnalytics = (dailyTotals) => {
+    dailyAnalyticsBody.innerHTML = '';
+
+    const dates = Object.keys(dailyTotals).sort().reverse();
+
+    if (dates.length === 0) {
+        dailyAnalyticsBody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">No data available yet.</td></tr>';
+        return;
+    }
+
+    dates.forEach(date => {
+        const data = dailyTotals[date];
+        const avgDuration = data.avgDuration.length > 0
+            ? Math.round(data.avgDuration.reduce((a, b) => a + b, 0) / data.avgDuration.length)
+            : 0;
+
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-700 transition-colors';
+        row.innerHTML = `
+            <td class="px-4 py-3 text-gray-300">${new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+            <td class="px-4 py-3 text-right text-blue-400 font-semibold">${data.views.toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-purple-400">${data.uniqueVisitors.toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-green-400">${data.clicks.toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-gray-300">${avgDuration}</td>
+        `;
+        dailyAnalyticsBody.appendChild(row);
+    });
+};
+
+const renderPostAnalytics = (posts) => {
+    postAnalyticsBody.innerHTML = '';
+
+    if (posts.length === 0) {
+        postAnalyticsBody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-center text-gray-500">No blog posts found or no analytics data available yet.</td></tr>';
+        return;
+    }
+
+    posts.forEach(post => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-700 transition-colors';
+        row.innerHTML = `
+            <td class="px-4 py-3 text-gray-300">
+                <div class="font-semibold">${post.title}</div>
+                <div class="text-xs text-gray-500">${post.slug}</div>
+            </td>
+            <td class="px-4 py-3 text-right text-blue-400 font-semibold">${(post.total_views || 0).toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-purple-400">${(post.unique_visitors || 0).toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-green-400">${(post.total_clicks || 0).toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-pink-400">${(post.likes_count || 0).toLocaleString()}</td>
+            <td class="px-4 py-3 text-right text-gray-300">${post.avg_duration_seconds || 0}</td>
+        `;
+        postAnalyticsBody.appendChild(row);
+    });
 };
 
 
@@ -372,6 +498,12 @@ const switchTab = (tab) => {
         tabProjects.classList.remove('text-gray-400');
         tabProjects.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
         contentProjects.classList.remove('hidden');
+    } else if (tab === 'analytics') {
+        tabAnalytics.classList.remove('text-gray-400');
+        tabAnalytics.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
+        contentAnalytics.classList.remove('hidden');
+        // Load analytics when tab is shown
+        loadBlogAnalytics();
     }
 };
 
@@ -384,10 +516,12 @@ modalClose.addEventListener('click', closeModal);
 modalCancel.addEventListener('click', closeModal);
 projectForm.addEventListener('submit', handleFormSubmit);
 refreshLogsButton.addEventListener('click', loadVisitorLogs);
+refreshAnalyticsButton.addEventListener('click', loadBlogAnalytics);
 
 // Tab switching
 tabLogs.addEventListener('click', () => switchTab('logs'));
 tabProjects.addEventListener('click', () => switchTab('projects'));
+tabAnalytics.addEventListener('click', () => switchTab('analytics'));
 
 projectsList.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-btn')) {
