@@ -222,6 +222,8 @@ const loadBlogAnalytics = async () => {
     }
 };
 
+let dailyViewsChartInstance = null;
+
 const renderDailyAnalytics = (dailyTotals) => {
     dailyAnalyticsBody.innerHTML = '';
 
@@ -231,6 +233,22 @@ const renderDailyAnalytics = (dailyTotals) => {
         dailyAnalyticsBody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">No data available yet.</td></tr>';
         return;
     }
+
+    // Arrays for Chart.js
+    const chartLabels = [];
+    const chartViewsData = [];
+    const chartUniqueData = [];
+
+    // We want the chart to display left-to-right (oldest to newest), 
+    // so we iterate the sorted 'dates' array in reverse for the chart
+    const chartDates = [...dates].reverse();
+
+    chartDates.forEach(date => {
+        const data = dailyTotals[date];
+        chartLabels.push(new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        chartViewsData.push(data.views);
+        chartUniqueData.push(data.uniqueVisitors);
+    });
 
     dates.forEach(date => {
         const data = dailyTotals[date];
@@ -249,6 +267,65 @@ const renderDailyAnalytics = (dailyTotals) => {
         `;
         dailyAnalyticsBody.appendChild(row);
     });
+
+    // Render Chart.js
+    const ctx = document.getElementById('dailyViewsChart');
+    if (ctx) {
+        if (dailyViewsChartInstance) {
+            dailyViewsChartInstance.destroy();
+        }
+        
+        dailyViewsChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [
+                    {
+                        label: 'Total Views',
+                        data: chartViewsData,
+                        borderColor: '#60a5fa', // text-blue-400
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Unique Visitors',
+                        data: chartUniqueData,
+                        borderColor: '#c084fc', // text-purple-400
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#d1d5db' } // text-gray-300
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#374151' }, // border-gray-700
+                        ticks: { color: '#9ca3af' } // text-gray-400
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#374151' },
+                        ticks: { color: '#9ca3af', precision: 0 }
+                    }
+                }
+            }
+        });
+    }
 };
 
 const renderPostAnalytics = (posts) => {

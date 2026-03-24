@@ -558,9 +558,9 @@
       const msg = allMessages.find(m => String(m.id) === String(id));
       if (!msg || msg.is_read) return;
 
+      // Optimistic update without triggering a full re-render that would collapse the accordion
       msg.is_read = true;
       updateUnreadBadge();
-      renderInbox();
 
       if (!isDevMode) {
         const { error } = await window.supabaseClient
@@ -570,10 +570,8 @@
 
         if (error) {
           console.error('Error marking message as read:', error);
-          // Revert local state on error
           msg.is_read = false;
           updateUnreadBadge();
-          renderInbox();
         }
       }
     }
@@ -581,9 +579,16 @@
     async function toggleReadStatus(id) {
       const msg = allMessages.find(m => String(m.id) === String(id));
       if (!msg) return;
+      
       const previousState = msg.is_read;
       msg.is_read = !msg.is_read;
+      
       updateUnreadBadge();
+      
+      // Stop the click from opening/closing the accordion
+      if (event) event.stopPropagation();
+      
+      // Full re-render is fine here because this is the external toggle button
       renderInbox();
 
       if (!isDevMode) {
@@ -594,7 +599,6 @@
 
         if (error) {
           console.error('Error toggling read status:', error);
-          // Revert local state on error
           msg.is_read = previousState;
           updateUnreadBadge();
           renderInbox();
