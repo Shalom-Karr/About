@@ -563,55 +563,101 @@
       renderInbox();
 
       if (!isDevMode) {
-        await window.supabaseClient
+        const { error } = await window.supabaseClient
           .from('contact_messages')
           .update({ is_read: true })
           .eq('id', id);
+
+        if (error) {
+          console.error('Error marking message as read:', error);
+          // Revert local state on error
+          msg.is_read = false;
+          updateUnreadBadge();
+          renderInbox();
+        }
       }
     }
 
     async function toggleReadStatus(id) {
       const msg = allMessages.find(m => String(m.id) === String(id));
       if (!msg) return;
+      const previousState = msg.is_read;
       msg.is_read = !msg.is_read;
       updateUnreadBadge();
       renderInbox();
 
       if (!isDevMode) {
-        await window.supabaseClient
+        const { error } = await window.supabaseClient
           .from('contact_messages')
           .update({ is_read: msg.is_read })
           .eq('id', id);
+
+        if (error) {
+          console.error('Error toggling read status:', error);
+          // Revert local state on error
+          msg.is_read = previousState;
+          updateUnreadBadge();
+          renderInbox();
+        }
       }
     }
 
     async function markAllRead() {
       const unread = allMessages.filter(m => !m.is_read);
       if (unread.length === 0) return;
+
+      // Store previous states for rollback
+      const previousStates = unread.map(m => ({ id: m.id, was_read: m.is_read }));
+
       unread.forEach(m => { m.is_read = true; });
       updateUnreadBadge();
       renderInbox();
 
       if (!isDevMode) {
         const ids = unread.map(m => m.id);
-        await window.supabaseClient
+        const { error } = await window.supabaseClient
           .from('contact_messages')
           .update({ is_read: true })
           .in('id', ids);
+
+        if (error) {
+          console.error('Error marking all as read:', error);
+          // Revert local state on error
+          previousStates.forEach(({ id, was_read }) => {
+            const msg = allMessages.find(m => m.id === id);
+            if (msg) msg.is_read = was_read;
+          });
+          updateUnreadBadge();
+          renderInbox();
+        }
       }
     }
 
     async function deleteMessage(id) {
       if (!confirm('Delete this message? This cannot be undone.')) return;
+
+      // Store the message for rollback
+      const deletedMsg = allMessages.find(m => String(m.id) === String(id));
+      if (!deletedMsg) return;
+
       allMessages = allMessages.filter(m => String(m.id) !== String(id));
       updateUnreadBadge();
       renderInbox();
 
       if (!isDevMode) {
-        await window.supabaseClient
+        const { error } = await window.supabaseClient
           .from('contact_messages')
           .delete()
           .eq('id', id);
+
+        if (error) {
+          console.error('Error deleting message:', error);
+          // Restore message on error
+          allMessages.push(deletedMsg);
+          allMessages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          updateUnreadBadge();
+          renderInbox();
+        }
       }
     }
 
