@@ -148,8 +148,7 @@ CREATE TABLE IF NOT EXISTS
     content_md TEXT NULL,
     tags TEXT[] NULL,
     is_published BOOLEAN NOT NULL DEFAULT false,
-    image_url TEXT NULL,
-    likes_count BIGINT NOT NULL DEFAULT 0
+    image_url TEXT NULL
   );
 
 -- 6. Create the table for tracking post likes.

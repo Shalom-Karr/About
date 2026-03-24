@@ -109,7 +109,7 @@ SELECT
     p.slug,
     p.title,
     p.created_at,
-    p.likes_count,
+    COUNT(DISTINCT l.id) as likes_count,
 
     -- View metrics
     COUNT(DISTINCT v.id) as total_views,
@@ -133,15 +133,16 @@ SELECT
 
     CASE
         WHEN COUNT(DISTINCT v.id) > 0
-        THEN (p.likes_count::FLOAT / COUNT(DISTINCT v.id)::FLOAT * 100)::NUMERIC(5,2)
+        THEN (COUNT(DISTINCT l.id)::FLOAT / COUNT(DISTINCT v.id)::FLOAT * 100)::NUMERIC(5,2)
         ELSE 0
     END as like_rate_percent
 
 FROM public.posts p
 LEFT JOIN public.blog_post_views v ON p.id = v.post_id
 LEFT JOIN public.blog_post_clicks c ON p.id = c.post_id
+LEFT JOIN public.post_likes l ON p.id = l.post_id
 WHERE p.is_published = true
-GROUP BY p.id, p.slug, p.title, p.created_at, p.likes_count;
+GROUP BY p.id, p.slug, p.title, p.created_at;
 
 -- View: Blog post analytics by date
 -- Purpose: Get daily analytics for trending analysis
