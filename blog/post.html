@@ -286,6 +286,34 @@
           }
         }
 
+
+        // --- Code Block Copy Buttons ---
+        const codeBlocks = container.querySelectorAll('pre');
+        codeBlocks.forEach(pre => {
+          pre.style.position = 'relative';
+          const btn = document.createElement('button');
+          btn.innerText = 'Copy';
+          btn.className = 'absolute top-2 right-2 bg-gray-700/80 hover:bg-gray-600 text-xs text-white px-2 py-1 rounded opacity-0 transition-opacity duration-200 z-10 backdrop-blur-sm';
+          pre.appendChild(btn);
+          
+          pre.addEventListener('mouseenter', () => btn.style.opacity = '1');
+          pre.addEventListener('mouseleave', () => btn.style.opacity = '0');
+          
+          btn.addEventListener('click', () => {
+            const code = pre.querySelector('code')?.innerText || pre.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+              btn.innerText = 'Copied!';
+              btn.classList.add('bg-green-600/80');
+              btn.classList.remove('bg-gray-700/80');
+              setTimeout(() => {
+                btn.innerText = 'Copy';
+                btn.classList.remove('bg-green-600/80');
+                btn.classList.add('bg-gray-700/80');
+              }, 2000);
+            });
+          });
+        });
+
         // --- Like Button and View Count Logic ---
         const fp = getFingerprint();
         const likeBtn = document.getElementById('like-btn');
