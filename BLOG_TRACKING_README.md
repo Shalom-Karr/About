@@ -10,6 +10,8 @@ The tracking system consists of two main tables and several analytics views:
 2. **`blog_post_clicks`** - Tracks clicks on links and interactions within blog posts
 3. **Analytics Views** - Pre-built views for easy reporting and analytics
 
+**Note**: This system uses **UUID** for post IDs to match the existing `posts.id` column type.
+
 ## Database Schema
 
 ### Installation
@@ -33,8 +35,8 @@ Or copy and paste the SQL into your Supabase SQL Editor.
 Tracks every view of a blog post with detailed metrics.
 
 **Columns:**
-- `id` - Primary key (auto-generated)
-- `post_id` - Foreign key to `posts.id`
+- `id` - Primary key (UUID, auto-generated)
+- `post_id` - Foreign key to `posts.id` (UUID)
 - `post_slug` - Denormalized slug for faster queries
 - `fingerprint` - Browser fingerprint for anonymous session tracking
 - `ip_address` - Optional IP address (can be anonymized)
@@ -48,7 +50,7 @@ Tracks every view of a blog post with detailed metrics.
 **Example Insert:**
 ```sql
 INSERT INTO blog_post_views (post_id, post_slug, fingerprint, user_agent, referrer)
-VALUES (1, 'my-first-post', 'fp_abc123', 'Mozilla/5.0...', 'https://google.com');
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'my-first-post', 'fp_abc123', 'Mozilla/5.0...', 'https://google.com');
 ```
 
 ### 2. `blog_post_clicks`
@@ -56,8 +58,8 @@ VALUES (1, 'my-first-post', 'fp_abc123', 'Mozilla/5.0...', 'https://google.com')
 Tracks clicks on links and interactions within blog posts.
 
 **Columns:**
-- `id` - Primary key (auto-generated)
-- `post_id` - Foreign key to `posts.id`
+- `id` - Primary key (UUID, auto-generated)
+- `post_id` - Foreign key to `posts.id` (UUID)
 - `post_slug` - Denormalized slug for faster queries
 - `fingerprint` - Same fingerprint as views for session correlation
 - `click_type` - Type of click: `'external_link'`, `'tag'`, `'share'`, `'like'`, etc.
@@ -68,7 +70,7 @@ Tracks clicks on links and interactions within blog posts.
 **Example Insert:**
 ```sql
 INSERT INTO blog_post_clicks (post_id, post_slug, fingerprint, click_type, click_target, click_text)
-VALUES (1, 'my-first-post', 'fp_abc123', 'external_link', 'https://example.com', 'Learn More');
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'my-first-post', 'fp_abc123', 'external_link', 'https://example.com', 'Learn More');
 ```
 
 ## Analytics Views
