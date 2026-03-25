@@ -82,6 +82,66 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style id="discord-code-style">
+    /* Discord Style Code Blocks */
+    .discord-code-wrapper {
+      background-color: #2b2d31;
+      border: 1px solid #1e1f22;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .discord-code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background-color: #1e1f22;
+      color: #b5bac1;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .discord-code-header .lang-name {
+      user-select: none;
+    }
+    .discord-code-header button {
+      background: transparent;
+      border: none;
+      color: #b5bac1;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+      outline: none;
+    }
+    .discord-code-header button:hover {
+      color: #ffffff;
+    }
+    .discord-code-header button svg {
+      width: 14px;
+      height: 14px;
+    }
+    .discord-code-wrapper pre {
+      margin: 0 !important;
+      padding: 16px !important;
+      background-color: transparent !important;
+      border-radius: 0 !important;
+    }
+    .discord-code-wrapper pre code {
+      font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: #dbdee1;
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative">
 
@@ -287,167 +347,6 @@
         }
 
 
-        // --- Code Block Copy Buttons ---
-        const codeBlocks = container.querySelectorAll('pre');
-        codeBlocks.forEach(pre => {
-          pre.style.position = 'relative';
-          const btn = document.createElement('button');
-          btn.innerText = 'Copy';
-          btn.className = 'absolute top-2 right-2 bg-gray-700/80 hover:bg-gray-600 text-xs text-white px-2 py-1 rounded opacity-0 transition-opacity duration-200 z-10 backdrop-blur-sm';
-          pre.appendChild(btn);
-          
-          pre.addEventListener('mouseenter', () => btn.style.opacity = '1');
-          pre.addEventListener('mouseleave', () => btn.style.opacity = '0');
-          
-          btn.addEventListener('click', () => {
-            const code = pre.querySelector('code')?.innerText || pre.innerText;
-            navigator.clipboard.writeText(code).then(() => {
-              btn.innerText = 'Copied!';
-              btn.classList.add('bg-green-600/80');
-              btn.classList.remove('bg-gray-700/80');
-              setTimeout(() => {
-                btn.innerText = 'Copy';
-                btn.classList.remove('bg-green-600/80');
-                btn.classList.add('bg-gray-700/80');
-              }, 2000);
-            });
-          });
-        });
-
-        // --- Like Button and View Count Logic ---
-        const fp = getFingerprint();
-        const likeBtn = document.getElementById('like-btn');
-        const likeIcon = document.getElementById('like-icon');
-        const likeCountEl = document.getElementById('like-count');
-        const viewCountEl = document.getElementById('view-count');
-
-        // Fetch like count, user like status, and view count
-        const [{ count: totalLikes }, { data: userLike }, { data: analytics }] = await Promise.all([
-          window.supabaseClient.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
-          window.supabaseClient.from('post_likes').select('id').eq('post_id', post.id).eq('fingerprint', fp).maybeSingle(),
-          window.supabaseClient.from('blog_post_analytics').select('total_views').eq('id', post.id).maybeSingle()
-        ]);
-
-        let liked = !!userLike;
-        let currentCount = totalLikes || 0;
-        const totalViews = analytics?.total_views || 0;
-
-        // Update view count display
-        if (viewCountEl) {
-          viewCountEl.textContent = totalViews.toLocaleString();
-        }
-
-        // --- Advanced Blog Tracking (Requested Features) ---
-        async function startBlogTracking(postObj, fingerPrint) {
-          let userIP = 'unknown';
-          try {
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            userIP = ipData.ip;
-          } catch(e) {}
-          
-          const userAgent = navigator.userAgent;
-          const referrer = document.referrer || '';
-          const postSlug = postObj.slug;
-          const postId = postObj.id;
-          
-          // Insert initial view into the database
-          const { data: viewSession, error: viewError } = await window.supabaseClient
-            .from('blog_post_views')
-            .insert({
-              post_id: postId,
-              post_slug: postSlug,
-              fingerprint: fingerPrint,
-              ip_address: userIP,
-              user_agent: userAgent,
-              referrer: referrer,
-              view_duration_seconds: 0
-            })
-            .select()
-            .single();
-            
-          if (!viewError && viewSession) {
-            console.log('View tracked successfully! Initializing real-time analytics tracker...');
-            
-            let secondsSpent = 0;
-            // Read URL every second and log requested info
-            setInterval(async () => {
-              secondsSpent++;
-              const currentUrl = window.location.href;
-              const currentTime = new Date().toISOString();
-              
-              // 1. "log the url and ip address and timestamp and browser info"
-              // 2. "track which slug people are on to track the views per article"
-              console.log(`[View Tracked] URL: ${currentUrl} | Slug: ${postSlug} | IP: ${userIP} | Time: ${currentTime} | Browser: ${userAgent} | Duration: ${secondsSpent}s`);
-              
-              // 3. "update it to read... then based on that it can see how long people spent on each page"
-              // 4. "and update the views"
-              if (secondsSpent % 5 === 0) {
-                // Update duration in DB
-                await window.supabaseClient
-                  .from('blog_post_views')
-                  .update({ 
-                    view_duration_seconds: secondsSpent,
-                    updated_at: new Date().toISOString()
-                  })
-                  .eq('id', viewSession.id);
-                  
-                // Fetch the updated total views
-                const { data: latestAnalytics } = await window.supabaseClient
-                  .from('blog_post_analytics')
-                  .select('total_views')
-                  .eq('id', postId)
-                  .maybeSingle();
-                  
-                if (latestAnalytics && viewCountEl) {
-                  viewCountEl.textContent = latestAnalytics.total_views.toLocaleString();
-                }
-              }
-            }, 1000);
-          } else {
-            console.warn('Tracking initialization failed:', viewError);
-          }
-        }
-        
-        // Start the tracking logic
-        startBlogTracking(post, fp);
-
-        const updateLikeUI = () => {
-          if (likeCountEl) likeCountEl.textContent = currentCount;
-          if (liked) {
-            likeBtn.className = 'group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-pink-500 text-pink-500 transition-all duration-300 font-bold text-sm';
-            likeIcon.setAttribute('fill', 'currentColor');
-            likeIcon.setAttribute('stroke', 'none');
-          } else {
-            likeBtn.className = 'group flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 transition-all duration-300 font-bold text-sm hover:border-pink-400 hover:text-pink-500';
-            likeIcon.setAttribute('fill', 'none');
-            likeIcon.setAttribute('stroke', 'currentColor');
-          }
-        };
-
-        updateLikeUI();
-
-        if (likeBtn) {
-          likeBtn.addEventListener('click', async () => {
-            if (!liked) {
-              liked = true;
-              currentCount++;
-              updateLikeUI();
-              if (typeof gsap !== 'undefined') {
-                gsap.fromTo(likeIcon, { scale: 1 }, { scale: 1.4, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.out' });
-              }
-              const { error } = await window.supabaseClient.from('post_likes').insert({ post_id: post.id, fingerprint: fp });
-              if (error) { liked = false; currentCount = Math.max(0, currentCount - 1); updateLikeUI(); }
-            } else {
-              liked = false;
-              currentCount = Math.max(0, currentCount - 1);
-              updateLikeUI();
-              const { error } = await window.supabaseClient.from('post_likes').delete().eq('post_id', post.id).eq('fingerprint', fp);
-              if (error) { liked = true; currentCount++; updateLikeUI(); }
-            }
-          });
-        }
-        
         if (window.initScrollAnimations) window.initScrollAnimations();
 
       } catch (err) {
