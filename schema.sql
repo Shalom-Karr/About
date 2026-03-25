@@ -199,6 +199,12 @@ CREATE POLICY "Only admin can read" ON contact_messages
     FOR SELECT
     USING (auth.role() = 'authenticated');
 
+-- Only authenticated users (admin) can update messages (e.g. mark as read)
+CREATE POLICY "Admin can update messages" ON contact_messages
+    FOR UPDATE
+    USING (auth.role() = 'authenticated')
+    WITH CHECK (auth.role() = 'authenticated');
+
 -- Index for admin dashboard queries
 CREATE INDEX idx_contact_messages_created_at ON contact_messages(created_at DESC);
 CREATE INDEX idx_contact_messages_is_read ON contact_messages(is_read);
@@ -242,3 +248,4 @@ VALUES (
     ''
 )
 ON CONFLICT (id) DO NOTHING;
+
