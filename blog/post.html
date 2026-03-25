@@ -142,6 +142,48 @@
       color: #dbdee1;
     }
   </style>
+  <style>
+    /* Discord-like Typography Overrides */
+    .prose :not(pre) > code {
+      background-color: rgba(115, 138, 148, 0.15) !important;
+      padding: 0.2em 0.4em !important;
+      border-radius: 6px !important;
+      color: #e32636 !important;
+      font-family: 'Fira Code', ui-monospace, monospace;
+      font-size: 0.85em;
+    }
+    .dark .prose :not(pre) > code {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: #ff7b72 !important;
+    }
+    .prose blockquote {
+      border-left-width: 4px !important;
+      border-left-color: #5865F2 !important;
+      background-color: rgba(88, 101, 242, 0.05) !important;
+      padding: 1rem 1.5rem !important;
+      border-radius: 0 8px 8px 0 !important;
+      font-style: normal !important;
+      color: inherit !important;
+      margin: 1.5rem 0 !important;
+    }
+    .dark .prose blockquote {
+        background-color: rgba(88, 101, 242, 0.1) !important;
+    }
+    .prose img {
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0,0,0,0.1);
+        margin: 2rem auto !important;
+        display: block;
+    }
+    .dark .prose img {
+        border-color: rgba(255,255,255,0.1);
+    }
+    .prose hr {
+        border-color: rgba(156, 163, 175, 0.2) !important;
+        margin: 3rem 0 !important;
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300 antialiased relative">
 
@@ -175,7 +217,7 @@
 
     <!-- Main Content -->
     <main class="p-8 lg:p-14 lg:col-span-2 relative">
-      <article id="post-container" class="max-w-3xl mx-auto">
+      <article id="post-container" class="max-w-3xl mx-auto prose prose-slate dark:prose-invert prose-lg md:prose-xl prose-headings:font-extrabold prose-p:leading-relaxed prose-a:text-blue-500 hover:prose-a:text-blue-400 prose-img:rounded-2xl prose-img:shadow-xl">
         <!-- Skeleton -->
         <div class="animate-pulse">
           <div class="h-10 bg-gray-300 dark:bg-gray-700 rounded-lg w-3/4 mb-6"></div>
