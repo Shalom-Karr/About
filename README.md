@@ -98,4 +98,4 @@ This repository contains the source code for my personal portfolio website, show
 
 ---
 
-Feel free to contribute or provide feedback by opening an issue or pull request!
+Feel free to provide feedback by opening an issue!
