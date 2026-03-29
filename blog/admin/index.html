@@ -13,12 +13,13 @@
     }
   </script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
     }
   </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
   <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 
@@ -26,8 +27,11 @@
     /* Basic overrides for EasyMDE dark mode compatibility */
     .dark .editor-toolbar { background: #374151; border-color: #4B5563; }
     .dark .editor-toolbar button { color: #D1D5DB; }
-    .dark .editor-toolbar button:hover { background: #4B5563; }
+    .dark .editor-toolbar button:hover, .dark .editor-toolbar button.active { background: #4B5563; border-color: #4B5563; }
+    .editor-toolbar.fullscreen { z-index: 10000 !important; } 
+    .CodeMirror-fullscreen, .editor-preview-side, .editor-preview { z-index: 9999 !important; }
     .dark .CodeMirror { background: #1F2937; color: #F3F4F6; border-color: #4B5563; }
+    .dark .editor-preview, .dark .editor-preview-side { background: #111827; color: #F3F4F6; }
     .dark .editor-statusbar { color: #9CA3AF; }
   </style>
 </head>
@@ -207,7 +211,40 @@
         element: document.getElementById('post-content'),
         spellChecker: false,
         status: false,
-        minHeight: "400px"
+        minHeight: "400px",
+        previewClass: ["editor-preview", "prose", "prose-blue", "dark:prose-invert", "max-w-none"],
+        toolbar: [
+          "bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link",
+          {
+            name: "image",
+            action: function customImageAction(editor){
+               triggerImageUpload();
+            },
+            className: "fa fa-picture-o",
+            title: "Upload Image (Ctrl-Alt-I)",
+          },
+          "|", "preview", "side-by-side", "fullscreen", "|", "guide"
+        ]
+      });
+
+      // Handle image paste
+      easyMDE.codemirror.on('paste', async (cm, event) => {
+        const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        for (const item of items) {
+          if (item.type.indexOf('image') === 0) {
+            event.preventDefault();
+            const file = item.getAsFile();
+            await uploadAndInsertImage(file);
+            break;
+          }
+        }
+      });
+
+      // Handle Ctrl-Alt-I shortcut
+      easyMDE.codemirror.addKeyMap({
+        "Ctrl-Alt-I": function(cm) {
+          triggerImageUpload();
+        }
       });
 
       // Check auth session
