@@ -355,6 +355,129 @@ const renderPostAnalytics = (posts) => {
 };
 
 
+// --- Image Manager Logic ---
+
+const loadImages = async () => {
+    imageGallery.innerHTML = '<div class="col-span-full text-gray-400 text-center py-4">Loading images...</div>';
+    
+    const { data, error } = await supabase
+        .storage
+        .from('blog-images')
+        .list('', {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'created_at', order: 'desc' },
+        });
+
+    if (error) {
+        console.error('Error loading images:', error);
+        imageGallery.innerHTML = `<div class="col-span-full text-red-500 text-center py-4">Error loading images: ${error.message}</div>`;
+        return;
+    }
+
+    renderImages(data);
+};
+
+const renderImages = (images) => {
+    imageGallery.innerHTML = '';
+    
+    // Filter out potential system files like .emptyFolderPlaceholder
+    const validImages = images.filter(img => img.name !== '.emptyFolderPlaceholder' && img.id);
+
+    if (validImages.length === 0) {
+        imageGallery.innerHTML = '<div class="col-span-full text-gray-500 text-center py-4">No images uploaded yet.</div>';
+        return;
+    }
+
+    validImages.forEach(img => {
+        const { data: { publicUrl } } = supabase.storage.from('blog-images').getPublicUrl(img.name);
+        
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'bg-gray-700 rounded-lg overflow-hidden border border-gray-600 relative group flex flex-col';
+        
+        imgContainer.innerHTML = `
+            <div class="h-32 w-full bg-gray-800 flex items-center justify-center overflow-hidden">
+                <img src="${publicUrl}" alt="${img.name}" class="object-contain w-full h-full" loading="lazy">
+            </div>
+            <div class="p-2 flex flex-col flex-grow">
+                <p class="text-xs text-gray-300 truncate mb-2" title="${img.name}">${img.name}</p>
+                <div class="mt-auto flex justify-between items-center">
+                    <button class="copy-url-btn text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded transition-colors" data-url="${publicUrl}">Copy URL</button>
+                    <button class="delete-img-btn text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity" data-name="${img.name}">Delete</button>
+                </div>
+            </div>
+        `;
+        imageGallery.appendChild(imgContainer);
+    });
+};
+
+const handleImageUpload = async (e) => {
+    e.preventDefault();
+    const file = imageFileInput.files[0];
+    if (!file) return;
+
+    uploadButtonLoading(true);
+
+    // Create unique filename while preserving extension
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+
+    const { error } = await supabase.storage
+        .from('blog-images')
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+        });
+
+    uploadButtonLoading(false);
+
+    if (error) {
+        showUploadStatus(`Upload failed: ${error.message}`, 'error');
+    } else {
+        showUploadStatus('Upload successful!', 'success');
+        imageUploadForm.reset();
+        await loadImages();
+    }
+};
+
+const handleDeleteImage = async (fileName) => {
+    if (!confirm(`Are you sure you want to delete ${fileName}?`)) return;
+
+    const { error } = await supabase.storage
+        .from('blog-images')
+        .remove([fileName]);
+
+    if (error) {
+        alert('Error deleting image: ' + error.message);
+    } else {
+        await loadImages();
+    }
+};
+
+const uploadButtonLoading = (isLoading) => {
+    if (isLoading) {
+        uploadImageButton.disabled = true;
+        uploadImageButton.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Uploading...`;
+    } else {
+        uploadImageButton.disabled = false;
+        uploadImageButton.innerHTML = 'Upload';
+    }
+};
+
+const showUploadStatus = (message, type) => {
+    uploadStatus.textContent = message;
+    uploadStatus.classList.remove('hidden', 'bg-red-500/20', 'text-red-400', 'bg-green-500/20', 'text-green-400');
+    if (type === 'error') {
+        uploadStatus.classList.add('bg-red-500/20', 'text-red-400');
+    } else {
+        uploadStatus.classList.add('bg-green-500/20', 'text-green-400');
+    }
+    setTimeout(() => {
+        uploadStatus.classList.add('hidden');
+    }, 5000);
+};
+
+
 // --- Rendering ---
 
 const renderVisitorLogs = (logs) => {
@@ -581,6 +704,12 @@ const switchTab = (tab) => {
         contentAnalytics.classList.remove('hidden');
         // Load analytics when tab is shown
         loadBlogAnalytics();
+    } else if (tab === 'images') {
+        tabImages.classList.remove('text-gray-400');
+        tabImages.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
+        contentImages.classList.remove('hidden');
+        // Load images when tab is shown
+        loadImages();
     }
 };
 
