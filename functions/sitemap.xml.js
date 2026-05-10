@@ -32,7 +32,7 @@ export async function onRequest(context) {
     try {
       const r = await fetch(
         `${supaUrl}/rest/v1/posts` +
-        `?select=slug,created_at,updated_at&is_published=eq.true&order=created_at.desc`,
+        `?select=slug,created_at&is_published=eq.true&order=created_at.desc`,
         { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } }
       );
       if (r.ok) posts = await r.json();
@@ -48,7 +48,7 @@ export async function onRequest(context) {
     { loc: `${origin}/blog/contact/`, lastmod: today, changefreq: 'monthly', priority: '0.7' },
     ...posts.map(p => ({
       loc: `${origin}/blog/post.html?slug=${encodeURIComponent(p.slug)}`,
-      lastmod: ((p.updated_at || p.created_at) || today + 'T00:00:00Z').slice(0, 10),
+      lastmod: (p.created_at || today + 'T00:00:00Z').slice(0, 10),
       changefreq: 'monthly',
       priority: '0.8',
     })),
