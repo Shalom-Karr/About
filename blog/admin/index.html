@@ -126,6 +126,36 @@
           <textarea id="post-content"></textarea>
         </div>
 
+        <!-- SEO overrides — collapsed by default to keep the editor tidy. -->
+        <details class="border dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/40">
+          <summary class="cursor-pointer px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+            SEO &amp; social sharing (optional)
+          </summary>
+          <div class="px-4 pb-4 pt-2 space-y-4">
+            <div>
+              <label class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+                <span>SEO title</span>
+                <span id="seo-title-counter" class="font-mono normal-case text-gray-400">0 / 60</span>
+              </label>
+              <input id="post-seo-title" type="text" placeholder="Defaults to the post title above" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+            </div>
+            <div>
+              <label class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+                <span>SEO description</span>
+                <span id="seo-description-counter" class="font-mono normal-case text-gray-400">0 / 160</span>
+              </label>
+              <textarea id="post-seo-description" rows="2" placeholder="Defaults to the excerpt above" class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none text-sm"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Cover image URL <span class="normal-case font-normal text-gray-400">— used for social shares (og:image)</span></label>
+              <input id="post-image-url" type="url" placeholder="https://..." class="w-full border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+            </div>
+            <p class="text-xs text-gray-500 leading-relaxed">
+              These set the title, description, and image Google and social platforms show. Leave blank to use the post title, excerpt, and a default avatar.
+            </p>
+          </div>
+        </details>
+
         <div class="flex items-center gap-2 pb-10">
           <input type="checkbox" id="post-published" class="w-4 h-4">
           <label for="post-published" class="font-bold cursor-pointer">Published</label>
@@ -254,7 +284,30 @@
           showDashboard(false);
         }
       }
+
+      // Wire SEO field char counters once the DOM is ready.
+      const seoTitle = document.getElementById('post-seo-title');
+      const seoDesc  = document.getElementById('post-seo-description');
+      if (seoTitle) seoTitle.addEventListener('input', updateSeoCounters);
+      if (seoDesc)  seoDesc.addEventListener('input', updateSeoCounters);
     });
+
+    function updateSeoCounters() {
+      const tEl = document.getElementById('seo-title-counter');
+      const dEl = document.getElementById('seo-description-counter');
+      const tInput = document.getElementById('post-seo-title');
+      const dInput = document.getElementById('post-seo-description');
+      if (tEl && tInput) {
+        const n = (tInput.value || '').length;
+        tEl.textContent = `${n} / 60`;
+        tEl.style.color = n > 65 ? '#dc2626' : n > 55 ? '#d97706' : '#9ca3af';
+      }
+      if (dEl && dInput) {
+        const n = (dInput.value || '').length;
+        dEl.textContent = `${n} / 160`;
+        dEl.style.color = n > 165 ? '#dc2626' : n > 140 ? '#d97706' : '#9ca3af';
+      }
+    }
 
     async function login() {
       const email = document.getElementById('email').value;
@@ -416,6 +469,10 @@
       document.getElementById('editor-title').innerText = "Create New Post";
       document.getElementById('post-title').value = '';
       document.getElementById('post-slug').value = '';
+      document.getElementById('post-seo-title').value = '';
+      document.getElementById('post-seo-description').value = '';
+      document.getElementById('post-image-url').value = '';
+      updateSeoCounters();
       document.getElementById('post-excerpt').value = '';
       document.getElementById('post-tags').value = '';
       easyMDE.value('');
@@ -435,6 +492,10 @@
       document.getElementById('post-tags').value = (post.tags || []).join(', ');
       easyMDE.value(post.content_md);
       document.getElementById('post-published').checked = post.is_published;
+      document.getElementById('post-seo-title').value       = post.seo_title       || '';
+      document.getElementById('post-seo-description').value = post.seo_description || '';
+      document.getElementById('post-image-url').value       = post.image_url       || '';
+      updateSeoCounters();
       document.getElementById('post-msg').innerText = '';
       renderPostList(); // Update active state
     }
@@ -460,7 +521,13 @@
       }
 
       const tagsArray = tagsRaw.split(',').map(t => t.trim()).filter(t => t.length > 0);
-      const postData = { title, slug, excerpt, content_md, tags: tagsArray, is_published };
+      const seo_title       = document.getElementById('post-seo-title').value.trim()       || null;
+      const seo_description = document.getElementById('post-seo-description').value.trim() || null;
+      const image_url       = document.getElementById('post-image-url').value.trim()       || null;
+      const postData = {
+        title, slug, excerpt, content_md, tags: tagsArray, is_published,
+        seo_title, seo_description, image_url,
+      };
 
       if (isDevMode) {
         if (currentPostId) {
