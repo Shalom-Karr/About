@@ -26,7 +26,17 @@ export async function onRequest(context) {
   const supaUrl = context.env.SUPABASE_URL;
   const supaKey = context.env.SUPABASE_ANON_KEY;
 
-  // Fetch published posts (slug + updated_at) from Supabase REST.
+  // Diagnostic state — surfaced as an XML comment in the response so
+  // you can view-source the sitemap and see what went wrong without
+  // having to read CF logs.
+  const diag = {
+    hasUrl: !!supaUrl,
+    hasKey: !!supaKey,
+    fetchStatus: null,
+    fetchError: null,
+    rowCount: 0,
+  };
+
   let posts = [];
   if (supaUrl && supaKey) {
     try {
@@ -35,9 +45,15 @@ export async function onRequest(context) {
         `?select=slug,created_at&is_published=eq.true&order=created_at.desc`,
         { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } }
       );
-      if (r.ok) posts = await r.json();
+      diag.fetchStatus = r.status;
+      if (r.ok) {
+        posts = await r.json();
+        diag.rowCount = Array.isArray(posts) ? posts.length : 0;
+      } else {
+        diag.fetchError = (await r.text()).slice(0, 300);
+      }
     } catch (e) {
-      // Fall through with empty list — sitemap still serves static URLs.
+      diag.fetchError = String(e).slice(0, 300);
     }
   }
 
@@ -54,7 +70,13 @@ export async function onRequest(context) {
     })),
   ];
 
+  const diagComment = `<!-- diag: hasUrl=${diag.hasUrl} hasKey=${diag.hasKey} ` +
+                      `fetchStatus=${diag.fetchStatus} rowCount=${diag.rowCount}` +
+                      (diag.fetchError ? ` fetchError="${xmlEscape(diag.fetchError)}"` : '') +
+                      ` -->`;
+
   const body = `<?xml version="1.0" encoding="UTF-8"?>
+${diagComment}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries.map(e => `  <url>
     <loc>${xmlEscape(e.loc)}</loc>
