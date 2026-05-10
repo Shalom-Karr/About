@@ -121,6 +121,57 @@
       0% { filter: hue-rotate(0deg); }
       100% { filter: hue-rotate(30deg); }
     }
+
+    /* Keyboard-focused post card */
+    .post-card.kb-focus {
+      outline: 2px solid rgba(139, 92, 246, 0.8);
+      outline-offset: 4px;
+      box-shadow: 0 20px 40px -15px rgba(139, 92, 246, 0.4) !important;
+    }
+
+    /* Floating keyboard hint */
+    #blog-hint {
+      position: fixed; bottom: 20px; left: 20px; z-index: 60;
+      display: none; align-items: center; gap: 10px;
+      padding: 8px 14px; border-radius: 999px;
+      background: rgba(17, 24, 39, 0.92); color: #cbd5e1;
+      font-family: ui-monospace, "Fira Code", monospace; font-size: 12px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    #blog-hint kbd {
+      padding: 2px 6px; border-radius: 4px;
+      background: rgba(55, 65, 81, 0.8);
+      border: 1px solid rgba(75, 85, 99, 0.6);
+      font: inherit; color: #fff;
+    }
+    @media (min-width: 768px) { #blog-hint { display: inline-flex; } }
+
+    /* Mobile floating theme toggle */
+    #mobile-theme-toggle {
+      position: fixed; bottom: 20px; right: 20px; z-index: 60;
+      width: 44px; height: 44px; border-radius: 999px;
+      background: rgba(17, 24, 39, 0.92); color: #fff;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      display: flex; align-items: center; justify-content: center;
+    }
+    @media (min-width: 1024px) { #mobile-theme-toggle { display: none; } }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 2px solid #8b5cf6; outline-offset: 3px; border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+      .gradient-mesh, .animate-blob { animation: none !important; }
+    }
   </style>
 
 </head>
@@ -559,6 +610,108 @@
         }
 
         applyFilters();
+
+        // ===== Developer-friendly keyboard navigation =====
+        let kbIndex = -1;
+        const cards = () => Array.from(container.querySelectorAll('.post-card'));
+
+        const focusCard = (i) => {
+          const list = cards();
+          if (!list.length) return;
+          kbIndex = Math.max(0, Math.min(list.length - 1, i));
+          list.forEach(c => c.classList.remove('kb-focus'));
+          const el = list[kbIndex];
+          el.classList.add('kb-focus');
+          el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        };
+
+        // Reset keyboard focus when filters re-render the grid
+        const observer = new MutationObserver(() => { kbIndex = -1; });
+        observer.observe(container, { childList: true });
+
+        let chord = '';
+        let chordTimer = null;
+        const armChord = () => { clearTimeout(chordTimer); chordTimer = setTimeout(() => chord = '', 1200); };
+
+        document.addEventListener('keydown', (e) => {
+          const tag = (e.target && e.target.tagName) || '';
+          const editable = /^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.target && e.target.isContentEditable);
+
+          // `/` focuses search even when not editable
+          if (e.key === '/' && !e.metaKey && !e.ctrlKey && !editable) {
+            e.preventDefault();
+            (searchInput || mobileSearchInput)?.focus();
+            return;
+          }
+          if (e.key === 'Escape' && editable) {
+            e.target.blur();
+            return;
+          }
+          if (editable) return;
+
+          // `?` opens a mini shortcuts popup (alert fallback)
+          if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+            e.preventDefault();
+            showBlogHelp();
+            return;
+          }
+
+          // j / k post navigation
+          if (e.key === 'j') { e.preventDefault(); focusCard(kbIndex + 1); return; }
+          if (e.key === 'k') { e.preventDefault(); focusCard(kbIndex - 1); return; }
+          if (e.key === 'Enter' && kbIndex >= 0) {
+            const list = cards();
+            const link = list[kbIndex]?.querySelector('a');
+            if (link) { e.preventDefault(); link.click(); }
+            return;
+          }
+          if (e.key === 'g' && !chord) { chord = 'g'; armChord(); return; }
+          if (chord === 'g') {
+            if (e.key === 'h') { e.preventDefault(); location.href = '/'; }
+            else if (e.key === 'c') { e.preventDefault(); location.href = '/blog/contact/'; }
+            else if (e.key === 'a') { e.preventDefault(); location.href = '/blog/about/'; }
+            else if (e.key === 'g') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            chord = '';
+          }
+        });
+
+        function showBlogHelp() {
+          if (document.getElementById('blog-help-modal')) return;
+          const m = document.createElement('div');
+          m.id = 'blog-help-modal';
+          m.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(3,7,18,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px';
+          m.innerHTML = `
+            <div style="background:#111827;border:1px solid rgba(139,92,246,.35);border-radius:12px;padding:28px;max-width:440px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.6);color:#e5e7eb;font-family:ui-monospace,monospace">
+              <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:18px">Blog shortcuts</h3>
+              <table style="width:100%;font-size:13px;line-height:2">
+                <tr><td>Focus search</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">/</kbd></td></tr>
+                <tr><td>Next / prev post</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">j</kbd> <kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">k</kbd></td></tr>
+                <tr><td>Open focused post</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">↵</kbd></td></tr>
+                <tr><td>Go home</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">g</kbd> <kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">h</kbd></td></tr>
+                <tr><td>Go to contact</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">g</kbd> <kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">c</kbd></td></tr>
+                <tr><td>Scroll top</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">g</kbd> <kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">g</kbd></td></tr>
+                <tr><td>Close</td><td style="text-align:right"><kbd style="padding:2px 8px;background:#1f2937;border:1px solid #374151;border-radius:4px">esc</kbd></td></tr>
+              </table>
+            </div>`;
+          m.addEventListener('click', () => m.remove());
+          document.addEventListener('keydown', function once(ev) {
+            if (ev.key === 'Escape') { m.remove(); document.removeEventListener('keydown', once); }
+          });
+          document.body.appendChild(m);
+        }
+
+        // Floating hint + mobile theme toggle
+        const hint = document.createElement('div');
+        hint.id = 'blog-hint';
+        hint.innerHTML = '<kbd>/</kbd> search &nbsp; <kbd>j</kbd>/<kbd>k</kbd> navigate &nbsp; <kbd>?</kbd> help';
+        document.body.appendChild(hint);
+
+        const mobTheme = document.createElement('button');
+        mobTheme.id = 'mobile-theme-toggle';
+        mobTheme.setAttribute('aria-label', 'Toggle theme');
+        mobTheme.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>';
+        mobTheme.addEventListener('click', () => document.getElementById('theme-toggle')?.click());
+        document.body.appendChild(mobTheme);
 
       } catch (err) {
         console.error('Error fetching posts:', err);

@@ -72,6 +72,74 @@
     /* Slide In Animation Utilities */
     .slide-in-left { opacity: 0; transform: translateX(-60px); transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .is-visible { opacity: 1 !important; transform: translate(0,0) !important; }
+
+    /* Heading anchor links (`#` on hover, click to copy deep link) */
+    .prose h2, .prose h3 { position: relative; scroll-margin-top: 96px; }
+    .heading-anchor {
+      position: absolute; left: -1.25em; top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      text-decoration: none !important;
+      color: #8b5cf6 !important;
+      font-weight: 700 !important;
+      transition: opacity .15s ease;
+      padding: 0 .25em;
+    }
+    .prose h2:hover .heading-anchor,
+    .prose h3:hover .heading-anchor,
+    .heading-anchor:focus-visible { opacity: 1; }
+    @media (max-width: 900px) { .heading-anchor { display: none; } }
+
+    /* Copy-code button on every <pre> */
+    .discord-code-header button.copy-code-btn.copied { color: #22c55e !important; }
+
+    /* Post navigation (prev/next) */
+    .post-nav-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(255, 255, 255, 0.4);
+      transition: all .25s ease;
+      text-decoration: none !important;
+    }
+    .dark .post-nav-card { background: rgba(30, 41, 59, 0.4); border-color: rgba(148, 163, 184, 0.15); }
+    .post-nav-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139, 92, 246, 0.5);
+      box-shadow: 0 12px 30px -12px rgba(139, 92, 246, 0.35);
+    }
+
+    /* Floating action hints */
+    #blog-hint {
+      position: fixed; bottom: 20px; left: 20px; z-index: 60;
+      display: none; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px;
+      background: rgba(17, 24, 39, 0.92); color: #cbd5e1;
+      font-family: ui-monospace, "Fira Code", monospace; font-size: 12px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    #blog-hint kbd {
+      padding: 2px 6px; border-radius: 4px;
+      background: rgba(55, 65, 81, 0.8);
+      border: 1px solid rgba(75, 85, 99, 0.6);
+      font: inherit; color: #fff;
+    }
+    @media (min-width: 768px) { #blog-hint { display: inline-flex; } }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 2px solid #8b5cf6; outline-offset: 3px; border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 
   <!-- Highlight.js for Code Snippets -->
@@ -82,6 +150,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- DOMPurify: sanitize rendered markdown HTML to close stored-XSS vector -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
   <style id="discord-code-style">
     /* Discord Style Code Blocks */
     .discord-code-wrapper {
@@ -299,18 +369,26 @@
           canonicalLink.href = `https://shalomkarr.pages.dev/blog/post.html?slug=${slug}`;
         }
 
-        const htmlContent = marked.parse(post.content_md);
-        
+        // Escape untrusted DB fields to prevent stored XSS
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g,
+          c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        // Sanitize the rendered markdown HTML
+        const rawHtml = marked.parse(post.content_md || '');
+        const htmlContent = (typeof DOMPurify !== 'undefined')
+          ? DOMPurify.sanitize(rawHtml, { ADD_ATTR: ['target', 'rel'] })
+          : rawHtml;
+
         const wordCount = (post.content_md || '').split(/\s+/).length;
         const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-        const tagsHtml = post.tags && post.tags.length > 0 
-          ? post.tags.map(t => `<a href="/blog/index.html?tag=${encodeURIComponent(t)}" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/60 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2.5 py-1 rounded-md tracking-wide uppercase transition-colors shadow-sm inline-block transform hover:-translate-y-0.5 cursor-pointer">${t}</a>`).join(' ')
+        const tagsHtml = post.tags && post.tags.length > 0
+          ? post.tags.map(t => `<a href="/blog/index.html?tag=${encodeURIComponent(t)}" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/60 dark:text-blue-300 dark:border-blue-800/50 text-xs font-semibold px-2.5 py-1 rounded-md tracking-wide uppercase transition-colors shadow-sm inline-block transform hover:-translate-y-0.5 cursor-pointer">${esc(t)}</a>`).join(' ')
           : '';
 
         container.innerHTML = `
           <header class="mb-8 pb-8 border-b border-gray-200 dark:border-gray-800 reveal">
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-gray-900 dark:text-gray-100">${post.title}</h1>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight text-gray-900 dark:text-gray-100">${esc(post.title)}</h1>
             <div class="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
               <time datetime="${post.created_at}" class="flex items-center">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -371,22 +449,194 @@
 
         // --- Table of Contents ---
         const proseEl = document.getElementById('prose-content');
+        const slugify = (s) => String(s).toLowerCase().trim()
+          .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
         if (proseEl) {
           const headings = proseEl.querySelectorAll('h2, h3');
-          if (headings.length > 2) {
+          if (headings.length >= 2) {
             headings.forEach((h, i) => {
-              if (!h.id) h.id = 'heading-' + i;
+              if (!h.id) h.id = slugify(h.textContent) || ('heading-' + i);
             });
             const tocItems = Array.from(headings).map(h => {
               const indent = h.tagName === 'H3' ? 'pl-4 text-gray-500 dark:text-gray-400' : 'font-semibold';
-              return `<li><a href="#${h.id}" class="block py-1 text-sm ${indent} hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${h.textContent}</a></li>`;
+              return `<li><a href="#${h.id}" data-toc class="toc-link block py-1 text-sm ${indent} hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${esc(h.textContent)}</a></li>`;
             }).join('');
             const toc = document.createElement('nav');
             toc.className = 'mb-10 p-6 rounded-2xl bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700';
+            toc.setAttribute('aria-label', 'Table of contents');
             toc.innerHTML = `<h3 class="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">Table of Contents</h3><ul class="space-y-1">${tocItems}</ul>`;
             proseEl.prepend(toc);
           }
         }
+
+        // --- Heading anchor links (deep-link + copy to clipboard on click) ---
+        if (proseEl) {
+          const copyToast = (msg) => {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:8px;font-family:ui-monospace,monospace;font-size:13px;z-index:200;border:1px solid rgba(139,92,246,.4);box-shadow:0 10px 30px rgba(0,0,0,.5)';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.transition = 'opacity .3s'; t.style.opacity = '0'; }, 1400);
+            setTimeout(() => t.remove(), 1800);
+          };
+          proseEl.querySelectorAll('h2, h3').forEach(h => {
+            if (!h.id) return;
+            const a = document.createElement('a');
+            a.href = '#' + h.id;
+            a.className = 'heading-anchor';
+            a.setAttribute('aria-label', 'Copy link to this section');
+            a.textContent = '#';
+            h.appendChild(a);
+            a.addEventListener('click', (e) => {
+              e.preventDefault();
+              history.replaceState(null, '', '#' + h.id);
+              const url = location.origin + location.pathname + location.search + '#' + h.id;
+              (navigator.clipboard?.writeText(url) ?? Promise.resolve()).then(() => copyToast('Section link copied'));
+              h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          });
+        }
+
+        // --- Copy-code button on every <pre> ---
+        if (proseEl) {
+          proseEl.querySelectorAll('pre').forEach(pre => {
+            if (pre.closest('.discord-code-wrapper')) return;
+            const codeEl = pre.querySelector('code');
+            const langClass = codeEl ? [...codeEl.classList].find(c => c.startsWith('language-')) : null;
+            const lang = langClass ? langClass.replace('language-', '') : 'code';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'discord-code-wrapper';
+
+            const header = document.createElement('div');
+            header.className = 'discord-code-header';
+
+            const langSpan = document.createElement('span');
+            langSpan.className = 'lang-name';
+            langSpan.textContent = lang;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'copy-code-btn';
+            btn.setAttribute('aria-label', 'Copy code');
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy';
+
+            header.appendChild(langSpan);
+            header.appendChild(btn);
+
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(header);
+            wrapper.appendChild(pre);
+
+            btn.addEventListener('click', async () => {
+              try {
+                await navigator.clipboard.writeText(codeEl ? codeEl.textContent : pre.textContent);
+                btn.classList.add('copied');
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied';
+                setTimeout(() => {
+                  btn.classList.remove('copied');
+                  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy';
+                }, 1500);
+              } catch (e) { /* ignore */ }
+            });
+          });
+        }
+
+        // --- Active TOC section highlighting via IntersectionObserver ---
+        if (proseEl && 'IntersectionObserver' in window) {
+          const tocLinks = Array.from(document.querySelectorAll('[data-toc]'));
+          const headingMap = new Map();
+          tocLinks.forEach(l => {
+            const id = l.getAttribute('href').slice(1);
+            const el = document.getElementById(id);
+            if (el) headingMap.set(el, l);
+          });
+          const setActive = (link) => {
+            tocLinks.forEach(l => l.classList.remove('text-blue-600', 'dark:text-blue-400'));
+            if (link) link.classList.add('text-blue-600', 'dark:text-blue-400');
+          };
+          const obs = new IntersectionObserver((entries) => {
+            const visible = entries.filter(e => e.isIntersecting)
+              .sort((a, b) => a.target.offsetTop - b.target.offsetTop);
+            if (visible[0]) setActive(headingMap.get(visible[0].target));
+          }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+          headingMap.forEach((_, h) => obs.observe(h));
+        }
+
+        // --- Prev / Next post navigation ---
+        try {
+          const { data: siblings } = await window.supabaseClient
+            .from('posts')
+            .select('slug, title, created_at')
+            .eq('is_published', true)
+            .order('created_at', { ascending: false });
+          if (siblings && siblings.length) {
+            const idx = siblings.findIndex(p => p.slug === post.slug);
+            const next = idx > 0 ? siblings[idx - 1] : null;     // newer
+            const prev = idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : null; // older
+            if (prev || next) {
+              const nav = document.createElement('nav');
+              nav.className = 'grid gap-4 md:grid-cols-2 mt-16 mb-8';
+              nav.setAttribute('aria-label', 'Post navigation');
+              const card = (p, dir) => {
+                if (!p) return '<div></div>';
+                const arrow = dir === 'prev' ? '←' : '→';
+                const label = dir === 'prev' ? 'Older post' : 'Newer post';
+                const align = dir === 'prev' ? '' : 'md:text-right md:justify-end md:flex-row-reverse';
+                return `<a href="/blog/post.html?slug=${encodeURIComponent(p.slug)}" class="post-nav-card ${align}">
+                  <span class="text-2xl text-purple-500">${arrow}</span>
+                  <span class="flex-1 min-w-0">
+                    <span class="block text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">${label}</span>
+                    <span class="block font-bold text-gray-900 dark:text-gray-100 truncate">${esc(p.title)}</span>
+                  </span>
+                </a>`;
+              };
+              nav.innerHTML = card(prev, 'prev') + card(next, 'next');
+              const likeSection = document.getElementById('like-section');
+              if (likeSection && likeSection.parentNode) {
+                likeSection.parentNode.insertBefore(nav, likeSection.nextSibling);
+              } else {
+                container.appendChild(nav);
+              }
+
+              // Store for keyboard nav
+              window.__postNav = { prev, next };
+            }
+          }
+        } catch (e) { console.warn('Prev/next fetch failed', e); }
+
+        // --- Keyboard shortcuts on post pages ---
+        document.addEventListener('keydown', (e) => {
+          const tag = (e.target && e.target.tagName) || '';
+          const editable = /^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.target && e.target.isContentEditable);
+          if (editable) return;
+          // Esc → back to blog index
+          if (e.key === 'Escape') {
+            location.href = '/blog/index.html';
+            return;
+          }
+          // j / k → older / newer post
+          if (e.key === 'j' && window.__postNav?.prev) {
+            e.preventDefault();
+            location.href = '/blog/post.html?slug=' + encodeURIComponent(window.__postNav.prev.slug);
+          } else if (e.key === 'k' && window.__postNav?.next) {
+            e.preventDefault();
+            location.href = '/blog/post.html?slug=' + encodeURIComponent(window.__postNav.next.slug);
+          } else if (e.key === 'l' && document.getElementById('like-btn')) {
+            e.preventDefault();
+            document.getElementById('like-btn').click();
+          } else if (e.key === 't') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+
+        // --- Floating hint badge ---
+        const hint = document.createElement('div');
+        hint.id = 'blog-hint';
+        hint.innerHTML = '<kbd>j</kbd>/<kbd>k</kbd> post &nbsp; <kbd>l</kbd> like &nbsp; <kbd>esc</kbd> back';
+        document.body.appendChild(hint);
 
 
         // --- Like Button and View Count Logic ---
