@@ -47,7 +47,7 @@ export async function onRequest(context) {
     { loc: `${origin}/blog/about/`,   lastmod: today, changefreq: 'monthly', priority: '0.7' },
     { loc: `${origin}/blog/contact/`, lastmod: today, changefreq: 'monthly', priority: '0.7' },
     ...posts.map(p => ({
-      loc: `${origin}/blog/post.html?slug=${encodeURIComponent(p.slug)}`,
+      loc: `${origin}/blog/post/${encodeURIComponent(p.slug)}`,
       lastmod: (p.created_at || today + 'T00:00:00Z').slice(0, 10),
       changefreq: 'monthly',
       priority: '0.8',

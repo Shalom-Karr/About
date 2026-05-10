@@ -34,8 +34,16 @@
        overwrite these later with richer DB content. -->
   <script>
   (function () {
-    var p = new URLSearchParams(location.search);
-    var slug = p.get('slug');
+    // Slug can come from the path (/blog/post/<slug>, via the Pages
+    // Function rewrite) or the legacy query string (?slug=). Prefer
+    // the path so clean URLs work even before scripts run.
+    var slug = null;
+    var pathMatch = location.pathname.match(/^\/blog\/post\/([^/?#]+)/);
+    if (pathMatch) slug = decodeURIComponent(pathMatch[1]);
+    if (!slug) {
+      var p = new URLSearchParams(location.search);
+      if (p.get('slug')) slug = p.get('slug');
+    }
     if (!slug) return;
 
     // Pretty-print the slug as a human title fallback.
@@ -47,7 +55,7 @@
     var SITE  = 'Shalom Karr';
     var title = pretty + ' · ' + SITE;
     var desc  = pretty + ' — read the full post on ' + SITE + "'s blog.";
-    var canon = 'https://shalomkarr.pages.dev/blog/post.html?slug=' + encodeURIComponent(slug);
+    var canon = 'https://shalomkarr.pages.dev/blog/post/' + encodeURIComponent(slug);
 
     document.title = title;
     var set = function (id, attr, val) {
@@ -375,7 +383,9 @@
 
     document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const slug = urlParams.get('slug');
+      // Slug can come from /blog/post/<slug> (clean URL) or ?slug= (legacy).
+      const pathMatch = window.location.pathname.match(/^\/blog\/post\/([^/?#]+)/);
+      const slug = pathMatch ? decodeURIComponent(pathMatch[1]) : urlParams.get('slug');
       const container = document.getElementById('post-container');
 
       if (!window.supabaseClient) {
@@ -423,7 +433,7 @@
            post.excerpt ||
            (post.content_md || '').replace(/[#*_`>\-\[\]()]/g, '').slice(0, 200));
         const desc  = rawDesc.replace(/\s+/g, ' ').trim().slice(0, 200);
-        const canon = `https://shalomkarr.pages.dev/blog/post.html?slug=${encodeURIComponent(slug)}`;
+        const canon = `https://shalomkarr.pages.dev/blog/post/${encodeURIComponent(slug)}`;
         const image = post.image_url || 'https://shalomkarr.pages.dev/img/ShalomProfessional.jpg';
 
         document.title = title;
@@ -675,7 +685,7 @@
                 const arrow = dir === 'prev' ? '←' : '→';
                 const label = dir === 'prev' ? 'Older post' : 'Newer post';
                 const align = dir === 'prev' ? '' : 'md:text-right md:justify-end md:flex-row-reverse';
-                return `<a href="/blog/post.html?slug=${encodeURIComponent(p.slug)}" class="post-nav-card ${align}">
+                return `<a href="/blog/post/${encodeURIComponent(p.slug)}" class="post-nav-card ${align}">
                   <span class="text-2xl text-purple-500">${arrow}</span>
                   <span class="flex-1 min-w-0">
                     <span class="block text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">${label}</span>
@@ -710,10 +720,10 @@
           // j / k → older / newer post
           if (e.key === 'j' && window.__postNav?.prev) {
             e.preventDefault();
-            location.href = '/blog/post.html?slug=' + encodeURIComponent(window.__postNav.prev.slug);
+            location.href = '/blog/post/' + encodeURIComponent(window.__postNav.prev.slug);
           } else if (e.key === 'k' && window.__postNav?.next) {
             e.preventDefault();
-            location.href = '/blog/post.html?slug=' + encodeURIComponent(window.__postNav.next.slug);
+            location.href = '/blog/post/' + encodeURIComponent(window.__postNav.next.slug);
           } else if (e.key === 'l' && document.getElementById('like-btn')) {
             e.preventDefault();
             document.getElementById('like-btn').click();

@@ -584,7 +584,7 @@
 
             return `
             <article class="post-card reveal bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200 dark:border-gray-700/80 rounded-2xl p-6 relative overflow-hidden group">
-              <a href="/blog/post.html?slug=${post.slug}" class="absolute inset-0 z-10"></a>
+              <a href="/blog/post/${post.slug}" class="absolute inset-0 z-10"></a>
 
               <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium mb-3">
                 <time datetime="${post.created_at}">${new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</time>
