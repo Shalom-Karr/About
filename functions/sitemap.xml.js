@@ -5,9 +5,11 @@
 // Replaces the hand-maintained sitemap.xml so adding a post only
 // requires publishing it in the admin — no sitemap edit needed.
 //
-// SUPABASE_URL and SUPABASE_ANON_KEY must be set as environment
-// variables on the Cloudflare Pages project (same vars used by the
-// build step for js/supabase-client.js).
+// SUPABASE_URL and SUPABASE_ANON_KEY are baked in at build time by
+// scripts/inject-env.js (see _lib/supabase-config.js). We fall back
+// to context.env for environments where the build hasn't run.
+
+import { SUPABASE_URL as BUILT_URL, SUPABASE_ANON_KEY as BUILT_KEY } from './_lib/supabase-config.js';
 
 function xmlEscape(s) {
   return String(s)
@@ -23,8 +25,8 @@ export async function onRequest(context) {
   const origin = url.origin;
   const today  = new Date().toISOString().slice(0, 10);
 
-  const supaUrl = context.env.SUPABASE_URL;
-  const supaKey = context.env.SUPABASE_ANON_KEY;
+  const supaUrl = BUILT_URL || context.env.SUPABASE_URL;
+  const supaKey = BUILT_KEY || context.env.SUPABASE_ANON_KEY;
 
   // Diagnostic state — surfaced as an XML comment in the response so
   // you can view-source the sitemap and see what went wrong without
