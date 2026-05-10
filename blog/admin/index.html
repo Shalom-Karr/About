@@ -64,10 +64,6 @@
         </div>
         <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">Log In securely</button>
         <p id="login-msg" class="text-red-500 text-sm text-center h-4"></p>
-        
-        <div class="border-t dark:border-gray-700 my-4 pt-4">
-          <button onclick="devLogin()" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 px-4 rounded transition-colors">Enter Dev Mode (Mock Login)</button>
-        </div>
       </div>
     </div>
   </div>
@@ -229,11 +225,9 @@
   
   <script type="module">import { supabase } from "/supabase-client.js"; window.supabaseClient = supabase;</script><script src="/blog/js/app.js"></script>
   <script>
-    let isDevMode = false;
     let currentPostId = null;
     let easyMDE = null;
     let allPosts = [];
-    let mockSettings = { name: "Shalom Karr", bio: "Full-stack developer building cool things on the internet.", avatar_url: "https://shalomkarr.pages.dev/img/ShalomProfessional.jpg" };
 
     document.addEventListener("DOMContentLoaded", async () => {
       // Initialize EasyMDE
@@ -281,7 +275,7 @@
       if (window.supabaseClient) {
         const { data: { session } } = await window.supabaseClient.auth.getSession();
         if (session) {
-          showDashboard(false);
+          showDashboard();
         }
       }
 
@@ -320,13 +314,8 @@
         msg.innerText = error.message;
       } else {
         msg.innerText = "";
-        showDashboard(false);
+        showDashboard();
       }
-    }
-
-    function devLogin() {
-      isDevMode = true;
-      showDashboard(true);
     }
 
     function triggerImageUpload() {
@@ -348,17 +337,6 @@
       
       const fileExt = file.name ? file.name.split('.').pop() : 'png';
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      
-      if (isDevMode) {
-         setTimeout(() => {
-             const mockUrl = "https://via.placeholder.com/800x400.png?text=Mock+Image";
-             insertImageMarkdown(mockUrl, fileName);
-             msg.innerText = "Mock image uploaded.";
-             msg.className = "text-sm h-4 text-green-600";
-             setTimeout(() => msg.innerText = '', 3000);
-         }, 1000);
-         return;
-      }
 
       const { data, error } = await window.supabaseClient.storage
         .from('blog-images')
@@ -383,23 +361,22 @@
     }
 
     async function logout() {
-      if (!isDevMode) await window.supabaseClient.auth.signOut();
-      isDevMode = false;
+      await window.supabaseClient.auth.signOut();
       document.getElementById('dashboard-section').classList.add('hidden');
       document.getElementById('dashboard-section').classList.remove('flex');
       document.getElementById('login-section').classList.remove('hidden');
       document.getElementById('user-controls').classList.add('hidden');
     }
 
-    async function showDashboard(devMode = false) {
+    async function showDashboard() {
       document.getElementById('login-section').classList.add('hidden');
       document.getElementById('dashboard-section').classList.remove('hidden');
       document.getElementById('dashboard-section').classList.add('flex');
-      
+
       const controls = document.getElementById('user-controls');
       controls.classList.remove('hidden');
-      document.getElementById('user-mode-label').innerText = devMode ? 'DEV MODE' : 'Admin';
-      
+      document.getElementById('user-mode-label').innerText = 'Admin';
+
       await loadPosts();
       await loadInbox();
       await fetchSettings();
@@ -427,15 +404,6 @@
     }
 
     async function loadPosts() {
-      if (isDevMode) {
-        allPosts = [
-          { id: 'dev-1', title: 'Test Post 1', slug: 'test-1', excerpt: 'Excerpt', content_md: '# Hello\\n\\nThis is a mock post.', is_published: true, tags: ['test'] },
-          { id: 'dev-2', title: 'Draft Post', slug: 'draft', excerpt: 'Draft', content_md: 'Drafting...', is_published: false, tags: [] }
-        ];
-        renderPostList();
-        return;
-      }
-
       const { data, error } = await window.supabaseClient
         .from('posts')
         .select('*')
@@ -529,20 +497,6 @@
         seo_title, seo_description, image_url,
       };
 
-      if (isDevMode) {
-        if (currentPostId) {
-          const idx = allPosts.findIndex(p => p.id === currentPostId);
-          allPosts[idx] = { ...allPosts[idx], ...postData };
-        } else {
-          const newMock = { id: 'dev-' + Date.now(), ...postData };
-          allPosts.unshift(newMock);
-          currentPostId = newMock.id;
-        }
-        renderPostList();
-        showMsg("post-msg", "Saved locally in Dev Mode!");
-        return;
-      }
-
       let error;
       if (currentPostId) {
         const res = await window.supabaseClient.from('posts').update(postData).eq('id', currentPostId);
@@ -565,12 +519,6 @@
     }
 
     async function fetchSettings() {
-      if (isDevMode) {
-        document.getElementById('setting-name').value = mockSettings.name;
-        document.getElementById('setting-bio').value = mockSettings.bio;
-        document.getElementById('setting-avatar').value = mockSettings.avatar_url;
-        return;
-      }
       const { data, error } = await window.supabaseClient.from('sitesettings').select('*').eq('id', 1).single();
       if (data) {
         document.getElementById('setting-name').value = data.name;
@@ -583,12 +531,6 @@
       const name = document.getElementById('setting-name').value.trim();
       const bio = document.getElementById('setting-bio').value.trim();
       const avatar_url = document.getElementById('setting-avatar').value.trim();
-
-      if (isDevMode) {
-        mockSettings = { name, bio, avatar_url };
-        showMsg("settings-msg", "Settings updated locally!");
-        return;
-      }
 
       const { error } = await window.supabaseClient.from('sitesettings').upsert({ id: 1, name, bio, avatar_url });
       if (error) {
@@ -611,17 +553,6 @@
     let currentFilter = 'all';
 
     async function loadInbox() {
-      if (isDevMode) {
-        allMessages = [
-          { id: 'msg-1', name: 'Jane Smith', email: 'jane@example.com', subject: 'Collaboration Opportunity', message: 'Hi Shalom! I came across your portfolio and I am really impressed with your work. I would love to discuss a potential collaboration on a web application project. Would you be available for a call next week?', created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), is_read: false },
-          { id: 'msg-2', name: 'Tech Corp HR', email: 'hr@techcorp.com', subject: 'Full-Stack Developer Position', message: 'We have an exciting opportunity for a Full-Stack Developer role that matches your skill set. The position involves JavaScript, Node.js, and PostgreSQL — right up your alley! Please let us know if you are interested.', created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), is_read: false },
-          { id: 'msg-3', name: 'Alex Johnson', email: 'alex@startup.io', subject: 'Bug Report on Your Portfolio', message: 'Hey, just wanted to let you know there is a minor visual glitch on mobile when scrolling through the skills section. Great site otherwise!', created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), is_read: true },
-        ];
-        updateUnreadBadge();
-        renderInbox();
-        return;
-      }
-
       const { data, error } = await window.supabaseClient
         .from('contact_messages')
         .select('*')
@@ -722,17 +653,15 @@
       msg.is_read = true;
       updateUnreadBadge();
 
-      if (!isDevMode) {
-        const { error } = await window.supabaseClient
-          .from('contact_messages')
-          .update({ is_read: true })
-          .eq('id', id);
+      const { error } = await window.supabaseClient
+        .from('contact_messages')
+        .update({ is_read: true })
+        .eq('id', id);
 
-        if (error) {
-          console.error('Error marking message as read:', error);
-          msg.is_read = false;
-          updateUnreadBadge();
-        }
+      if (error) {
+        console.error('Error marking message as read:', error);
+        msg.is_read = false;
+        updateUnreadBadge();
       }
     }
 
@@ -751,18 +680,16 @@
       // Full re-render is fine here because this is the external toggle button
       renderInbox();
 
-      if (!isDevMode) {
-        const { error } = await window.supabaseClient
-          .from('contact_messages')
-          .update({ is_read: msg.is_read })
-          .eq('id', id);
+      const { error } = await window.supabaseClient
+        .from('contact_messages')
+        .update({ is_read: msg.is_read })
+        .eq('id', id);
 
-        if (error) {
-          console.error('Error toggling read status:', error);
-          msg.is_read = previousState;
-          updateUnreadBadge();
-          renderInbox();
-        }
+      if (error) {
+        console.error('Error toggling read status:', error);
+        msg.is_read = previousState;
+        updateUnreadBadge();
+        renderInbox();
       }
     }
 
@@ -777,23 +704,21 @@
       updateUnreadBadge();
       renderInbox();
 
-      if (!isDevMode) {
-        const ids = unread.map(m => m.id);
-        const { error } = await window.supabaseClient
-          .from('contact_messages')
-          .update({ is_read: true })
-          .in('id', ids);
+      const ids = unread.map(m => m.id);
+      const { error } = await window.supabaseClient
+        .from('contact_messages')
+        .update({ is_read: true })
+        .in('id', ids);
 
-        if (error) {
-          console.error('Error marking all as read:', error);
-          // Revert local state on error
-          previousStates.forEach(({ id, was_read }) => {
-            const msg = allMessages.find(m => m.id === id);
-            if (msg) msg.is_read = was_read;
-          });
-          updateUnreadBadge();
-          renderInbox();
-        }
+      if (error) {
+        console.error('Error marking all as read:', error);
+        // Revert local state on error
+        previousStates.forEach(({ id, was_read }) => {
+          const msg = allMessages.find(m => m.id === id);
+          if (msg) msg.is_read = was_read;
+        });
+        updateUnreadBadge();
+        renderInbox();
       }
     }
 
@@ -808,20 +733,18 @@
       updateUnreadBadge();
       renderInbox();
 
-      if (!isDevMode) {
-        const { error } = await window.supabaseClient
-          .from('contact_messages')
-          .delete()
-          .eq('id', id);
+      const { error } = await window.supabaseClient
+        .from('contact_messages')
+        .delete()
+        .eq('id', id);
 
-        if (error) {
-          console.error('Error deleting message:', error);
-          // Restore message on error
-          allMessages.push(deletedMsg);
-          allMessages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-          updateUnreadBadge();
-          renderInbox();
-        }
+      if (error) {
+        console.error('Error deleting message:', error);
+        // Restore message on error
+        allMessages.push(deletedMsg);
+        allMessages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        updateUnreadBadge();
+        renderInbox();
       }
     }
 
