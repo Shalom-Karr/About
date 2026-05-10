@@ -76,14 +76,16 @@ export async function onRequest(context) {
     })),
   ];
 
-  const diagComment = `<!-- diag: builtUrl=${diag.builtUrl} builtKey=${diag.builtKey} ` +
-                      `envUrl=${diag.envUrl} envKey=${diag.envKey} ` +
-                      `fetchStatus=${diag.fetchStatus} rowCount=${diag.rowCount}` +
-                      (diag.fetchError ? ` fetchError="${xmlEscape(diag.fetchError)}"` : '') +
-                      ` -->`;
+  // Diagnostic info is exposed via a custom header instead of an XML
+  // comment — Google Search Console's sitemap parser is strict about
+  // anything sitting between <?xml ?> and the root <urlset>, and a
+  // comment there can flip the report to "Sitemap could not be read".
+  const diagHeader = `builtUrl=${diag.builtUrl} builtKey=${diag.builtKey} ` +
+                     `envUrl=${diag.envUrl} envKey=${diag.envKey} ` +
+                     `fetchStatus=${diag.fetchStatus} rowCount=${diag.rowCount}` +
+                     (diag.fetchError ? ` fetchError="${diag.fetchError}"` : '');
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
-${diagComment}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries.map(e => `  <url>
     <loc>${xmlEscape(e.loc)}</loc>
@@ -98,6 +100,7 @@ ${entries.map(e => `  <url>
     headers: {
       'Content-Type':  'application/xml; charset=utf-8',
       'Cache-Control': 'public, max-age=300, s-maxage=300',
+      'X-Sitemap-Diag': diagHeader,
     },
   });
 }
