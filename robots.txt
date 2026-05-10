@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /blog/admin
+Disallow: /blog/admin/
+Disallow: /admin.html
 
 # Sitemaps
 Sitemap: https://shalomkarr.pages.dev/sitemap.xml
