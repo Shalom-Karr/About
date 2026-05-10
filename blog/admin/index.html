@@ -300,7 +300,27 @@
     let allPosts = [];
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // Initialize EasyMDE
+      // Wire SEO field char counters as soon as the DOM is ready.
+      const seoTitle = document.getElementById('post-seo-title');
+      const seoDesc  = document.getElementById('post-seo-description');
+      if (seoTitle) seoTitle.addEventListener('input', updateSeoCounters);
+      if (seoDesc)  seoDesc.addEventListener('input', updateSeoCounters);
+
+      // Check auth session — defers showDashboard, which is the only
+      // place EasyMDE gets initialized (see ensureEasyMDE below).
+      // EasyMDE/CodeMirror crashes when initialized inside a hidden
+      // container (Cannot set properties of undefined), so we wait
+      // until the dashboard is actually visible.
+      if (window.supabaseClient) {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+          showDashboard();
+        }
+      }
+    });
+
+    function ensureEasyMDE() {
+      if (easyMDE) return easyMDE;
       easyMDE = new EasyMDE({
         element: document.getElementById('post-content'),
         spellChecker: false,
@@ -321,7 +341,6 @@
         ]
       });
 
-      // Handle image paste
       easyMDE.codemirror.on('paste', async (cm, event) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
         for (const item of items) {
@@ -334,27 +353,14 @@
         }
       });
 
-      // Handle Ctrl-Alt-I shortcut
       easyMDE.codemirror.addKeyMap({
         "Ctrl-Alt-I": function(cm) {
           triggerImageUpload();
         }
       });
 
-      // Check auth session
-      if (window.supabaseClient) {
-        const { data: { session } } = await window.supabaseClient.auth.getSession();
-        if (session) {
-          showDashboard();
-        }
-      }
-
-      // Wire SEO field char counters once the DOM is ready.
-      const seoTitle = document.getElementById('post-seo-title');
-      const seoDesc  = document.getElementById('post-seo-description');
-      if (seoTitle) seoTitle.addEventListener('input', updateSeoCounters);
-      if (seoDesc)  seoDesc.addEventListener('input', updateSeoCounters);
-    });
+      return easyMDE;
+    }
 
     function updateSeoCounters() {
       const tEl = document.getElementById('seo-title-counter');
@@ -446,6 +452,10 @@
       const controls = document.getElementById('user-controls');
       controls.classList.remove('hidden');
       document.getElementById('user-mode-label').innerText = 'Admin';
+
+      // Initialize EasyMDE now that the editor view is actually visible
+      // (CodeMirror needs real layout dimensions to wire up).
+      ensureEasyMDE();
 
       await loadPosts();
       await loadInbox();
@@ -853,15 +863,20 @@
       msg.is_read = true;
       updateUnreadBadge();
 
-      const { error } = await window.supabaseClient
+      // .select() forces PostgREST to return the row, so we can detect
+      // the silent-failure case where RLS denies the update (no error
+      // returned, but zero rows affected).
+      const { data, error } = await window.supabaseClient
         .from('contact_messages')
         .update({ is_read: true })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) {
-        console.error('Error marking message as read:', error);
+      if (error || !data || data.length === 0) {
+        console.error('Error marking message as read — likely RLS denying update:', error || '0 rows updated');
         msg.is_read = false;
         updateUnreadBadge();
+        showMsg('inbox-count', 'Mark-read failed (RLS) — see contact_messages_rls.sql', 'error');
       }
     }
 
@@ -880,13 +895,14 @@
       // Full re-render is fine here because this is the external toggle button
       renderInbox();
 
-      const { error } = await window.supabaseClient
+      const { data, error } = await window.supabaseClient
         .from('contact_messages')
         .update({ is_read: msg.is_read })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) {
-        console.error('Error toggling read status:', error);
+      if (error || !data || data.length === 0) {
+        console.error('Error toggling read status — likely RLS denying update:', error || '0 rows updated');
         msg.is_read = previousState;
         updateUnreadBadge();
         renderInbox();
@@ -905,13 +921,14 @@
       renderInbox();
 
       const ids = unread.map(m => m.id);
-      const { error } = await window.supabaseClient
+      const { data, error } = await window.supabaseClient
         .from('contact_messages')
         .update({ is_read: true })
-        .in('id', ids);
+        .in('id', ids)
+        .select();
 
-      if (error) {
-        console.error('Error marking all as read:', error);
+      if (error || !data || data.length === 0) {
+        console.error('Error marking all as read — likely RLS denying update:', error || '0 rows updated');
         // Revert local state on error
         previousStates.forEach(({ id, was_read }) => {
           const msg = allMessages.find(m => m.id === id);
