@@ -11,8 +11,12 @@
 
 -- 1. New columns on blog_post_views
 ALTER TABLE public.blog_post_views
-  ADD COLUMN IF NOT EXISTS session_id  text,
-  ADD COLUMN IF NOT EXISTS device_type text;
+  ADD COLUMN IF NOT EXISTS session_id    text,
+  ADD COLUMN IF NOT EXISTS device_type   text,
+  ADD COLUMN IF NOT EXISTS screen_width  integer,
+  ADD COLUMN IF NOT EXISTS screen_height integer;
+-- ip_address column already exists on the table (added in
+-- blog-tracking-schema.sql) — we just begin populating it now.
 
 CREATE INDEX IF NOT EXISTS idx_blog_post_views_session_id
   ON public.blog_post_views (session_id);

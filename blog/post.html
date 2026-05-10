@@ -797,6 +797,9 @@
             return 'desktop';
           })();
 
+          const screenWidth  = window.screen?.width  || window.innerWidth  || null;
+          const screenHeight = window.screen?.height || window.innerHeight || null;
+
           const { data: viewSession, error: viewError } = await window.supabaseClient
             .from('blog_post_views')
             .insert({
@@ -809,12 +812,29 @@
               view_duration_seconds: 0,
               session_id: sessionId,
               device_type: deviceType,
+              screen_width: screenWidth,
+              screen_height: screenHeight,
             })
             .select('id')
             .single();
 
           if (viewError || !viewSession) return;
           const viewId = viewSession.id;
+
+          // Backfill the IP address asynchronously — non-blocking so the
+          // rest of the tracker isn't held up by a third-party round-trip.
+          // ipify is over CORS-safe https; if it fails we leave ip_address
+          // null and move on.
+          fetch('https://api.ipify.org?format=json')
+            .then(r => r.ok ? r.json() : null)
+            .then(j => {
+              if (!j || !j.ip) return;
+              return window.supabaseClient
+                .from('blog_post_views')
+                .update({ ip_address: j.ip })
+                .eq('id', viewId);
+            })
+            .catch(() => {});
 
           // Visible-time accumulator (in seconds).
           let secondsVisible = 0;
