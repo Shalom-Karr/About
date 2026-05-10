@@ -590,7 +590,7 @@
       // Recent views (last 50)
       const { data: recent } = await sb
         .from('blog_post_views')
-        .select('post_slug,created_at,view_duration_seconds,scroll_depth_percent,device_type,referrer')
+        .select('post_slug,created_at,view_duration_seconds,scroll_depth_percent,device_type,referrer,ip_address')
         .order('created_at', { ascending: false })
         .limit(50);
       const recentEl = document.getElementById('recent-views-table');
@@ -602,11 +602,12 @@
           try { host = r.referrer ? new URL(r.referrer).hostname : 'direct'; } catch (e) { host = 'direct'; }
           return `
             <div class="grid grid-cols-12 gap-2 px-5 py-2 text-xs items-center">
-              <span class="col-span-4 font-mono truncate" title="${escape(r.post_slug)}">${escape(r.post_slug)}</span>
+              <span class="col-span-3 font-mono truncate" title="${escape(r.post_slug)}">${escape(r.post_slug)}</span>
               <span class="col-span-2 text-gray-500">${fmtTimeAgo(r.created_at)}</span>
-              <span class="col-span-2 text-gray-500">${fmtDuration(r.view_duration_seconds)}</span>
+              <span class="col-span-1 text-gray-500">${fmtDuration(r.view_duration_seconds)}</span>
               <span class="col-span-1 text-gray-500">${(r.scroll_depth_percent || 0)}%</span>
               <span class="col-span-1 text-gray-500 capitalize">${escape(r.device_type || '—')}</span>
+              <span class="col-span-2 font-mono text-gray-500 truncate" title="${escape(r.ip_address || '')}">${escape(r.ip_address || '—')}</span>
               <span class="col-span-2 text-gray-500 truncate" title="${escape(host)}">${escape(host)}</span>
             </div>`;
         }).join('');
