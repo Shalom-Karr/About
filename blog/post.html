@@ -782,6 +782,21 @@
           const postSlug  = postObj.slug;
           const postId    = postObj.id;
 
+          // Per-tab session id (sessionStorage clears on tab close).
+          let sessionId = sessionStorage.getItem('blog_session_id');
+          if (!sessionId) {
+            sessionId = 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+            sessionStorage.setItem('blog_session_id', sessionId);
+          }
+
+          // Coarse device class — mirrors what's useful in the dashboard.
+          const deviceType = (() => {
+            const w = window.innerWidth || 1024;
+            if (/Mobi|Android|iPhone/.test(userAgent) || w < 640) return 'mobile';
+            if (/iPad|Tablet/.test(userAgent) || w < 1024)        return 'tablet';
+            return 'desktop';
+          })();
+
           const { data: viewSession, error: viewError } = await window.supabaseClient
             .from('blog_post_views')
             .insert({
@@ -792,6 +807,8 @@
               user_agent: userAgent,
               referrer: referrer,
               view_duration_seconds: 0,
+              session_id: sessionId,
+              device_type: deviceType,
             })
             .select('id')
             .single();
@@ -828,6 +845,7 @@
                 .from('blog_post_views')
                 .update({
                   view_duration_seconds: secondsVisible,
+                  scroll_depth_percent: scrollDepth,
                   updated_at: new Date().toISOString(),
                 })
                 .eq('id', viewId);
@@ -873,6 +891,7 @@
                 },
                 body: JSON.stringify({
                   view_duration_seconds: secondsVisible,
+                  scroll_depth_percent: scrollDepth,
                   updated_at: new Date().toISOString(),
                 }),
               }).catch(() => {});
