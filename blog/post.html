@@ -9,8 +9,60 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
-  <!-- Canonical URL (dynamically set based on post) -->
-  <link rel="canonical" id="canonical-url" href="https://shalomkarr.pages.dev/blog/post.html">
+  <!-- ─── SEO meta tags ──────────────────────────────────────────────────
+       The IDs are populated dynamically once the post loads. The fallback
+       values (and the synchronous bootstrap script below) keep these
+       sensible for crawlers that haven't run our async fetch yet. -->
+  <meta name="description"        id="seo-description"     content="Writing on code, life, and the web by Shalom Karr.">
+  <link rel="canonical"           id="seo-canonical"       href="https://shalomkarr.pages.dev/blog/">
+  <meta property="og:type"        content="article">
+  <meta property="og:site_name"   content="Shalom Karr">
+  <meta property="og:title"       id="seo-og-title"        content="Shalom Karr — Blog">
+  <meta property="og:description" id="seo-og-description"  content="Writing on code, life, and the web by Shalom Karr.">
+  <meta property="og:url"         id="seo-og-url"          content="https://shalomkarr.pages.dev/blog/">
+  <meta property="og:image"       id="seo-og-image"        content="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      id="seo-tw-title"        content="Shalom Karr — Blog">
+  <meta name="twitter:description" id="seo-tw-description" content="Writing on code, life, and the web by Shalom Karr.">
+  <meta name="twitter:image"      id="seo-tw-image"        content="https://shalomkarr.pages.dev/img/ShalomProfessional.jpg">
+  <script id="seo-jsonld" type="application/ld+json"></script>
+
+  <!-- Synchronous SEO bootstrap. Runs before any other script and before
+       the body parses, so crawlers (and Googlebot's renderer) see a
+       unique per-post title / canonical / description immediately —
+       even before the async DB fetch completes. The async loader will
+       overwrite these later with richer DB content. -->
+  <script>
+  (function () {
+    var p = new URLSearchParams(location.search);
+    var slug = p.get('slug');
+    if (!slug) return;
+
+    // Pretty-print the slug as a human title fallback.
+    var pretty = slug.split('-').map(function (w) {
+      if (!w) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ');
+
+    var SITE  = 'Shalom Karr';
+    var title = pretty + ' · ' + SITE;
+    var desc  = pretty + ' — read the full post on ' + SITE + "'s blog.";
+    var canon = 'https://shalomkarr.pages.dev/blog/post.html?slug=' + encodeURIComponent(slug);
+
+    document.title = title;
+    var set = function (id, attr, val) {
+      var el = document.getElementById(id);
+      if (el) el.setAttribute(attr, val);
+    };
+    set('seo-description',    'content', desc);
+    set('seo-canonical',      'href',    canon);
+    set('seo-og-title',       'content', title);
+    set('seo-og-description', 'content', desc);
+    set('seo-og-url',         'content', canon);
+    set('seo-tw-title',       'content', title);
+    set('seo-tw-description', 'content', desc);
+  })();
+  </script>
 
   <!-- URL Redirect Check -->
   <script>
@@ -361,12 +413,51 @@
 
         if (error || !post) throw new Error('Post not found');
 
-        document.title = `${post.title} · Shalom Karr`;
+        // ─── Apply real SEO from the loaded post ─────────────────────────
+        // Admin-set seo_title / seo_description take precedence; otherwise
+        // fall back to the post title and excerpt (or a content snippet).
+        const SITE  = 'Shalom Karr';
+        const title = (post.seo_title       || `${post.title} · ${SITE}`).slice(0, 70);
+        const rawDesc =
+          (post.seo_description ||
+           post.excerpt ||
+           (post.content_md || '').replace(/[#*_`>\-\[\]()]/g, '').slice(0, 200));
+        const desc  = rawDesc.replace(/\s+/g, ' ').trim().slice(0, 200);
+        const canon = `https://shalomkarr.pages.dev/blog/post.html?slug=${encodeURIComponent(slug)}`;
+        const image = post.image_url || 'https://shalomkarr.pages.dev/img/ShalomProfessional.jpg';
 
-        // Update canonical URL with the post slug
-        const canonicalLink = document.getElementById('canonical-url');
-        if (canonicalLink) {
-          canonicalLink.href = `https://shalomkarr.pages.dev/blog/post.html?slug=${slug}`;
+        document.title = title;
+        const setMeta = (id, attr, val) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute(attr, val);
+        };
+        setMeta('seo-description',    'content', desc);
+        setMeta('seo-canonical',      'href',    canon);
+        setMeta('seo-og-title',       'content', title);
+        setMeta('seo-og-description', 'content', desc);
+        setMeta('seo-og-url',         'content', canon);
+        setMeta('seo-og-image',       'content', image);
+        setMeta('seo-tw-title',       'content', title);
+        setMeta('seo-tw-description', 'content', desc);
+        setMeta('seo-tw-image',       'content', image);
+
+        // JSON-LD Article schema — helps Google show rich results.
+        const ldEl = document.getElementById('seo-jsonld');
+        if (ldEl) {
+          ldEl.textContent = JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            'headline': post.title,
+            'description': desc,
+            'image': image,
+            'mainEntityOfPage': canon,
+            'datePublished': post.created_at || undefined,
+            'dateModified':  post.updated_at || post.created_at || undefined,
+            'author':    { '@type': 'Person',       'name': SITE, 'url': 'https://shalomkarr.pages.dev/' },
+            'publisher': { '@type': 'Organization', 'name': SITE,
+                           'logo': { '@type': 'ImageObject', 'url': 'https://shalomkarr.pages.dev/img/ShalomProfessional.jpg' } },
+            'keywords': (post.tags || []).join(', ') || undefined,
+          });
         }
 
         // Escape untrusted DB fields to prevent stored XSS
