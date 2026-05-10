@@ -30,13 +30,17 @@ export async function onRequest(context) {
 
   // Diagnostic state — surfaced as an XML comment in the response so
   // you can view-source the sitemap and see what went wrong without
-  // having to read CF logs.
+  // having to read CF logs. Splits "did the build inject?" from
+  // "did the runtime env binding work?" so we can tell where the
+  // pipeline broke.
   const diag = {
-    hasUrl: !!supaUrl,
-    hasKey: !!supaKey,
+    builtUrl:    !!BUILT_URL,
+    builtKey:    !!BUILT_KEY,
+    envUrl:      !!context.env.SUPABASE_URL,
+    envKey:      !!context.env.SUPABASE_ANON_KEY,
     fetchStatus: null,
-    fetchError: null,
-    rowCount: 0,
+    fetchError:  null,
+    rowCount:    0,
   };
 
   let posts = [];
@@ -72,7 +76,8 @@ export async function onRequest(context) {
     })),
   ];
 
-  const diagComment = `<!-- diag: hasUrl=${diag.hasUrl} hasKey=${diag.hasKey} ` +
+  const diagComment = `<!-- diag: builtUrl=${diag.builtUrl} builtKey=${diag.builtKey} ` +
+                      `envUrl=${diag.envUrl} envKey=${diag.envKey} ` +
                       `fetchStatus=${diag.fetchStatus} rowCount=${diag.rowCount}` +
                       (diag.fetchError ? ` fetchError="${xmlEscape(diag.fetchError)}"` : '') +
                       ` -->`;
