@@ -16,13 +16,24 @@ const initParticleHero = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let mouse = { x: null, y: null };
-    const PARTICLE_COUNT = 120;  // Number of drifting particles
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const PARTICLE_COUNT = isMobile ? 80 : 120;
     const LINK_DISTANCE = 120;   // Max px between particles to draw a connecting line
+    const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
     const MOUSE_DISTANCE = 150;  // Max px from cursor to draw a mouse connection line
+    const MOUSE_DISTANCE_SQ = MOUSE_DISTANCE * MOUSE_DISTANCE;
 
+    // Track CSS-pixel dimensions; scale the backing store by devicePixelRatio
+    // so particles render crisp (not blurry) on high-DPI / retina screens.
+    let W = 0, H = 0;
     const resize = () => {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+        W = canvas.offsetWidth;
+        H = canvas.offsetHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener('resize', resize);
@@ -35,58 +46,87 @@ const initParticleHero = () => {
     canvas.parentElement.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
 
     const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
+        x: Math.random() * W,
+        y: Math.random() * H,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
         r: Math.random() * 2 + 1,
     }));
 
+    const drawParticles = () => {
+        ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    };
+
+    let running = false;
+    let rafId = null;
+
     const animate = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, W, H);
         particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
-            ctx.fill();
+            if (p.x < 0 || p.x > W) p.vx *= -1;
+            if (p.y < 0 || p.y > H) p.vy *= -1;
         });
+        drawParticles();
 
+        ctx.lineWidth = 0.5;
         for (let i = 0; i < particles.length; i++) {
+            const pi = particles[i];
             for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < LINK_DISTANCE) {
+                const pj = particles[j];
+                const dx = pi.x - pj.x;
+                const dy = pi.y - pj.y;
+                const distSq = dx * dx + dy * dy;
+                if (distSq < LINK_DISTANCE_SQ) {
+                    const dist = Math.sqrt(distSq);
                     ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.moveTo(pi.x, pi.y);
+                    ctx.lineTo(pj.x, pj.y);
                     ctx.strokeStyle = `rgba(96, 165, 250, ${1 - dist / LINK_DISTANCE})`;
-                    ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
             }
             if (mouse.x !== null) {
-                const dx = particles[i].x - mouse.x;
-                const dy = particles[i].y - mouse.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < MOUSE_DISTANCE) {
+                const dx = pi.x - mouse.x;
+                const dy = pi.y - mouse.y;
+                const distSq = dx * dx + dy * dy;
+                if (distSq < MOUSE_DISTANCE_SQ) {
+                    const dist = Math.sqrt(distSq);
                     ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.moveTo(pi.x, pi.y);
                     ctx.lineTo(mouse.x, mouse.y);
                     ctx.strokeStyle = `rgba(139, 92, 246, ${1 - dist / MOUSE_DISTANCE})`;
                     ctx.lineWidth = 0.8;
                     ctx.stroke();
+                    ctx.lineWidth = 0.5;
                 }
             }
         }
-        requestAnimationFrame(animate);
+        rafId = requestAnimationFrame(animate);
     };
-    animate();
+
+    if (reduceMotion) {
+        drawParticles(); // single static frame, no loop
+        return;
+    }
+
+    const start = () => { if (!running) { running = true; animate(); } };
+    const stop = () => { running = false; if (rafId) cancelAnimationFrame(rafId); };
+
+    // Stop the loop entirely once the hero scrolls out of view
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(([entry]) => {
+            entry.isIntersecting ? start() : stop();
+        }, { threshold: 0 }).observe(canvas);
+    } else {
+        start();
+    }
 };
 
 // --- Magnetic Buttons ---
@@ -163,9 +203,9 @@ const initAnimations = () => {
     // 1. Advanced Hero Animations
     const heroTl = gsap.timeline({ defaults: { ease: "back.out(1.7)" } });
     
-    heroTl.fromTo(".hero-anim", 
+    heroTl.fromTo(".hero-anim",
         { y: 60, opacity: 0, scale: 0.9, rotationX: 15 },
-        { y: 0, opacity: 1, scale: 1, rotationX: 0, duration: 1.2, stagger: 0.15 }
+        { y: 0, opacity: 1, scale: 1, rotationX: 0, duration: 0.6, stagger: 0.08 }
     );
 
     // 2. About Section Animation
@@ -354,37 +394,31 @@ const initCustomEffects = () => {
         });
     }
 
-    // 2. Global Spotlight Effect for all cards (Skills & Projects)
-    document.addEventListener('mousemove', (e) => {
+    // 2 & 3. Spotlight + 3D tilt — one mousemove listener, work batched to a
+    // single rAF tick so a fast cursor can't trigger layout thrashing per event.
+    let lastX = 0, lastY = 0;
+    let effectsTicking = false;
+
+    const processCardEffects = () => {
+        effectsTicking = false;
         document.querySelectorAll('.spotlight-card').forEach(card => {
             const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
+            card.style.setProperty('--mouse-x', `${lastX - rect.left}px`);
+            card.style.setProperty('--mouse-y', `${lastY - rect.top}px`);
         });
-    });
-
-    // 3. 3D Tilt Effect for specific cards
-    document.addEventListener('mousemove', (e) => {
         document.querySelectorAll('.tilt-card').forEach(card => {
             const rect = card.getBoundingClientRect();
-            // Check if mouse is over the card
-            if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                const xPos = (e.clientX - rect.left) / rect.width - 0.5;
-                const yPos = (e.clientY - rect.top) / rect.height - 0.5;
-                const xOffset = yPos * 20; // Max rotation X
-                const yOffset = -xPos * 20; // Max rotation Y
-                
+            if (lastX >= rect.left && lastX <= rect.right && lastY >= rect.top && lastY <= rect.bottom) {
+                const xPos = (lastX - rect.left) / rect.width - 0.5;
+                const yPos = (lastY - rect.top) / rect.height - 0.5;
                 gsap.to(card, {
-                    rotationX: xOffset,
-                    rotationY: yOffset,
+                    rotationX: yPos * 20,
+                    rotationY: -xPos * 20,
                     scale: 1.05,
                     ease: "power2.out",
                     duration: 0.3
                 });
             } else {
-                // Reset card when mouse leaves
                 gsap.to(card, {
                     rotationX: 0,
                     rotationY: 0,
@@ -394,6 +428,15 @@ const initCustomEffects = () => {
                 });
             }
         });
+    };
+
+    document.addEventListener('mousemove', (e) => {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (!effectsTicking) {
+            effectsTicking = true;
+            requestAnimationFrame(processCardEffects);
+        }
     });
 };
 
@@ -410,26 +453,28 @@ const setupNavigation = () => {
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
 
-    window.addEventListener('scroll', () => {
+    let navTicking = false;
+    const handleNavScroll = () => {
+        navTicking = false;
         const scrollY = window.scrollY;
-        
+
         // 1. Glass Nav background
         if (scrollY > 20) {
             header.classList.add('scrolled-nav');
         } else {
             header.classList.remove('scrolled-nav');
         }
-        
+
         // 2. ScrollSpy Logic
         let currentSectionId = '';
-        
+
         // Use an offset so it highlights before you perfectly hit the top
         const spyOffset = scrollY + 150;
-        
+
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
             const sectionHeight = section.offsetHeight;
-            
+
             if (spyOffset >= sectionTop && spyOffset < sectionTop + sectionHeight) {
                 currentSectionId = section.getAttribute('id');
             }
@@ -439,10 +484,10 @@ const setupNavigation = () => {
         navLinks.forEach(link => {
             const href = link.getAttribute('href');
             if (!href.startsWith('#')) return; // Skip external links like /blog/
-            
+
             const targetId = href.substring(1);
             const indicator = link.querySelector('.nav-indicator');
-            
+
             if (targetId === currentSectionId) {
                 link.classList.remove('text-gray-300');
                 link.classList.add('text-white');
@@ -453,7 +498,15 @@ const setupNavigation = () => {
                 if(indicator) indicator.classList.remove('w-full');
             }
         });
-    });
+    };
+
+    // Throttle to one run per frame — scroll fires far faster than 60fps
+    window.addEventListener('scroll', () => {
+        if (!navTicking) {
+            navTicking = true;
+            requestAnimationFrame(handleNavScroll);
+        }
+    }, { passive: true });
 
     const toggleMenu = () => {
         burgerBtn.classList.toggle('active');
@@ -598,27 +651,25 @@ const loadProjects = async () => {
 };
 
 const initTypingAnimation = () => {
-    // 1. Existing Subtitle Loop
+    // 1. Existing Subtitle Loop — starts immediately, no startup delay
     const typedElement = document.getElementById('typed');
     if (typedElement) {
-        setTimeout(() => {
-            new TypeIt('#typed', {
-                speed: 50,
-                startDelay: 500,
-                loop: true,
-                cursorChar: '_',
-                waitUntilVisible: true,
-            })
-            .type("Digital Infrastructure Specialist")
-            .pause(2000).delete()
-            .type("Full-Stack Software Engineer")
-            .pause(2000).delete()
-            .type("JavaScript & Python Expert")
-            .pause(2000).delete()
-            .type("Automation Architect")
-            .pause(2000).delete()
-            .go();
-        }, 100); 
+        new TypeIt('#typed', {
+            speed: 50,
+            startDelay: 0,
+            loop: true,
+            cursorChar: '_',
+            waitUntilVisible: true,
+        })
+        .type("Digital Infrastructure Specialist")
+        .pause(2000).delete()
+        .type("Full-Stack Software Engineer")
+        .pause(2000).delete()
+        .type("JavaScript & Python Expert")
+        .pause(2000).delete()
+        .type("Automation Architect")
+        .pause(2000).delete()
+        .go();
     }
 
     // 2. Advanced Terminal Injection
@@ -788,11 +839,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // To-Top Button Logic
 const toTopButton = document.getElementById('to-top');
 if (toTopButton) {
+    let topTicking = false;
     window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            toTopButton.classList.remove('hidden');
-        } else {
-            toTopButton.classList.add('hidden');
+        if (!topTicking) {
+            topTicking = true;
+            requestAnimationFrame(() => {
+                topTicking = false;
+                toTopButton.classList.toggle('hidden', window.pageYOffset <= 300);
+            });
         }
-    });
+    }, { passive: true });
 }
