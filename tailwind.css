@@ -1,3 +1,13 @@
+/* Homepage stylesheet -> output.css
+   Deliberately excludes @tailwindcss/typography: nothing on the homepage uses
+   `prose`, and it costs ~9 KB gzipped on the render-blocking path. The blog
+   gets its own bundle in blog.css. */
 @import "tailwindcss" source(none);
+
 @source "./index.html";
 @source "./script.js";
+
+@theme {
+  /* Used between gray-800 and gray-900 on the homepage. */
+  --color-gray-850: #151d2c;
+}

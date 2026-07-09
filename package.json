@@ -5,8 +5,10 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node ./scripts/inject-env.js && postcss ./tailwind.css -o ./output.css",
-    "generate-sitemap": "node ./scripts/generate-sitemap.js"
+    "build": "node ./scripts/inject-env.js && node ./scripts/prerender.js && postcss ./tailwind.css -o ./output.css && postcss ./blog.css -o ./blog-output.css",
+    "generate-sitemap": "node ./scripts/generate-sitemap.js",
+    "optimize-images": "node ./scripts/optimize-images.js",
+    "serve": "npx --yes http-server . -p 8788 -c-1 --silent"
   },
   "repository": {
     "type": "git",
@@ -22,9 +24,12 @@
   "homepage": "https://github.com/Shalom-Karr/About#readme",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
+    "@tailwindcss/typography": "^0.5.20",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
+    "sharp": "^0.35.3",
+    "simple-icons": "^16.25.0",
     "tailwindcss": "^4.1.17"
   }
 }

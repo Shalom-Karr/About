@@ -1,852 +1,544 @@
-// START OF FILE script.js
-import { initTracker } from './tracker.js';
-import { supabase } from './supabase-client.js';
+// Homepage behaviour. No animation library, no canvas, no mousemove listeners.
+// Everything below the fold is either CSS or a passive observer.
 
-// --- GSAP Animations ---
-// Wait for GSAP to be loaded before registering plugin (handles module vs global script timing)
-if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
-} else {
-    console.warn('GSAP or ScrollTrigger not loaded yet. Will register on DOMContentLoaded.');
-}
+const $  = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const onIdle = window.requestIdleCallback || (fn => setTimeout(fn, 200));
 
-// --- Particle Hero Canvas ---
-const initParticleHero = () => {
-    const canvas = document.getElementById('hero-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let mouse = { x: null, y: null };
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const PARTICLE_COUNT = isMobile ? 80 : 120;
-    const LINK_DISTANCE = 120;   // Max px between particles to draw a connecting line
-    const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
-    const MOUSE_DISTANCE = 150;  // Max px from cursor to draw a mouse connection line
-    const MOUSE_DISTANCE_SQ = MOUSE_DISTANCE * MOUSE_DISTANCE;
+const SUPABASE_URL = 'https://qvoxpfigbukidlmshiei.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2b3hwZmlnYnVraWRsbXNoaWVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyOTM2OTEsImV4cCI6MjA2NTg2OTY5MX0.CEbyeIw6QiMxbLBhU7x7Re7SL_unWJMyaJQPS9y-k60';
 
-    // Track CSS-pixel dimensions; scale the backing store by devicePixelRatio
-    // so particles render crisp (not blurry) on high-DPI / retina screens.
-    let W = 0, H = 0;
-    const resize = () => {
-        const dpr = window.devicePixelRatio || 1;
-        W = canvas.offsetWidth;
-        H = canvas.offsetHeight;
-        canvas.width = W * dpr;
-        canvas.height = H * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    canvas.parentElement.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
-    });
-    canvas.parentElement.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
-
-    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        r: Math.random() * 2 + 1,
-    }));
-
-    const drawParticles = () => {
-        ctx.fillStyle = 'rgba(96, 165, 250, 0.6)';
-        particles.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fill();
-        });
-    };
-
-    let running = false;
-    let rafId = null;
-
-    const animate = () => {
-        ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            if (p.x < 0 || p.x > W) p.vx *= -1;
-            if (p.y < 0 || p.y > H) p.vy *= -1;
-        });
-        drawParticles();
-
-        ctx.lineWidth = 0.5;
-        for (let i = 0; i < particles.length; i++) {
-            const pi = particles[i];
-            for (let j = i + 1; j < particles.length; j++) {
-                const pj = particles[j];
-                const dx = pi.x - pj.x;
-                const dy = pi.y - pj.y;
-                const distSq = dx * dx + dy * dy;
-                if (distSq < LINK_DISTANCE_SQ) {
-                    const dist = Math.sqrt(distSq);
-                    ctx.beginPath();
-                    ctx.moveTo(pi.x, pi.y);
-                    ctx.lineTo(pj.x, pj.y);
-                    ctx.strokeStyle = `rgba(96, 165, 250, ${1 - dist / LINK_DISTANCE})`;
-                    ctx.stroke();
-                }
-            }
-            if (mouse.x !== null) {
-                const dx = pi.x - mouse.x;
-                const dy = pi.y - mouse.y;
-                const distSq = dx * dx + dy * dy;
-                if (distSq < MOUSE_DISTANCE_SQ) {
-                    const dist = Math.sqrt(distSq);
-                    ctx.beginPath();
-                    ctx.moveTo(pi.x, pi.y);
-                    ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = `rgba(139, 92, 246, ${1 - dist / MOUSE_DISTANCE})`;
-                    ctx.lineWidth = 0.8;
-                    ctx.stroke();
-                    ctx.lineWidth = 0.5;
-                }
-            }
-        }
-        rafId = requestAnimationFrame(animate);
-    };
-
-    if (reduceMotion) {
-        drawParticles(); // single static frame, no loop
-        return;
-    }
-
-    const start = () => { if (!running) { running = true; animate(); } };
-    const stop = () => { running = false; if (rafId) cancelAnimationFrame(rafId); };
-
-    // Stop the loop entirely once the hero scrolls out of view
-    if ('IntersectionObserver' in window) {
-        new IntersectionObserver(([entry]) => {
-            entry.isIntersecting ? start() : stop();
-        }, { threshold: 0 }).observe(canvas);
-    } else {
-        start();
-    }
-};
-
-// --- Magnetic Buttons ---
-const initMagneticButtons = () => {
-    document.querySelectorAll('.magnetic-btn').forEach(btn => {
-        btn.addEventListener('mousemove', (e) => {
-            const rect = btn.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: 'power2.out' });
-        });
-        btn.addEventListener('mouseleave', () => {
-            gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.3)' });
-        });
-    });
-};
-
-// --- Text Scramble ---
-class TextScramble {
-    constructor(el) {
-        this.el = el;
-        this.chars = '!<>-_\\/[]{}—=+*^?#________';
-        this.update = this.update.bind(this);
-    }
-    setText(newText) {
-        const old = this.el.innerText;
-        const length = Math.max(old.length, newText.length);
-        const promise = new Promise(resolve => this.resolve = resolve);
-        this.queue = [];
-        for (let i = 0; i < length; i++) {
-            const from = old[i] || '';
-            const to = newText[i] || '';
-            const start = Math.floor(Math.random() * 10);
-            const end = start + Math.floor(Math.random() * 15);
-            this.queue.push({ from, to, start, end });
-        }
-        cancelAnimationFrame(this.frameRequest);
-        this.frame = 0;
-        this.update();
-        return promise;
-    }
-    update() {
-        let output = '';
-        let complete = 0;
-        for (let i = 0; i < this.queue.length; i++) {
-            let { from, to, start, end, char } = this.queue[i];
-            if (this.frame >= end) {
-                complete++;
-                output += to;
-            } else if (this.frame >= start) {
-                if (!char || Math.random() < 0.28) {
-                    char = this.randomChar();
-                    this.queue[i].char = char;
-                }
-                output += `<span style="opacity:0.4">${char}</span>`;
-            } else {
-                output += from;
-            }
-        }
-        this.el.innerHTML = output;
-        if (complete === this.queue.length) {
-            this.resolve();
-        } else {
-            this.frameRequest = requestAnimationFrame(this.update);
-            this.frame++;
-        }
-    }
-    randomChar() {
-        return this.chars[Math.floor(Math.random() * this.chars.length)];
-    }
-}
-
-const initAnimations = () => {
-    // 1. Advanced Hero Animations
-    const heroTl = gsap.timeline({ defaults: { ease: "back.out(1.7)" } });
-    
-    heroTl.fromTo(".hero-anim",
-        { y: 60, opacity: 0, scale: 0.9, rotationX: 15 },
-        { y: 0, opacity: 1, scale: 1, rotationX: 0, duration: 0.6, stagger: 0.08 }
-    );
-
-    // 2. About Section Animation
-    gsap.fromTo(".section-title", 
-        { opacity: 0, y: 40, scale: 0.8 },
-        { scrollTrigger: { trigger: "#about", start: "top 80%", onEnter: () => {
-            const el = document.querySelector('.section-title');
-            if (el) new TextScramble(el).setText(el.innerText);
-        }}, opacity: 1, y: 0, scale: 1, duration: 1, ease: "power3.out" }
-    );
-
-    gsap.fromTo(".about-text", 
-        { opacity: 0, x: -80 },
-        { scrollTrigger: { trigger: "#about", start: "top 75%" }, opacity: 1, x: 0, duration: 1.2, ease: "power3.out" }
-    );
-
-    gsap.fromTo(".about-img", 
-        { opacity: 0, x: 80, rotation: 10 },
-        { scrollTrigger: { trigger: "#about", start: "top 75%" }, opacity: 1, x: 0, rotation: 0, duration: 1.2, ease: "back.out(1.5)" }
-    );
-
-    // 3. Skills Animation (Staggered 3D Pop)
-    gsap.fromTo("#skills-header",
-        { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#skills-header", start: "top 85%", onEnter: () => {
-            const el = document.querySelector('#skills-description');
-            if (el) new TextScramble(el).setText(el.innerText);
-        }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
-    );
-
-    gsap.fromTo(".skill-card", 
-        { opacity: 0, scale: 0.5, rotationY: 45 },
-        {
-            scrollTrigger: { trigger: "#skills-header", start: "top 75%" },
-            opacity: 1, scale: 1, rotationY: 0, duration: 0.6,
-            stagger: { each: 0.05, from: "random" },
-            ease: "back.out(2)"
-        }
-    );
-
-    // 4. Projects Header Animation
-    gsap.fromTo("#projects-header",
-        { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#projects-header", start: "top 85%", onEnter: () => {
-            const el = document.querySelector('#projects-description');
-            if (el) new TextScramble(el).setText(el.innerText);
-        }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
-    );
-
-    // 5. Blog Section Animations
-    gsap.fromTo("#blog-header",
-        { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#blog-header", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
-    );
-
-    gsap.fromTo("#blog-features",
-        { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#blog-features", start: "top 85%" }, opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "power3.out" }
-    );
-
-    gsap.fromTo("#blog-cta",
-        { opacity: 0, y: 30, scale: 0.95 },
-        { scrollTrigger: { trigger: "#blog-cta", start: "top 85%" }, opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.4, ease: "back.out(1.5)" }
-    );
-
-    // 6. Contact Animations (multi-stage staggered)
-    gsap.fromTo("#contact-header",
-        { opacity: 0, y: 50 },
-        { scrollTrigger: { trigger: "#contact", start: "top 80%", onEnter: () => {
-            const el = document.querySelector('#contact-description');
-            if (el) new TextScramble(el).setText(el.innerText);
-        }}, opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
-    );
-
-    gsap.fromTo("#contact-card",
-        { opacity: 0, scale: 0.95 },
-        { scrollTrigger: { trigger: "#contact", start: "top 75%" }, opacity: 1, scale: 1, duration: 0.8, delay: 0.2, ease: "power3.out" }
-    );
-
-    gsap.fromTo(".contact-form-field",
-        { opacity: 0, x: -30 },
-        { scrollTrigger: { trigger: "#contact-card", start: "top 80%" }, opacity: 1, x: 0, duration: 0.6, stagger: 0.1, delay: 0.4, ease: "power2.out" }
-    );
-
-    gsap.fromTo(".contact-link-item",
-        { opacity: 0, x: 30 },
-        { scrollTrigger: { trigger: "#contact-card", start: "top 80%" }, opacity: 1, x: 0, duration: 0.6, stagger: 0.1, delay: 0.4, ease: "power2.out" }
-    );
-};
-
-// Function specifically to animate project cards AFTER they are loaded
-const animateProjects = () => {
-    ScrollTrigger.getAll().filter(t => t.trigger && t.trigger.id === 'projects').forEach(t => t.kill());
-
-    const projectsGrid = document.getElementById('projects-grid');
-    const projectsScrollContainer = document.getElementById('projects-scroll-container');
-
-    // Check if we're on mobile
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-    if (!isMobile && projectsGrid && projectsScrollContainer) {
-        // Add horizontal-scroll class for desktop
-        projectsGrid.classList.add('horizontal-scroll');
-
-        // Calculate total scroll width
-        const cards = gsap.utils.toArray('.project-card');
-        const totalWidth = projectsGrid.scrollWidth;
-
-        // Create horizontal scroll animation with ID
-        const mainScrollTrigger = ScrollTrigger.create({
-            trigger: "#projects",
-            start: "top top",
-            end: () => `+=${totalWidth}`,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            animation: gsap.to(projectsGrid, {
-                x: () => -(totalWidth - projectsScrollContainer.offsetWidth),
-                ease: "none"
-            }),
-            scrub: 1
-        });
-
-        // Animate individual cards on entry (simplified without containerAnimation)
-        cards.forEach((card, i) => {
-            gsap.fromTo(card,
-                { opacity: 0, y: 50, scale: 0.95 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: 0.6,
-                    ease: "back.out(1.2)",
-                    scrollTrigger: {
-                        trigger: "#projects",
-                        start: "top 80%",
-                        toggleActions: "play none none none"
-                    }
-                }
-            );
-        });
-    } else {
-        // Mobile: Use vertical stagger animation
-        projectsGrid.classList.remove('horizontal-scroll');
-
-        gsap.fromTo(".project-card",
-            { opacity: 0, y: 80, scale: 0.9 },
-            {
-                opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.2)",
-                scrollTrigger: { id: 'projects', trigger: "#projects-grid", start: "top 85%" }
-            }
-        );
-    }
-};
-
-
-// --- CUSTOM EFFECTS (Cursor & 3D Cards) ---
-
-const initCustomEffects = () => {
-    // 1. Custom Cursor
-    const cursorDot = document.getElementById('cursor-dot');
-    const cursorRing = document.getElementById('cursor-ring');
-    
-    if (cursorDot && cursorRing && window.matchMedia("(pointer: fine)").matches) {
-        window.addEventListener('mousemove', (e) => {
-            // Instantly move the dot
-            cursorDot.style.left = `${e.clientX}px`;
-            cursorDot.style.top = `${e.clientY}px`;
-            
-            // Smoothly move the ring using GSAP. 
-            // Note: Since we already use transform: translate(-50%, -50%) in CSS, 
-            // we must use left/top here instead of x/y to prevent transform conflicts.
-            gsap.to(cursorRing, {
-                left: e.clientX,
-                top: e.clientY,
-                duration: 0.15,
-                ease: "power2.out"
-            });
-        });
-
-        // Add hover states for all interactive elements
-        const interactiveElements = document.querySelectorAll('a, button, input, textarea, .cursor-pointer');
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-        });
-    }
-
-    // 2 & 3. Spotlight + 3D tilt — one mousemove listener, work batched to a
-    // single rAF tick so a fast cursor can't trigger layout thrashing per event.
-    let lastX = 0, lastY = 0;
-    let effectsTicking = false;
-
-    const processCardEffects = () => {
-        effectsTicking = false;
-        document.querySelectorAll('.spotlight-card').forEach(card => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty('--mouse-x', `${lastX - rect.left}px`);
-            card.style.setProperty('--mouse-y', `${lastY - rect.top}px`);
-        });
-        document.querySelectorAll('.tilt-card').forEach(card => {
-            const rect = card.getBoundingClientRect();
-            if (lastX >= rect.left && lastX <= rect.right && lastY >= rect.top && lastY <= rect.bottom) {
-                const xPos = (lastX - rect.left) / rect.width - 0.5;
-                const yPos = (lastY - rect.top) / rect.height - 0.5;
-                gsap.to(card, {
-                    rotationX: yPos * 20,
-                    rotationY: -xPos * 20,
-                    scale: 1.05,
-                    ease: "power2.out",
-                    duration: 0.3
-                });
-            } else {
-                gsap.to(card, {
-                    rotationX: 0,
-                    rotationY: 0,
-                    scale: 1,
-                    ease: "power2.out",
-                    duration: 0.5
-                });
-            }
-        });
-    };
-
-    document.addEventListener('mousemove', (e) => {
-        lastX = e.clientX;
-        lastY = e.clientY;
-        if (!effectsTicking) {
-            effectsTicking = true;
-            requestAnimationFrame(processCardEffects);
-        }
-    });
-};
-
-
-// --- Functionality ---
-
-const setupNavigation = () => {
-    const header = document.querySelector('header');
-    const burgerBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileLinks = document.querySelectorAll('.mobile-link');
-    
-    // Elements for ScrollSpy
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    let navTicking = false;
-    const handleNavScroll = () => {
-        navTicking = false;
-        const scrollY = window.scrollY;
-
-        // 1. Glass Nav background
-        if (scrollY > 20) {
-            header.classList.add('scrolled-nav');
-        } else {
-            header.classList.remove('scrolled-nav');
-        }
-
-        // 2. ScrollSpy Logic
-        let currentSectionId = '';
-
-        // Use an offset so it highlights before you perfectly hit the top
-        const spyOffset = scrollY + 150;
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-
-            if (spyOffset >= sectionTop && spyOffset < sectionTop + sectionHeight) {
-                currentSectionId = section.getAttribute('id');
-            }
-        });
-
-        // Loop through desktop links to apply active styling
-        navLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (!href.startsWith('#')) return; // Skip external links like /blog/
-
-            const targetId = href.substring(1);
-            const indicator = link.querySelector('.nav-indicator');
-
-            if (targetId === currentSectionId) {
-                link.classList.remove('text-gray-300');
-                link.classList.add('text-white');
-                if(indicator) indicator.classList.add('w-full');
-            } else {
-                link.classList.add('text-gray-300');
-                link.classList.remove('text-white');
-                if(indicator) indicator.classList.remove('w-full');
-            }
-        });
-    };
-
-    // Throttle to one run per frame — scroll fires far faster than 60fps
-    window.addEventListener('scroll', () => {
-        if (!navTicking) {
-            navTicking = true;
-            requestAnimationFrame(handleNavScroll);
-        }
-    }, { passive: true });
-
-    const toggleMenu = () => {
-        burgerBtn.classList.toggle('active');
-        const body = document.body;
-
-        if (burgerBtn.classList.contains('active')) {
-            mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
-            body.classList.add('menu-open');
-            // Add a small delay before showing menu items for better effect
-            setTimeout(() => {
-                mobileMenu.style.transform = 'scale(1)';
-            }, 10);
-        } else {
-            mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-            body.classList.remove('menu-open');
-            mobileMenu.style.transform = 'scale(0.95)';
-        }
-    };
-
-    if(burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
-
-    const closeBtn = document.getElementById('mobile-menu-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            if (burgerBtn && burgerBtn.classList.contains('active')) toggleMenu();
-        });
-    }
-
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (burgerBtn.classList.contains('active')) toggleMenu();
-        });
-    });
-};
-
-const smoothScroll = () => {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-                const headerOffset = 80;
-                const elementPosition = targetElement.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-            }
-        });
-    });
-};
-
-const setDynamicYear = () => {
-    const yearSpan = document.getElementById('currentYear');
-    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
-}
-
-// --- Data Loading ---
-
-const loadProjects = async () => {
-    const projectsGrid = document.getElementById('projects-grid');
-    if (!projectsGrid) return;
-
-    try {
-        const { data: projects, error } = await supabase
-            .from('profile_websites')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        projectsGrid.innerHTML = ''; 
-
-        if (!projects || projects.length === 0) {
-            projectsGrid.innerHTML = '<p class="text-gray-400 text-center col-span-full">No projects to display at the moment.</p>';
-            return;
-        }
-
-        projects.forEach((project) => {
-          const card = document.createElement('a');
-          card.href = project.url;
-          card.target = '_blank';
-
-          // Ultra-Premium Project Card Classes
-          card.className = 'project-card spotlight-card tilt-card glare-effect glow-border frosted-glass relative rounded-2xl shadow-2xl p-8 flex flex-col transition-all duration-500 border border-gray-700/50 hover:border-blue-500/40 group overflow-hidden';
-          const techSpans = project.technologies.map(tech =>
-              `<span class="text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full backdrop-blur-sm relative z-10 transition-colors group-hover:bg-blue-500/20 group-hover:text-blue-300 group-hover:border-blue-400/40">${tech}</span>`
-          ).join('');
-
-          card.innerHTML = `
-              <!-- Animated Glowing Top Border -->
-              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20"></div>
-
-              <div class="relative z-10 flex flex-col h-full">
-                  <!-- Icon & Arrow Row -->
-                  <div class="flex justify-between items-start mb-6">
-                      <div class="p-3 bg-gray-900/50 rounded-xl border border-gray-700/50 shadow-inner group-hover:bg-blue-500/10 group-hover:border-blue-500/30 transition-colors duration-500">
-                          <!-- Code Icon -->
-                          <svg class="w-6 h-6 text-blue-400 opacity-80 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                          </svg>
-                      </div>
-                      <!-- External Link Arrow -->
-                      <div class="p-2 rounded-full bg-transparent group-hover:bg-gray-800/50 transition-colors duration-300">
-                          <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-400 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                          </svg>
-                      </div>
-                  </div>
-
-                  <!-- Content -->
-                  <h3 class="text-2xl font-extrabold mb-4 text-gray-100 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300 tracking-tight leading-tight">${project.title}</h3>
-
-                  <p class="text-gray-400 mb-8 leading-relaxed text-sm flex-grow overflow-hidden" style="-webkit-line-clamp: 9; display: -webkit-box; -webkit-box-orient: vertical;">${project.description}</p>
-
-                  <!-- Footer Tech Tags -->
-                  <div class="mt-auto pt-6 border-t border-gray-700/40 group-hover:border-blue-500/20 transition-colors duration-500">
-                      <div class="flex flex-wrap gap-2">
-                          ${techSpans}
-                      </div>
-                  </div>
-              </div>
-          `;
-
-          projectsGrid.appendChild(card);
-        });
-        // Initialize animations on the new DOM nodes
-        animateProjects();
-
-        // Re-bind cursor hover states for dynamically added project cards
-        const cursorRing = document.getElementById('cursor-ring');
-        if (cursorRing) {
-            document.querySelectorAll('.project-card').forEach(el => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-            });
-        }
-
-    } catch (e) {
-        console.error('Load projects error:', e);
-        projectsGrid.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load projects.</p>';
-    }
-};
-
-const initTypingAnimation = () => {
-    // 1. Existing Subtitle Loop — starts immediately, no startup delay
-    const typedElement = document.getElementById('typed');
-    if (typedElement) {
-        new TypeIt('#typed', {
-            speed: 50,
-            startDelay: 0,
-            loop: true,
-            cursorChar: '_',
-            waitUntilVisible: true,
-        })
-        .type("Digital Infrastructure Specialist")
-        .pause(2000).delete()
-        .type("Full-Stack Software Engineer")
-        .pause(2000).delete()
-        .type("JavaScript & Python Expert")
-        .pause(2000).delete()
-        .type("Automation Architect")
-        .pause(2000).delete()
-        .go();
-    }
-
-    // 2. Advanced Terminal Injection
-    const terminalBody = document.getElementById('terminal-body');
-    if (terminalBody) {
-        setTimeout(() => {
-            new TypeIt('#terminal-body', {
-                speed: 30,
-                startDelay: 1000,
-                waitUntilVisible: true,
-                cursorChar: '█',
-                cursor: true,
-            })
-            .type('<span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
-            .pause(500)
-            .type('cat intro.txt')
-            .break()
-            .pause(300)
-            .type('<br/>') // Blank line
-            .type('I engineer high-performance web applications and digital infrastructure.<br/>')
-            .pause(500)
-            .type('Specializing in <span class="text-[#F7DF1E] font-semibold">JavaScript</span>, <span class="text-[#3ECF8E] font-semibold">Supabase</span>, and serverless architecture.<br/>')
-            .pause(800)
-            .type('<br/><span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
-            .pause(800)
-            .type('ls -la ./skills')
-            .break()
-            .pause(400)
-            .type('<br/>') // Blank line
-            .type('<span class="text-blue-300">drwxr-xr-x</span>  <span class="text-gray-400">frontend/</span>      <span class="text-gray-500">(React, Alpine, Tailwind)</span><br/>')
-            .pause(200)
-            .type('<span class="text-blue-300">drwxr-xr-x</span>  <span class="text-gray-400">backend/</span>       <span class="text-gray-500">(Node.js, Python, PostgreSQL)</span><br/>')
-            .pause(200)
-            .type('<span class="text-blue-300">drwxr-xr-x</span>  <span class="text-gray-400">integrations/</span>  <span class="text-gray-500">(GCP, OAuth 2.0, Stripe)</span><br/>')
-            .pause(800)
-            .type('<br/><span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
-            .pause(800)
-            .type('./run_deployment.sh')
-            .break()
-            .pause(300)
-            .type('<br/>') // Blank line
-            .type('<span class="text-green-500">✔</span> Compiling assets... [OK]<br/>')
-            .pause(200)
-            .type('<span class="text-green-500">✔</span> Establishing secure OAuth tunnels... [OK]<br/>')
-            .pause(200)
-            .type('<span class="text-green-500">✔</span> Booting Supabase Edge Functions... [OK]<br/>')
-            .pause(200)
-            .type('<span class="text-green-500">✔</span> Connecting Google Apps Script Webhooks... [OK]<br/>')
-            .pause(200)
-            .type('<span class="text-green-500">✔</span> Dispatching GroupMe notifications... [OK]<br/>')
-            .pause(200)
-            .type('<span class="text-green-500">✔</span> Deploying to Edge network... [OK]<br/>')
-            .pause(400)
-            .type('<br/><span class="text-blue-400">ℹ</span> Systems online and fully operational.<br/>')
-            .pause(500)
-            .type('<br/><span class="text-green-400">user@shalomkarr</span>:<span class="text-blue-400">~</span>$ ')
-            .go();
-        }, 500);
-    }
-};
-
-// --- EmailJS Contact Form ---
 const EMAILJS_PUBLIC_KEY = '6XAGlx_tFQG41xPB3';
 const EMAILJS_SERVICE_ID = 'service_wcrrkbp';
 const EMAILJS_TEMPLATE_ID = 'template_qgcjka4';
 
-const initContactForm = () => {
-    if (typeof emailjs === 'undefined') return;
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+const AMPLITUDE_KEY = '1c885336c34e4a886e13e859363a199a';
 
-    const form = document.getElementById('contact-form');
+// --- Scroll reveal -----------------------------------------------------------
+const initReveal = () => {
+    const targets = $$('[data-reveal]');
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+        targets.forEach(el => el.classList.add('revealed'));
+        return;
+    }
+    const io = new IntersectionObserver((entries, obs) => {
+        for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            e.target.classList.add('revealed');
+            obs.unobserve(e.target);
+        }
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    targets.forEach(el => io.observe(el));
+};
+
+// --- Header, scrollspy, scroll progress, to-top ------------------------------
+// One rAF-throttled scroll handler for all four. The only writes are class
+// toggles and a single width on the progress bar.
+const initScrollEffects = () => {
+    const header = $('header');
+    const progress = $('#scroll-progress');
+    const toTop = $('#to-top');
+    const navLinks = $$('header .nav-link');
+    const sections = ['hero', 'about', 'skills', 'projects', 'contact']
+        .map(id => document.getElementById(id)).filter(Boolean);
+
+    let ticking = false;
+    const update = () => {
+        ticking = false;
+        const y = scrollY;
+        const doc = document.documentElement;
+
+        header.classList.toggle('scrolled-nav', y > 50);
+        toTop.classList.toggle('show', y > 400);
+
+        const max = Math.max(1, doc.scrollHeight - doc.clientHeight);
+        progress.style.width = ((y / max) * 100).toFixed(2) + '%';
+
+        let active = sections[0]?.id;
+        for (const s of sections) if (s.offsetTop <= y + 120) active = s.id;
+        for (const a of navLinks) {
+            a.classList.toggle('is-active', a.getAttribute('href') === '#' + active);
+        }
+    };
+
+    addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+};
+
+// --- Mobile menu -------------------------------------------------------------
+const initMobileMenu = () => {
+    const btn = $('#mobile-menu-btn');
+    const menu = $('#mobile-menu');
+    const close = $('#mobile-menu-close');
+    if (!btn || !menu) return;
+
+    const setOpen = (open) => {
+        menu.classList.toggle('open', open);
+        btn.classList.toggle('active', open);
+        btn.setAttribute('aria-expanded', String(open));
+        document.body.classList.toggle('menu-open', open);
+    };
+
+    btn.addEventListener('click', () => setOpen(!menu.classList.contains('open')));
+    close?.addEventListener('click', () => setOpen(false));
+    $$('.mobile-link', menu).forEach(a => a.addEventListener('click', () => setOpen(false)));
+    addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+};
+
+// --- Typing line -------------------------------------------------------------
+// The first phrase is server-rendered, so the hero never shifts or flashes.
+const initTyping = () => {
+    const el = $('#typed');
+    const caret = $('#caret');
+    if (!el) return;
+
+    if (reduceMotion) { caret?.remove(); return; }
+
+    const phrases = [
+        'Full-Stack Web Developer',
+        'Digital Infrastructure Specialist',
+        'AI & Automation Engineer',
+        'Supabase & Serverless Architect',
+    ];
+
+    let phrase = 0, chars = phrases[0].length, deleting = true;
+    const tick = () => {
+        const full = phrases[phrase];
+        chars += deleting ? -1 : 1;
+        el.textContent = full.slice(0, chars);
+
+        let delay = deleting ? 32 : 62;
+        if (!deleting && chars === full.length) { delay = 1900; deleting = true; }
+        else if (deleting && chars === 0) { deleting = false; phrase = (phrase + 1) % phrases.length; delay = 320; }
+        setTimeout(tick, delay);
+    };
+    setTimeout(tick, 2200);
+};
+
+// --- Hero particle constellation ---------------------------------------------
+// Booted after `load`, never on the critical path. Skipped entirely on phones and
+// under reduced-motion, and the rAF loop stops whenever the hero is offscreen or
+// the tab is hidden — so it costs nothing once you've scrolled past it.
+const initParticles = () => {
+    const canvas = $('#hero-canvas');
+    const hero = $('#hero');
+    if (!canvas || !hero || reduceMotion) return;
+    if (!matchMedia('(min-width: 768px) and (pointer: fine)').matches) return;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    const LINK_DIST = 130;
+    let particles = [], w = 0, h = 0, dpr = 1, raf = 0;
+    let onscreen = true, visible = !document.hidden;
+
+    const resize = () => {
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        w = hero.clientWidth;
+        h = hero.clientHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // ~1 particle per 14k css px², clamped. A 1440x900 hero gets ~90.
+        const count = Math.max(28, Math.min(90, Math.round((w * h) / 14000)));
+        particles = Array.from({ length: count }, () => ({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.28,
+            vy: (Math.random() - 0.5) * 0.28,
+            r: Math.random() * 1.4 + 0.7,
+        }));
+    };
+
+    const frame = () => {
+        raf = 0;
+        ctx.clearRect(0, 0, w, h);
+
+        for (const p of particles) {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > w) p.vx *= -1;
+            if (p.y < 0 || p.y > h) p.vy *= -1;
+        }
+
+        // Links first, so the dots sit on top of them.
+        ctx.lineWidth = 1;
+        for (let i = 0; i < particles.length; i++) {
+            const a = particles[i];
+            for (let j = i + 1; j < particles.length; j++) {
+                const b = particles[j];
+                const dx = a.x - b.x, dy = a.y - b.y;
+                const d2 = dx * dx + dy * dy;
+                if (d2 > LINK_DIST * LINK_DIST) continue;
+                const alpha = (1 - Math.sqrt(d2) / LINK_DIST) * 0.35;
+                ctx.strokeStyle = `rgba(96, 165, 250, ${alpha.toFixed(3)})`;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+            }
+        }
+
+        ctx.fillStyle = 'rgba(147, 197, 253, 0.55)';
+        for (const p of particles) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        schedule();
+    };
+
+    const schedule = () => {
+        if (raf || !onscreen || !visible) return;
+        raf = requestAnimationFrame(frame);
+    };
+    const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+
+    resize();
+    canvas.classList.add('ready');
+    schedule();
+
+    new IntersectionObserver(([e]) => {
+        onscreen = e.isIntersecting;
+        onscreen ? schedule() : stop();
+    }, { threshold: 0 }).observe(hero);
+
+    document.addEventListener('visibilitychange', () => {
+        visible = !document.hidden;
+        visible ? schedule() : stop();
+    });
+
+    let resizeTimer;
+    addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => { resize(); schedule(); }, 150);
+    }, { passive: true });
+};
+
+// --- Projects: revalidate the prerendered grid --------------------------------
+// scripts/prerender.js bakes the current project list into index.html at build
+// time, so this only patches the DOM when the admin has changed something since.
+const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+));
+
+const projectCardHTML = (p) => {
+    const tags = (p.technologies || [])
+        .map(t => `<span class="tech-pill">${escapeHtml(t)}</span>`).join('');
+    return `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer" class="project-card card group" style="--brand:#3b82f6">
+  <div class="flex justify-between items-start mb-6">
+    <div class="p-3 bg-gray-900/50 rounded-xl border border-gray-700/50 group-hover:border-blue-500/30 transition-colors">
+      <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+    </div>
+    <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-400 transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+  </div>
+  <h3 class="text-2xl font-extrabold mb-4 text-gray-100 group-hover:text-blue-400 transition-colors tracking-tight leading-tight">${escapeHtml(p.title)}</h3>
+  <p class="project-desc text-gray-400 mb-8 leading-relaxed text-sm grow">${escapeHtml(p.description)}</p>
+  <div class="mt-auto pt-6 border-t border-gray-700/40 group-hover:border-blue-500/20 transition-colors">
+    <div class="flex flex-wrap gap-2">${tags}</div>
+  </div>
+</a>`;
+};
+
+const revalidateProjects = async () => {
+    const grid = $('#projects-grid');
+    if (!grid) return;
+    try {
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/profile_websites?select=title,url,description,technologies&order=created_at.desc`,
+            { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+        );
+        if (!res.ok) return;
+        const projects = await res.json();
+        if (!Array.isArray(projects) || !projects.length) return;
+
+        const fresh = projects.map(projectCardHTML).join('\n');
+        const norm = (s) => s.replace(/\s+/g, ' ').trim();
+        if (norm(grid.innerHTML) === norm(fresh)) return;
+
+        grid.innerHTML = fresh;
+    } catch {
+        // The prerendered markup is already on screen — a failed refresh is a no-op.
+    }
+};
+
+// --- Contact form ------------------------------------------------------------
+// EmailJS (~13 KB) is fetched on first interaction, not on page load.
+let emailjsReady = null;
+const loadEmailJS = () => {
+    if (emailjsReady) return emailjsReady;
+    emailjsReady = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        s.crossOrigin = 'anonymous';
+        s.onload = () => { window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); resolve(window.emailjs); };
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+    return emailjsReady;
+};
+
+const initContactForm = () => {
+    const form = $('#contact-form');
     if (!form) return;
+    const btn = $('#contact-submit');
+    const status = $('#contact-status');
+
+    form.addEventListener('focusin', () => loadEmailJS().catch(() => {}), { once: true });
+
+    const say = (msg, ok) => {
+        status.textContent = msg;
+        status.className = `mt-4 text-sm text-center ${ok ? 'text-green-400' : 'text-red-400'}`;
+    };
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const submitBtn = document.getElementById('contact-submit');
-        const statusEl = document.getElementById('contact-status');
+        if (!form.reportValidity()) return;
 
-        const from_name = form.from_name.value.trim();
-        const from_email = form.from_email.value.trim();
-        const subject = form.subject.value.trim();
-        const message = form.message.value.trim();
-
-        // Client-side validation
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!from_name || !from_email || !message) {
-            statusEl.textContent = 'Please fill in all required fields.';
-            statusEl.className = 'mt-4 text-sm text-center text-red-400';
-            statusEl.classList.remove('hidden');
-            return;
-        }
-        if (!emailPattern.test(from_email)) {
-            statusEl.textContent = 'Please enter a valid email address.';
-            statusEl.className = 'mt-4 text-sm text-center text-red-400';
-            statusEl.classList.remove('hidden');
-            return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-        statusEl.className = 'mt-4 text-sm text-center hidden';
-        statusEl.textContent = '';
-
+        btn.disabled = true;
+        const label = btn.textContent;
+        btn.textContent = 'Sending…';
         try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                from_name,
-                from_email,
-                subject,
-                message,
-            });
-
-            // Fire-and-forget: save to Supabase (non-blocking)
-            supabase.from('contact_messages').insert([{ name: from_name, email: from_email, subject, message }])
-                .then(({ error }) => { if (error) console.error('Supabase insert error:', error); });
-
-            statusEl.textContent = "Message sent successfully! I'll get back to you soon.";
-            statusEl.className = 'mt-4 text-sm text-center text-green-400';
+            const emailjs = await loadEmailJS();
+            await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form);
+            say("Message sent — I'll get back to you shortly.", true);
             form.reset();
         } catch (err) {
-            console.error('EmailJS send error:', err);
-            statusEl.textContent = 'Failed to send message. Please try again or reach out directly.';
-            statusEl.className = 'mt-4 text-sm text-center text-red-400';
+            console.error('Contact form:', err);
+            say('Could not send. Email shalomkarr@gmail.com directly.', false);
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
-            statusEl.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = label;
         }
     });
 };
 
-// --- Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Ensure GSAP ScrollTrigger is registered (handles timing issues with module loading)
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        gsap.registerPlugin(ScrollTrigger);
-    } else {
-        console.error('GSAP or ScrollTrigger not available. Animations may not work.');
-    }
+// --- Toast -------------------------------------------------------------------
+const toast = (msg) => {
+    document.getElementById('toast')?.remove();
+    const t = document.createElement('div');
+    t.id = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1800);
+};
 
-    initTypingAnimation();
-    setupNavigation();
-    smoothScroll();
-    setDynamicYear();
-    initTracker();
+// --- Command palette (⌘K) ----------------------------------------------------
+const initCommandPalette = () => {
+    const backdrop = $('#cmdk-backdrop');
+    const input = $('#cmdk-input');
+    const list = $('#cmdk-list');
+    const help = $('#shortcut-help');
+    if (!backdrop || !input || !list) return;
 
-    initAnimations();
-    initCustomEffects(); // Initialize new mind-blowing effects
-    initParticleHero();
-    initMagneticButtons();
-    initContactForm();
+    const go = (href) => { location.href = href; };
+    const copyEmail = async () => {
+        try { await navigator.clipboard.writeText('shalomkarr@gmail.com'); toast('Email copied'); }
+        catch { toast('Copy failed'); }
+    };
 
-    loadProjects();
+    const closePalette = () => backdrop.classList.remove('open');
 
-    // Re-initialize animations on window resize
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            const projectsGrid = document.getElementById('projects-grid');
-            if (projectsGrid && projectsGrid.children.length > 0) {
-                animateProjects();
+    const commands = [
+        { group: 'Navigate', icon: '🏠', label: 'Home',     hint: 'g h', run: () => go('#hero') },
+        { group: 'Navigate', icon: '👤', label: 'About',    hint: 'g a', run: () => go('#about') },
+        { group: 'Navigate', icon: '💻', label: 'Skills',   hint: 'g s', run: () => go('#skills') },
+        { group: 'Navigate', icon: '📁', label: 'Projects', hint: 'g p', run: () => go('#projects') },
+        { group: 'Navigate', icon: '📧', label: 'Contact',  hint: 'g c', run: () => go('#contact') },
+        { group: 'Navigate', icon: '📝', label: 'Blog',     hint: 'g b', run: () => go('/blog/') },
+        { group: 'Actions',  icon: '📋', label: 'Copy email address', hint: 'y e', run: copyEmail },
+        { group: 'Actions',  icon: '✉️', label: 'Send an email',      run: () => go('mailto:shalomkarr@gmail.com') },
+        { group: 'Actions',  icon: '📞', label: 'Call Shalom',        run: () => go('tel:+12164516698') },
+        { group: 'Links',    icon: '🐙', label: 'GitHub',       run: () => open('https://github.com/Shalom-Karr', '_blank', 'noopener') },
+        { group: 'Links',    icon: '🛡️', label: 'JTech Forums', run: () => open('https://forums.jtechforums.org/u/Shalom_Karr', '_blank', 'noopener') },
+        { group: 'Help',     icon: '⌨️', label: 'Keyboard shortcuts', hint: '?', run: () => { closePalette(); help?.classList.add('open'); } },
+    ];
+
+    const fuzzy = (needle, haystack) => {
+        if (!needle) return true;
+        const t = haystack.toLowerCase();
+        let i = 0;
+        for (const c of needle.toLowerCase()) { i = t.indexOf(c, i); if (i < 0) return false; i++; }
+        return true;
+    };
+
+    let filtered = commands, selected = 0;
+
+    const updateSelection = () => {
+        $$('.cmdk-item', list).forEach(el => {
+            const on = Number(el.dataset.index) === selected;
+            el.setAttribute('aria-selected', String(on));
+            if (on) el.scrollIntoView({ block: 'nearest' });
+        });
+    };
+
+    const runSelected = () => {
+        const cmd = filtered[selected];
+        if (!cmd) return;
+        closePalette();
+        cmd.run();
+    };
+
+    const render = () => {
+        const q = input.value.trim();
+        filtered = commands.filter(c => fuzzy(q, c.label + ' ' + c.group));
+        selected = 0;
+        list.textContent = '';
+
+        if (!filtered.length) {
+            list.innerHTML = '<div id="cmdk-empty">No results. Try <kbd>contact</kbd> or <kbd>blog</kbd>.</div>';
+            return;
+        }
+        let group = null;
+        filtered.forEach((cmd, i) => {
+            if (cmd.group !== group) {
+                group = cmd.group;
+                const g = document.createElement('div');
+                g.className = 'cmdk-group-label';
+                g.textContent = group;
+                list.appendChild(g);
             }
-        }, 250);
+            const el = document.createElement('div');
+            el.className = 'cmdk-item';
+            el.setAttribute('role', 'option');
+            el.setAttribute('aria-selected', String(i === selected));
+            el.dataset.index = String(i);
+
+            const ic = document.createElement('span'); ic.className = 'cmdk-icon'; ic.textContent = cmd.icon;
+            const lb = document.createElement('span'); lb.className = 'cmdk-label'; lb.textContent = cmd.label;
+            el.append(ic, lb);
+            if (cmd.hint) {
+                const h = document.createElement('span'); h.className = 'cmdk-hint'; h.textContent = cmd.hint;
+                el.appendChild(h);
+            }
+            el.addEventListener('click', () => { selected = i; runSelected(); });
+            list.appendChild(el);
+        });
+    };
+
+    const openPalette = () => { backdrop.classList.add('open'); input.value = ''; render(); input.focus(); };
+
+    input.addEventListener('input', render);
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) closePalette(); });
+    help?.addEventListener('click', e => { if (e.target === help) help.classList.remove('open'); });
+
+    input.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); selected = Math.min(selected + 1, filtered.length - 1); updateSelection(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); selected = Math.max(selected - 1, 0); updateSelection(); }
+        else if (e.key === 'Enter') { e.preventDefault(); runSelected(); }
+        else if (e.key === 'Escape') closePalette();
+    });
+
+    // Global shortcuts. `g`- and `y`-prefixed chords use a 900 ms window.
+    let pending = '', pendingTimer;
+    addEventListener('keydown', e => {
+        const typing = /^(INPUT|TEXTAREA)$/.test(e.target.tagName) || e.target.isContentEditable;
+
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            backdrop.classList.contains('open') ? closePalette() : openPalette();
+            return;
+        }
+        if (typing) return;
+
+        if (e.key === 'Escape') { closePalette(); help?.classList.remove('open'); return; }
+        if (e.key === '?') { e.preventDefault(); help?.classList.toggle('open'); return; }
+
+        const jumps = { h: '#hero', a: '#about', s: '#skills', p: '#projects', c: '#contact', b: '/blog/' };
+        const k = e.key.toLowerCase();
+
+        if (pending === 'g' && jumps[k]) { go(jumps[k]); pending = ''; return; }
+        if (pending === 'y' && k === 'e') { copyEmail(); pending = ''; return; }
+        if (k === 'g' || k === 'y') {
+            pending = k;
+            clearTimeout(pendingTimer);
+            pendingTimer = setTimeout(() => { pending = ''; }, 900);
+        } else {
+            pending = '';
+        }
+    });
+
+    window.openCommandPalette = openPalette;
+};
+
+// --- Easter eggs -------------------------------------------------------------
+const initEasterEggs = () => {
+    window.hire = () => {
+        document.getElementById('contact')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+        console.log('%c🎉 Excellent choice! Scrolling you to the contact form…', 'color:#3b82f6;font-size:14px;font-weight:bold');
+        return "Let's build something.";
+    };
+
+    const KONAMI = ['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a'];
+    let idx = 0;
+    addEventListener('keydown', e => {
+        idx = e.key.toLowerCase() === KONAMI[idx] ? idx + 1 : 0;
+        if (idx === KONAMI.length) {
+            idx = 0;
+            document.body.style.transition = 'filter 1s';
+            document.body.style.filter = 'hue-rotate(180deg)';
+            toast('🎮 Konami code!');
+            setTimeout(() => { document.body.style.filter = ''; }, 4000);
+        }
+    });
+
+    console.log(
+        '%cShalom Karr%c\nFull-stack & AI engineer · Cleveland, OH\n\n' +
+        '📧 shalomkarr@gmail.com\n💼 Try window.hire()\n⌨️  Press ⌘K / Ctrl+K for the command palette\n',
+        'color:#3b82f6;font-size:28px;font-weight:800',
+        'color:#94a3b8;font-size:13px;line-height:1.6'
+    );
+};
+
+// --- Analytics ---------------------------------------------------------------
+// Loaded after `load`, so it never competes with the critical path.
+const initAnalytics = () => {
+    const add = (src) => new Promise(res => {
+        const s = document.createElement('script');
+        s.src = src; s.async = true; s.onload = res; s.onerror = res;
+        document.head.appendChild(s);
+    });
+    Promise.all([
+        add('https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz'),
+        add('https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.8.0-min.js.gz'),
+    ]).then(() => {
+        try {
+            if (window.amplitude && window.sessionReplay) {
+                window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 1 }));
+                window.amplitude.init(AMPLITUDE_KEY, { autocapture: { elementInteractions: true } });
+            }
+        } catch {
+            // Tracking prevention blocked it. Nothing to do.
+        }
+    });
+};
+
+// --- Boot --------------------------------------------------------------------
+const boot = () => {
+    const year = $('#currentYear');
+    if (year) year.textContent = new Date().getFullYear();
+    initReveal();
+    initScrollEffects();
+    initMobileMenu();
+    initTyping();
+    initContactForm();
+    initCommandPalette();
+    initEasterEggs();
+};
+
+if (document.readyState === 'loading') addEventListener('DOMContentLoaded', boot);
+else boot();
+
+// Deferred work: none of this blocks first paint or interaction.
+addEventListener('load', () => {
+    initParticles();
+    onIdle(() => {
+        revalidateProjects();
+        initAnalytics();
+        import('./tracker.js').then(m => m.initTracker?.()).catch(() => {});
     });
 });
-
-// To-Top Button Logic
-const toTopButton = document.getElementById('to-top');
-if (toTopButton) {
-    let topTicking = false;
-    window.addEventListener('scroll', () => {
-        if (!topTicking) {
-            topTicking = true;
-            requestAnimationFrame(() => {
-                topTicking = false;
-                toTopButton.classList.toggle('hidden', window.pageYOffset <= 300);
-            });
-        }
-    }, { passive: true });
-}

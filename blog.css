@@ -1,0 +1,68 @@
+/* Blog + admin + future stylesheet -> blog-output.css
+   Replaces the Tailwind Play CDN (tailwind.js 407 KB + tailwind-typography.js
+   499 KB) that these pages used to compile in the browser on every load.
+   The theme block below reproduces the inline `tailwind.config` each page
+   previously declared. */
+@import "tailwindcss" source(none);
+@plugin "@tailwindcss/typography";
+
+/* Static markup */
+@source "./admin.html";
+@source "./future.html";
+@source "./blog/**/*.html";
+
+/* These inject class names at runtime via innerHTML / className.
+   Without them those classes are purged and the pages render unstyled. */
+@source "./admin.js";
+@source "./blog/js/*.js";
+
+/* These pages toggle themes with a `dark` class on <html> (blog/js/app.js). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --animate-blob: blob 7s infinite;
+  --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes blob {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  33%  { transform: translate(30px, -50px) scale(1.1); }
+  66%  { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+@keyframes fadeInUp {
+  0%   { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* Prose overrides carried over from blog/post.html's inline typography config. */
+.prose :where(code):not(:where([class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"] *))::after {
+  content: "";
+}
+.prose :where(code):not(:where([class~="not-prose"] *)) {
+  background-color: var(--color-gray-100);
+  padding: 0.2em 0.4em;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+.prose :where(pre code):not(:where([class~="not-prose"] *)) {
+  background-color: transparent;
+  padding: 0;
+}
+.prose :where(a):not(:where([class~="not-prose"] *)) { color: var(--color-blue-600); }
+.prose :where(a):not(:where([class~="not-prose"] *)):hover { color: var(--color-blue-800); }
+
+.prose-invert :where(code):not(:where([class~="not-prose"] *)) {
+  background-color: var(--color-gray-800);
+}
+.prose-invert :where(a):not(:where([class~="not-prose"] *)) { color: var(--color-blue-400); }
+.prose-invert :where(a):not(:where([class~="not-prose"] *)):hover { color: var(--color-blue-300); }
