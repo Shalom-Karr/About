@@ -138,20 +138,20 @@ const loadProjects = async () => {
 const loadVisitorLogs = async () => {
     visitorLogsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading...</td></tr>';
     
-    // Attempt to fetch logs
-    // ERROR HANDLING NOTE: If you get "column created_at does not exist", 
-    // you need to add that column to your Supabase table.
+    // page_visits carries two timestamps: visited_at (schema.sql, DEFAULT NOW()) and a
+    // later-added created_at. tracker.js sets neither, so only visited_at is guaranteed
+    // populated on every row — order and display by that one.
     const { data, error } = await supabase
         .from('page_visits')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('visited_at', { ascending: false })
         .limit(50);
 
     if (error) {
         console.error("Error loading logs:", error);
         if (error.code === "42703") {
             // Specific error for missing column
-            visitorLogsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-400">Database Error: Missing "created_at" column in "page_visits" table. Please update Supabase.</td></tr>';
+            visitorLogsBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-400">Database Error: Missing "visited_at" column in "page_visits" table. Please update Supabase.</td></tr>';
         } else {
             visitorLogsBody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
         }
@@ -491,7 +491,8 @@ const renderVisitorLogs = (logs) => {
         const row = document.createElement('tr');
         row.className = 'hover:bg-gray-700 transition-colors';
         
-        const date = log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A';
+        const ts = log.visited_at || log.created_at;
+        const date = ts ? new Date(ts).toLocaleString() : 'N/A';
         // Safe access to meta in case it's null
         const browser = log.meta?.browser || 'Unknown';
         const os = log.meta?.os || 'Unknown';
