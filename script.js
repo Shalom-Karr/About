@@ -267,6 +267,51 @@ const revalidateProjects = async () => {
     }
 };
 
+// --- Blog: revalidate the prerendered "latest posts" -------------------------
+// The three cards are baked at build time; this refreshes them live on idle so a
+// newly published post appears without a rebuild. Markup mirrors postCardHTML in
+// scripts/prerender.js, so an unchanged list is a no-op (normalized compare).
+const POST_ACCENTS = ['#3b82f6', '#a855f7', '#ec4899'];
+
+const postCardHTML = (p, i) => {
+    const date = new Date(p.created_at).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+    });
+    const tags = (p.tags || []).slice(0, 3)
+        .map(t => `<span class="tech-pill">${escapeHtml(t)}</span>`).join('');
+    const delay = i * 80;
+    return `<a href="/blog/post/${escapeHtml(p.slug)}" data-reveal style="--brand:${POST_ACCENTS[i % POST_ACCENTS.length]}${delay ? `;--reveal-delay:${delay}ms` : ''}" class="card group flex flex-col p-6 text-left">
+  <time datetime="${escapeHtml(p.created_at)}" class="text-xs font-mono text-gray-500 mb-3">${date}</time>
+  <h3 class="text-lg font-bold text-white mb-2 leading-snug group-hover:text-blue-400 transition-colors">${escapeHtml(p.title)}</h3>
+  <p class="post-excerpt text-sm text-gray-400 leading-relaxed grow">${escapeHtml(p.excerpt || '')}</p>
+  <div class="flex flex-wrap gap-2 mt-4">${tags}</div>
+</a>`;
+};
+
+const revalidateBlogPosts = async () => {
+    const grid = $('#blog-posts');
+    if (!grid) return;
+    try {
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/posts?select=slug,title,excerpt,tags,created_at&is_published=eq.true&order=created_at.desc&limit=3`,
+            { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+        );
+        if (!res.ok) return;
+        const posts = await res.json();
+        if (!Array.isArray(posts) || !posts.length) return;
+
+        const fresh = posts.map(postCardHTML).join('\n');
+        const norm = (s) => s.replace(/\s+/g, ' ').trim();
+        if (norm(grid.innerHTML) === norm(fresh)) return;
+
+        grid.innerHTML = fresh;
+        // These were injected after the reveal observer ran, so show them immediately.
+        $$('[data-reveal]', grid).forEach(el => el.classList.add('revealed'));
+    } catch {
+        // Prerendered posts are already on screen — a failed refresh is a no-op.
+    }
+};
+
 // --- Contact form ------------------------------------------------------------
 // EmailJS (~13 KB) is fetched on first interaction, not on page load.
 let emailjsReady = null;
@@ -539,6 +584,7 @@ addEventListener('load', () => {
     initParticles();
     onIdle(() => {
         revalidateProjects();
+        revalidateBlogPosts();
         initAnalytics();
         import('./tracker.js').then(m => m.initTracker?.()).catch(() => {});
     });
