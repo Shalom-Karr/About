@@ -27,16 +27,24 @@ const SOURCES = [
     fallbackOpts: { quality: 82, mozjpeg: true },
   },
   {
+    // Open Graph wants 1.91:1. The source is 1350x585 (2.31:1), so `contain` onto the
+    // site's background colour rather than letting Facebook/LinkedIn crop it themselves.
     file: 'social-preview.png',
     basename: 'social-preview',
     widths: [1200],
+    height: 630,
+    fit: 'contain',
     fallback: 'jpeg',
     fallbackOpts: { quality: 85, mozjpeg: true },
   },
 ];
 
-async function processOne(src, basename, width, fallback, fallbackOpts) {
-  const resized = sharp(src).resize(width, null, { withoutEnlargement: true });
+async function processOne(src, basename, width, fallback, fallbackOpts, height, fit) {
+  const resized = sharp(src).resize(width, height ?? null, {
+    withoutEnlargement: true,
+    fit: fit ?? 'cover',
+    background: BG,
+  });
 
   const avifPath  = path.join(OUT, `${basename}-${width}.avif`);
   const webpPath  = path.join(OUT, `${basename}-${width}.webp`);
@@ -65,13 +73,13 @@ async function main() {
   const rows = [];
   const sourceStats = [];
 
-  for (const { file, basename, widths, fallback, fallbackOpts } of SOURCES) {
+  for (const { file, basename, widths, fallback, fallbackOpts, height, fit } of SOURCES) {
     const srcPath = path.join(SRC, file);
     const srcSize = fs.statSync(srcPath).size;
     let totalOptSize = 0;
 
     for (const width of widths) {
-      const written = await processOne(srcPath, basename, width, fallback, fallbackOpts);
+      const written = await processOne(srcPath, basename, width, fallback, fallbackOpts, height, fit);
       for (const p of written) {
         const sz = fs.statSync(p).size;
         totalOptSize += sz;

@@ -155,16 +155,43 @@ const projectCardHTML = (p) => {
 </a>`;
 };
 
-const fetchProjects = async () => {
-    const url = `${SUPABASE_URL}/rest/v1/profile_websites?select=title,url,description,technologies&order=created_at.desc`;
-    const res = await fetch(url, {
+const supabaseGet = async (query, what) => {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) throw new Error(`Supabase responded ${res.status} ${res.statusText}`);
     const rows = await res.json();
-    if (!Array.isArray(rows) || rows.length === 0) throw new Error('Supabase returned no projects');
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error(`Supabase returned no ${what}`);
     return rows;
+};
+
+const fetchProjects = () => supabaseGet(
+    'profile_websites?select=title,url,description,technologies&order=created_at.desc',
+    'projects'
+);
+
+const fetchPosts = () => supabaseGet(
+    'posts?select=slug,title,excerpt,tags,created_at&is_published=eq.true&order=created_at.desc&limit=3',
+    'posts'
+);
+
+const POST_ACCENTS = ['#3b82f6', '#a855f7', '#ec4899'];
+
+const postCardHTML = (p, i) => {
+    const date = new Date(p.created_at).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+    });
+    const tags = (p.tags || []).slice(0, 3)
+        .map(t => `<span class="tech-pill">${escapeHtml(t)}</span>`).join('');
+    const delay = i * 80;
+
+    return `                    <a href="/blog/post/${escapeHtml(p.slug)}" data-reveal style="--brand:${POST_ACCENTS[i % POST_ACCENTS.length]}${delay ? `;--reveal-delay:${delay}ms` : ''}" class="card group flex flex-col p-6 text-left">
+                        <time datetime="${escapeHtml(p.created_at)}" class="text-xs font-mono text-gray-500 mb-3">${date}</time>
+                        <h3 class="text-lg font-bold text-white mb-2 leading-snug group-hover:text-blue-400 transition-colors">${escapeHtml(p.title)}</h3>
+                        <p class="post-excerpt text-sm text-gray-400 leading-relaxed grow">${escapeHtml(p.excerpt || '')}</p>
+                        <div class="flex flex-wrap gap-2 mt-4">${tags}</div>
+                    </a>`;
 };
 
 const main = async () => {
@@ -181,6 +208,14 @@ const main = async () => {
         console.log(`prerender: baked ${projects.length} project cards`);
     } catch (err) {
         console.warn(`prerender: WARNING — keeping existing project markup (${err.message})`);
+    }
+
+    try {
+        const posts = await fetchPosts();
+        html = replaceBlock(html, 'POSTS', posts.map(postCardHTML).join('\n'));
+        console.log(`prerender: baked ${posts.length} blog posts`);
+    } catch (err) {
+        console.warn(`prerender: WARNING — keeping existing blog markup (${err.message})`);
     }
 
     fs.writeFileSync(INDEX, html);
