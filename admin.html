@@ -151,14 +151,25 @@
             <!-- Tab Content: Projects Manager -->
             <div id="content-projects" class="tab-content hidden">
                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex justify-between items-center mb-2">
                         <h2 class="text-2xl font-semibold text-blue-400">Manage Projects</h2>
                         <button id="add-project-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded transition-colors duration-300 shadow-lg flex items-center gap-2">
                             <span>+</span> Add Project
                         </button>
                     </div>
-                    <div id="projects-list" class="space-y-4">
+                    <p class="text-sm text-gray-500 mb-5">Drag a row, or use ▲ ▼ / ⤒ Top, to set the order they appear on the homepage. Top of this list shows first.</p>
+
+                    <div id="projects-list" class="space-y-3">
                         <!-- Projects will be loaded here -->
+                    </div>
+
+                    <!-- Sticky save bar, shown only when the order has unsaved changes -->
+                    <div id="order-bar" class="hidden sticky bottom-4 mt-5 flex items-center justify-between gap-4 bg-blue-600/95 backdrop-blur border border-blue-400/40 rounded-lg px-5 py-3 shadow-2xl">
+                        <span class="text-sm text-white font-medium">You've changed the project order.</span>
+                        <div class="flex gap-2">
+                            <button id="cancel-order-btn" class="text-sm text-blue-100 hover:text-white px-3 py-1.5 rounded transition-colors">Cancel</button>
+                            <button id="save-order-btn" class="text-sm bg-white text-blue-700 hover:bg-blue-50 font-semibold px-4 py-1.5 rounded transition-colors">Save order</button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -247,11 +247,12 @@ const projectCardHTML = (p) => {
 const revalidateProjects = async () => {
     const grid = $('#projects-grid');
     if (!grid) return;
+    const base = `${SUPABASE_URL}/rest/v1/profile_websites?select=title,url,description,technologies`;
+    const headers = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
     try {
-        const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/profile_websites?select=title,url,description,technologies&order=created_at.desc`,
-            { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
-        );
+        // Prefer the admin-set order; fall back if the sort_order column isn't there yet.
+        let res = await fetch(`${base}&order=sort_order.asc.nullslast,created_at.desc`, { headers });
+        if (!res.ok) res = await fetch(`${base}&order=created_at.desc`, { headers });
         if (!res.ok) return;
         const projects = await res.json();
         if (!Array.isArray(projects) || !projects.length) return;

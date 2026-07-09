@@ -166,10 +166,18 @@ const supabaseGet = async (query, what) => {
     return rows;
 };
 
-const fetchProjects = () => supabaseGet(
-    'profile_websites?select=title,url,description,technologies&order=created_at.desc',
-    'projects'
-);
+// Admin-controlled order: sort_order ascending, unordered rows fall to the back by
+// recency. Falls back to created_at if the sort_order column isn't there yet, so the
+// build never depends on supabase/add_project_sort_order.sql having been run first.
+const fetchProjects = async () => {
+    const select = 'profile_websites?select=title,url,description,technologies';
+    try {
+        return await supabaseGet(`${select}&order=sort_order.asc.nullslast,created_at.desc`, 'projects');
+    } catch (err) {
+        console.warn(`prerender: sort_order unavailable (${err.message}); ordering by created_at`);
+        return supabaseGet(`${select}&order=created_at.desc`, 'projects');
+    }
+};
 
 const fetchPosts = () => supabaseGet(
     'posts?select=slug,title,excerpt,tags,created_at&is_published=eq.true&order=created_at.desc&limit=3',

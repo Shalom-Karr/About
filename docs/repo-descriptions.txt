@@ -1,0 +1,52 @@
+GitHub repository descriptions — Shalom Karr
+Title (2–3 words) · Link · Description
+============================================================
+
+
+JtechTools
+https://github.com/JTech-Forums/JtechTools
+A production Discourse plugin bundle powering forums.jtechforums.org, a filtered-tech
+community of thousands. Packages the plugins that actually run the forum — dislike
+reactions, custom SMTP, a mini-moderation toolkit, and moderator category controls —
+into one installable bundle surfaced through six admin tabs. Written in Ruby and
+Ember.js against the Discourse plugin API, and maintained in production.
+
+Short (GitHub "About" field):
+Discourse plugin bundle powering forums.jtechforums.org — moderation, SMTP, dislikes
+and category tools in one install.
+
+
+------------------------------------------------------------
+
+
+lockguard
+https://github.com/Shalom-Karr/lockguard
+A kernel-mode lockdown for turning a Windows 11 machine into a Word-only focus device
+that resists a determined admin-level user. A BootStart driver enforces the rules the
+OS itself honors: a Windows Filtering Platform filter restricts the network, a registry
+callback protects the boot, recovery and services keys, a process-creation callback
+refuses to let regedit or a debugger launch, a filesystem minifilter guards files even
+from SYSTEM, and an object callback strips the TERMINATE right off the watchdog so it
+can't be killed. Recovery is gated behind PBKDF2 (a million iterations) and a Windows
+Defender Application Control policy whitelists only the allowed apps. Written in C with
+the WDK, with Go userspace components.
+
+Short (GitHub "About" field):
+Kernel-mode Windows 11 lockdown — WFP firewall, registry/process/file/object callbacks,
+WDAC allowlist, PBKDF2 recovery. Resists an admin user.
+
+
+------------------------------------------------------------
+
+
+Shul Widget
+https://github.com/Shalom-Karr/Shul-Widget-Published-App
+Live: https://shalom-karr.github.io/Shul-Widget-Published-App/
+An Android home-screen widget that pulls live davening times from a shul's Luach feed,
+so the day's zmanim and next minyan sit on the phone's home screen without opening an
+app. Built in Kotlin and distributed as a standalone app; this repo holds the public
+releases and the landing page. In use at multiple synagogues already running Luach.
+
+Short (GitHub "About" field):
+Android home-screen widget for Luach shuls — live davening times on your home screen.
+Public releases + landing page.

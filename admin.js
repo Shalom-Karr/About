@@ -126,13 +126,80 @@ const loadTechnologies = async () => {
     renderTechDropdown();
 };
 
+// Current projects in display order, and whether the order has unsaved edits.
+let projectOrder = [];
+let orderDirty = false;
+
 const loadProjects = async () => {
-    const { data, error } = await supabase.from('profile_websites').select('*').order('created_at', { ascending: true });
+    // Prefer sort_order; fall back if the column isn't there yet (migration not run).
+    let { data, error } = await supabase.from('profile_websites').select('*')
+        .order('sort_order', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: false });
+
+    if (error && error.code === '42703') {
+        ({ data, error } = await supabase.from('profile_websites').select('*')
+            .order('created_at', { ascending: false }));
+    }
     if (error) {
         console.error('Error fetching projects:', error);
+        projectsList.innerHTML = `<p class="text-red-400 text-center py-4">Error loading projects: ${error.message}</p>`;
         return;
     }
-    renderProjects(data);
+
+    projectOrder = data || [];
+    orderDirty = false;
+    renderProjects();
+    updateOrderBar();
+};
+
+// --- Reorder ----------------------------------------------------------------
+const moveProject = (id, delta) => {
+    const i = projectOrder.findIndex(p => String(p.id) === String(id));
+    const j = i + delta;
+    if (i < 0 || j < 0 || j >= projectOrder.length) return;
+    [projectOrder[i], projectOrder[j]] = [projectOrder[j], projectOrder[i]];
+    orderDirty = true;
+    renderProjects();
+    updateOrderBar();
+};
+
+const moveProjectTo = (id, edge) => {
+    const i = projectOrder.findIndex(p => String(p.id) === String(id));
+    if (i < 0) return;
+    const [item] = projectOrder.splice(i, 1);
+    if (edge === 'top') projectOrder.unshift(item);
+    else projectOrder.push(item);
+    orderDirty = true;
+    renderProjects();
+    updateOrderBar();
+};
+
+const updateOrderBar = () => {
+    const bar = document.getElementById('order-bar');
+    if (bar) bar.classList.toggle('hidden', !orderDirty);
+};
+
+const saveProjectOrder = async () => {
+    const saveBtn = document.getElementById('save-order-btn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+    // Only write rows whose position actually changed.
+    const updates = projectOrder
+        .map((p, idx) => ({ p, idx }))
+        .filter(({ p, idx }) => p.sort_order !== idx)
+        .map(({ p, idx }) => supabase.from('profile_websites').update({ sort_order: idx }).eq('id', p.id));
+
+    const results = await Promise.all(updates);
+    const failed = results.find(r => r.error);
+
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save order'; }
+
+    if (failed) {
+        alert('Error saving order: ' + failed.error.message +
+              (failed.error.code === '42703' ? '\n\nRun supabase/add_project_sort_order.sql first — the sort_order column is missing.' : ''));
+        return;
+    }
+    await loadProjects();
 };
 
 const loadVisitorLogs = async () => {
@@ -508,30 +575,81 @@ const renderVisitorLogs = (logs) => {
     });
 };
 
-const renderProjects = (projects) => {
+const escAttr = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const escHtml = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const renderProjects = () => {
     projectsList.innerHTML = '';
-    if (projects.length === 0) {
+    if (!projectOrder.length) {
         projectsList.innerHTML = '<p class="text-gray-500 text-center py-4">No projects found. Add one to get started!</p>';
         return;
     }
 
-    projects.forEach(project => {
-        const projectEl = document.createElement('div');
-        projectEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center border border-gray-600 hover:border-gray-500 transition-colors';
-        projectEl.innerHTML = `
-            <div>
-                <h3 class="text-xl font-bold text-gray-200">${project.title}</h3>
-                <a href="${project.url}" target="_blank" class="text-sm text-blue-400 hover:underline">${project.url}</a>
-                <div class="mt-1 flex gap-1 flex-wrap">
-                    ${project.technologies.map(t => `<span class="text-xs bg-gray-600 px-2 py-0.5 rounded text-gray-300">${t}</span>`).join('')}
-                </div>
+    projectOrder.forEach((project, idx) => {
+        const last = idx === projectOrder.length - 1;
+        const techs = (project.technologies || [])
+            .map(t => `<span class="text-xs bg-gray-600/80 px-2 py-0.5 rounded text-gray-300">${escHtml(t)}</span>`).join('');
+        const desc = project.description
+            ? `<p class="text-sm text-gray-400 mt-1.5 line-clamp-2">${escHtml(project.description)}</p>` : '';
+
+        const row = document.createElement('div');
+        row.className = 'project-row group bg-gray-700/60 hover:bg-gray-700 p-4 rounded-lg flex items-start gap-3 border border-gray-600 hover:border-blue-500/50 transition-colors';
+        row.draggable = true;
+        row.dataset.id = project.id;
+        row.innerHTML = `
+            <div class="flex flex-col items-center pt-0.5 select-none">
+                <span class="drag-handle cursor-grab text-gray-500 group-hover:text-gray-300 leading-none" title="Drag to reorder" aria-hidden="true">⠿</span>
+                <span class="mt-1 text-xs font-mono text-gray-500 tabular-nums">${idx + 1}</span>
             </div>
-            <div class="flex space-x-2">
-                <button class="edit-btn bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-1.5 px-3 rounded text-sm transition-colors" data-id="${project.id}">Edit</button>
-                <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded text-sm transition-colors" data-id="${project.id}">Delete</button>
+
+            <div class="flex flex-col gap-0.5 mr-1">
+                <button class="order-btn move-up ${idx === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-400'} text-gray-400 leading-none text-sm" data-id="${project.id}" ${idx === 0 ? 'disabled' : ''} title="Move up" aria-label="Move up">▲</button>
+                <button class="order-btn move-down ${last ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-400'} text-gray-400 leading-none text-sm" data-id="${project.id}" ${last ? 'disabled' : ''} title="Move down" aria-label="Move down">▼</button>
+            </div>
+
+            <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-gray-100 truncate">${escHtml(project.title)}</h3>
+                <a href="${escAttr(project.url)}" target="_blank" rel="noopener" class="text-sm text-blue-400 hover:underline break-all">${escHtml(project.url)}</a>
+                ${desc}
+                <div class="mt-2 flex gap-1 flex-wrap">${techs}</div>
+            </div>
+
+            <div class="flex flex-col gap-2 shrink-0">
+                <button class="edit-btn bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-1.5 px-3 rounded text-sm transition-colors" data-id="${project.id}">Edit</button>
+                <button class="delete-btn bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-3 rounded text-sm transition-colors" data-id="${project.id}">Delete</button>
+                <button class="top-btn text-xs text-gray-400 hover:text-blue-400 ${idx === 0 ? 'invisible' : ''}" data-id="${project.id}" title="Move to top">⤒ Top</button>
             </div>
         `;
-        projectsList.appendChild(projectEl);
+        projectsList.appendChild(row);
+    });
+
+    bindProjectDrag();
+};
+
+// HTML5 drag-and-drop reordering (desktop). Arrow buttons cover touch/keyboard.
+let dragId = null;
+const bindProjectDrag = () => {
+    projectsList.querySelectorAll('.project-row').forEach(row => {
+        row.addEventListener('dragstart', (e) => {
+            dragId = row.dataset.id;
+            row.classList.add('opacity-40');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        row.addEventListener('dragend', () => { dragId = null; row.classList.remove('opacity-40'); });
+        row.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+        row.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const targetId = row.dataset.id;
+            if (!dragId || dragId === targetId) return;
+            const from = projectOrder.findIndex(p => String(p.id) === String(dragId));
+            const to = projectOrder.findIndex(p => String(p.id) === String(targetId));
+            if (from < 0 || to < 0) return;
+            const [item] = projectOrder.splice(from, 1);
+            projectOrder.splice(to, 0, item);
+            orderDirty = true;
+            renderProjects();
+            updateOrderBar();
+        });
     });
 };
 
@@ -605,8 +723,13 @@ const handleFormSubmit = async (event) => {
         const { error: updateError } = await supabase.from('profile_websites').update(projectData).eq('id', id);
         error = updateError;
     } else {
-        // Create new project
-        const { error: insertError } = await supabase.from('profile_websites').insert([projectData]);
+        // New projects append to the end of the order. Retry without sort_order if the
+        // column isn't there yet (migration not run).
+        let { error: insertError } = await supabase.from('profile_websites')
+            .insert([{ ...projectData, sort_order: projectOrder.length }]);
+        if (insertError && insertError.code === '42703') {
+            ({ error: insertError } = await supabase.from('profile_websites').insert([projectData]));
+        }
         error = insertError;
     }
 
@@ -719,6 +842,8 @@ const switchTab = (tab) => {
 loginForm.addEventListener('submit', handleLogin);
 logoutButton.addEventListener('click', handleLogout);
 addProjectButton.addEventListener('click', () => openModal());
+document.getElementById('save-order-btn')?.addEventListener('click', saveProjectOrder);
+document.getElementById('cancel-order-btn')?.addEventListener('click', loadProjects);
 modalClose.addEventListener('click', closeModal);
 modalCancel.addEventListener('click', closeModal);
 projectForm.addEventListener('submit', handleFormSubmit);
@@ -731,12 +856,14 @@ tabProjects.addEventListener('click', () => switchTab('projects'));
 tabAnalytics.addEventListener('click', () => switchTab('analytics'));
 
 projectsList.addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete-btn')) {
-        handleDeleteProject(e.target.dataset.id);
-    }
-    if (e.target.classList.contains('edit-btn')) {
-        handleEditProject(e.target.dataset.id);
-    }
+    const btn = e.target.closest('button');
+    if (!btn || !projectsList.contains(btn)) return;
+    const id = btn.dataset.id;
+    if (btn.classList.contains('delete-btn')) handleDeleteProject(id);
+    else if (btn.classList.contains('edit-btn')) handleEditProject(id);
+    else if (btn.classList.contains('move-up')) moveProject(id, -1);
+    else if (btn.classList.contains('move-down')) moveProject(id, 1);
+    else if (btn.classList.contains('top-btn')) moveProjectTo(id, 'top');
 });
 
 // For the multi-select dropdown
