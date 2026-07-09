@@ -1,37 +1,9 @@
--- Add the engineering work that was missing from profile_websites.
---
--- The projects grid held mostly client marketing sites and none of the systems work:
--- SK Music, lockguard, kiosk-exit-guard, JtechTools and Shul Widget were all absent.
--- This adds those five.
---
--- Ordering: the homepage renders `ORDER BY sort_order NULLS LAST, created_at DESC`, and
--- these rows are added without a sort_order, so created_at (set explicitly below) decides
--- their order among each other. SK Music is stamped latest and therefore lands first.
---
--- Idempotent: each INSERT is guarded on url, so re-running is a no-op.
 
--- ── 1. Technologies referenced below (drives the admin panel's dropdown) ──────────
-INSERT INTO public.technologies (name)
-SELECT t.name
-FROM (VALUES
-  ('Kotlin'), ('C'), ('Win32'), ('WebView2'),
-  ('Discourse'), ('Ember.js'), ('Android'), ('SQLite'), ('Web Workers')
-) AS t(name)
-WHERE NOT EXISTS (
-  SELECT 1 FROM public.technologies e WHERE e.name = t.name
-);
 
 -- ── 2. Projects ──────────────────────────────────────────────────────────────────
 INSERT INTO public.profile_websites (title, url, description, technologies, created_at)
 SELECT p.title, p.url, p.description, p.technologies, p.created_at
 FROM (VALUES
-  (
-    'SK Music',
-    'https://skmusic.shalomkarr.workers.dev/',
-    'A filtered music client for the Orthodox Jewish community — every artist in the catalog is vetted by hand, so the app is safe by construction rather than by runtime filter. It runs entirely on Cloudflare Workers static assets: a build-time pipeline bakes a SQLite catalog into a compressed search index, per-entity JSON, and chunked sitemaps, while a thin Worker handles the few things that cannot be static (live playlist contents, Open Graph injection for shared deep links, trending analytics). Search runs fully in the browser on a hand-built dual inverted index — Hebrew-aware consonant-skeleton normalization, IDF weighting, bigram candidate indexing and Damerau fuzzy matching — off the main thread in a Web Worker, with no search backend to operate.',
-    ARRAY['Cloudflare Workers','Vanilla JS','Supabase','Service Workers','SQLite','Web Workers'],
-    NOW()
-  ),
   (
     'lockguard',
     'https://github.com/Shalom-Karr/lockguard',
