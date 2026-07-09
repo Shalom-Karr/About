@@ -1,12 +1,12 @@
 -- Add the engineering work that was missing from profile_websites.
 --
--- The projects grid held 28 rows, almost all of them client marketing sites, and none
--- of the systems work: SK Music, lockguard, kiosk-exit-guard and JtechTools were all
--- absent. This adds them.
+-- The projects grid held mostly client marketing sites and none of the systems work:
+-- SK Music, lockguard, kiosk-exit-guard, JtechTools and Shul Widget were all absent.
+-- This adds those five.
 --
--- Ordering: the homepage renders `ORDER BY created_at DESC`, so created_at is set
--- explicitly below to control the order the cards appear in. SK Music is stamped
--- latest and therefore lands first.
+-- Ordering: the homepage renders `ORDER BY sort_order NULLS LAST, created_at DESC`, and
+-- these rows are added without a sort_order, so created_at (set explicitly below) decides
+-- their order among each other. SK Music is stamped latest and therefore lands first.
 --
 -- Idempotent: each INSERT is guarded on url, so re-running is a no-op.
 
@@ -14,9 +14,8 @@
 INSERT INTO public.technologies (name)
 SELECT t.name
 FROM (VALUES
-  ('TypeScript'), ('Kotlin'), ('C'), ('Win32'), ('WebView2'),
-  ('Discourse'), ('Ember.js'), ('Android'), ('SQLite'), ('IndexedDB'),
-  ('Node.js'), ('Angular'), ('Web Workers')
+  ('Kotlin'), ('C'), ('Win32'), ('WebView2'),
+  ('Discourse'), ('Ember.js'), ('Android'), ('SQLite'), ('Web Workers')
 ) AS t(name)
 WHERE NOT EXISTS (
   SELECT 1 FROM public.technologies e WHERE e.name = t.name
@@ -55,32 +54,11 @@ FROM (VALUES
     NOW() - INTERVAL '3 minutes'
   ),
   (
-    'JTech Appstore',
-    'https://github.com/Shalom-Karr/JTech-Appstore',
-    'A curated app store for the JTech filtered-phone community. Angular and TypeScript over an IndexedDB-backed mock API, with an admin review queue and full-text search across the catalog.',
-    ARRAY['TypeScript','Angular','IndexedDB'],
-    NOW() - INTERVAL '4 minutes'
-  ),
-  (
     'Shul Widget',
     'https://github.com/Shalom-Karr/Shul-Widget-Published-App',
     'An Android home-screen widget that pulls live davening times from a shul''s Luach feed. Written in Kotlin and distributed as a standalone app, in use at multiple synagogues already running Luach.',
     ARRAY['Kotlin','Android'],
     NOW() - INTERVAL '5 minutes'
-  ),
-  (
-    'SK YouTube',
-    'https://skyoutube.pages.dev/',
-    'A personalized YouTube player — save, organize and watch a curated collection without the algorithmic feed.',
-    ARRAY['Vanilla JS','Supabase'],
-    NOW() - INTERVAL '6 minutes'
-  ),
-  (
-    'MDM Installer',
-    'https://github.com/JTech-Forums/mdminstaller',
-    'An installer for community-managed Android devices, maintained under the JTech Forums organisation for users running filtered phones under mobile device management.',
-    ARRAY['Vanilla JS','Android'],
-    NOW() - INTERVAL '7 minutes'
   )
 ) AS p(title, url, description, technologies, created_at)
 WHERE NOT EXISTS (
