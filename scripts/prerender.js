@@ -104,6 +104,52 @@ const SKILL_GROUPS = [
     },
 ];
 
+// Featured open-source repos. `stars` is a fallback used only if the build-time GitHub
+// fetch fails or is rate-limited; otherwise the live count replaces it on each deploy.
+const OPEN_SOURCE = [
+    {
+        name: 'JtechTools', repo: 'JTech-Forums/JtechTools', stars: 8,
+        lang: 'Ruby', color: '#CC342D', live: 'https://forums.jtechforums.org/',
+        note: 'In production for a community of thousands',
+        blurb: 'A Discourse plugin bundle powering forums.jtechforums.org — dislikes, custom SMTP, a mini-moderation toolkit and moderator category controls, one install behind six admin tabs.',
+    },
+    {
+        name: 'SK Music', repo: 'Shalom-Karr/SK-Music', stars: 5,
+        lang: 'JavaScript', color: '#F7DF1E', live: 'https://skmusic.shalomkarr.workers.dev/',
+        blurb: 'A kosher filtered music client on Cloudflare Workers — a build-baked catalog, Hebrew-aware search that runs entirely in the browser, and an installable PWA. No search backend.',
+    },
+    {
+        name: 'JTech Appstore', repo: 'Shalom-Karr/JTech-Appstore', stars: 5,
+        lang: 'TypeScript', color: '#3178C6',
+        blurb: 'A curated app store for the JTech filtered-phone community — TypeScript over an IndexedDB-backed catalog, with an admin review queue and full-text search.',
+    },
+    {
+        name: 'Otzar Hachochma Filter', repo: 'Shalom-Karr/otzar-hachochma-filter', stars: 1,
+        lang: 'PowerShell', color: '#5391FE',
+        blurb: 'Turns a Windows 11 Pro PC into a locked Otzar Hachochma kiosk: a passwordless standard user restricted to one app by NTFS execute-deny, a custom launcher bar, and printing preserved — while the admin account stays untouched.',
+    },
+    {
+        name: 'SK-Tools', repo: 'Shalom-Karr/SK-Tools', stars: 3,
+        lang: 'JavaScript', color: '#F7DF1E', live: 'https://sk-tools.pages.dev/',
+        blurb: 'A privacy-first browser toolbox — PDF editor, video/audio/image converters, VCF splitter and a Claude chat — all running client-side, nothing uploaded.',
+    },
+    {
+        name: 'Shul Widget', repo: 'Shalom-Karr/Shul-Widget-Published-App', stars: 3,
+        lang: 'Kotlin', color: '#7F52FF', live: 'https://shalom-karr.github.io/Shul-Widget-Published-App/',
+        blurb: 'An Android home-screen widget that pulls live davening times from a shul\'s Luach feed. Built in Kotlin, in use at multiple synagogues.',
+    },
+    {
+        name: 'kiosk-exit-guard', repo: 'Shalom-Karr/kiosk-exit-guard', stars: 1,
+        lang: 'Go', color: '#00ADD8',
+        blurb: 'A single-executable Windows kiosk: a WebView2 window, a low-level keyboard hook with password-gated re-injection, a default-deny allowlist firewall and a SHA-256-verified self-updater.',
+    },
+    {
+        name: 'lockguard', repo: 'Shalom-Karr/lockguard', stars: 0,
+        lang: 'C', color: '#A8B9CC',
+        blurb: 'A kernel-mode Windows 11 lockdown — a WFP firewall enforced at the driver layer plus registry, process and file callbacks, written to resist a tech-savvy admin user. Driver in C, watchdog in Go.',
+    },
+];
+
 const slug = (label) => label.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 const replaceBlock = (html, name, body) => {
@@ -150,6 +196,50 @@ ${cards}
 const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
+
+// Live star counts, fetched once at build time. Unauthenticated GitHub allows 60 req/hr
+// per IP — deploys are far rarer than that. Any repo that fails keeps its baked fallback.
+const fetchStars = async () => {
+    const counts = {};
+    let fetched = 0;
+    await Promise.all(OPEN_SOURCE.map(async (p) => {
+        counts[p.repo] = p.stars;
+        try {
+            const r = await fetch(`https://api.github.com/repos/${p.repo}`, {
+                headers: { 'User-Agent': 'shalomkarr-portfolio-build', Accept: 'application/vnd.github+json' },
+                signal: AbortSignal.timeout(8000),
+            });
+            if (r.ok) {
+                const j = await r.json();
+                if (typeof j.stargazers_count === 'number') { counts[p.repo] = j.stargazers_count; fetched++; }
+            }
+        } catch { /* keep fallback */ }
+    }));
+    return { counts, fetched };
+};
+
+const STAR_SVG = '<svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>';
+const GH_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>';
+
+const buildOpenSource = (stars) => OPEN_SOURCE.map((p, i) => {
+    const delay = Math.min(i, 8) * 40;
+    const style = `--brand:${p.color}${delay ? `;--reveal-delay:${delay}ms` : ''}`;
+    const note = p.note
+        ? `\n                    <p class="text-xs text-blue-400/90 font-medium mb-4">${escapeHtml(p.note)}</p>` : '';
+    const live = p.live
+        ? `\n                        <a href="${escapeHtml(p.live)}" target="_blank" rel="noopener noreferrer" class="os-link os-link-live">Live <span aria-hidden="true">↗</span></a>` : '';
+    return `                <div data-reveal style="${style}" class="os-card card flex flex-col p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-1.5 text-xs text-gray-400"><span class="w-2.5 h-2.5 rounded-full" style="background:${p.color}"></span>${escapeHtml(p.lang)}</span>
+                        <span class="inline-flex items-center gap-1 text-xs font-mono text-gray-400" title="GitHub stars">${STAR_SVG}${stars[p.repo] ?? p.stars}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-100 mb-2 font-mono tracking-tight">${escapeHtml(p.name)}</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed grow mb-4">${escapeHtml(p.blurb)}</p>${note}
+                    <div class="flex gap-2 mt-auto pt-2">
+                        <a href="https://github.com/${escapeHtml(p.repo)}" target="_blank" rel="noopener noreferrer" class="os-link os-link-src">${GH_SVG} Source</a>${live}
+                    </div>
+                </div>`;
+}).join('\n');
 
 // Must stay byte-identical to projectCardHTML() in script.js, or the client-side
 // revalidation will repaint the grid on every load.
@@ -225,6 +315,10 @@ const main = async () => {
     html = replaceBlock(html, 'ICONS', buildSprite());
     html = replaceBlock(html, 'SKILLS', buildSkills());
     console.log(`prerender: inlined ${iconCount} SVG icons across ${SKILL_GROUPS.length} skill groups`);
+
+    const { counts: stars, fetched } = await fetchStars();
+    html = replaceBlock(html, 'OPENSOURCE', buildOpenSource(stars));
+    console.log(`prerender: baked ${OPEN_SOURCE.length} open-source cards (${fetched} live star counts, ${OPEN_SOURCE.length - fetched} fallback)`);
 
     try {
         const projects = await fetchProjects();

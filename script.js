@@ -40,7 +40,7 @@ const initScrollEffects = () => {
     const progress = $('#scroll-progress');
     const toTop = $('#to-top');
     const navLinks = $$('header .nav-link');
-    const sections = ['hero', 'about', 'skills', 'projects', 'contact']
+    const sections = ['hero', 'about', 'skills', 'projects', 'opensource', 'contact']
         .map(id => document.getElementById(id)).filter(Boolean);
 
     let ticking = false;
@@ -394,6 +394,7 @@ const initCommandPalette = () => {
         { group: 'Navigate', icon: '👤', label: 'About',    hint: 'g a', run: () => go('#about') },
         { group: 'Navigate', icon: '💻', label: 'Skills',   hint: 'g s', run: () => go('#skills') },
         { group: 'Navigate', icon: '📁', label: 'Projects', hint: 'g p', run: () => go('#projects') },
+        { group: 'Navigate', icon: '🌱', label: 'Open Source', hint: 'g o', run: () => go('#opensource') },
         { group: 'Navigate', icon: '📧', label: 'Contact',  hint: 'g c', run: () => go('#contact') },
         { group: 'Navigate', icon: '📝', label: 'Blog',     hint: 'g b', run: () => go('/blog/') },
         { group: 'Actions',  icon: '📋', label: 'Copy email address', hint: 'y e', run: copyEmail },
@@ -494,7 +495,7 @@ const initCommandPalette = () => {
         if (e.key === 'Escape') { closePalette(); help?.classList.remove('open'); return; }
         if (e.key === '?') { e.preventDefault(); help?.classList.toggle('open'); return; }
 
-        const jumps = { h: '#hero', a: '#about', s: '#skills', p: '#projects', c: '#contact', b: '/blog/' };
+        const jumps = { h: '#hero', a: '#about', s: '#skills', p: '#projects', o: '#opensource', c: '#contact', b: '/blog/' };
         const k = e.key.toLowerCase();
 
         if (pending === 'g' && jumps[k]) { go(jumps[k]); pending = ''; return; }
