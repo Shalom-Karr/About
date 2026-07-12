@@ -235,7 +235,8 @@ const buildOpenSource = (stars) => OPEN_SOURCE.map((p, i) => {
                     </div>
                     <h3 class="text-lg font-bold text-gray-100 mb-2 font-mono tracking-tight">${escapeHtml(p.name)}</h3>
                     <p class="text-sm text-gray-400 leading-relaxed grow mb-4">${escapeHtml(p.blurb)}</p>${note}
-                    <div class="flex gap-2 mt-auto pt-2">
+                    <div class="flex flex-wrap gap-2 mt-auto pt-2">
+                        <a href="https://github.com/${escapeHtml(p.repo)}" target="_blank" rel="noopener noreferrer" class="os-link os-link-star" title="Star ${escapeHtml(p.name)} on GitHub">${STAR_SVG} Star</a>
                         <a href="https://github.com/${escapeHtml(p.repo)}" target="_blank" rel="noopener noreferrer" class="os-link os-link-src">${GH_SVG} Source</a>${live}
                     </div>
                 </div>`;
