@@ -1,0 +1,32 @@
+# Cloudflare Pages headers. https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Security headers on every route, plus long-lived caching for content-stable assets.
+# A Content-Security-Policy is intentionally NOT set here — the pages pull from Supabase,
+# Amplitude, Google Fonts and a couple of CDNs, so a CSP has to be built in report-only
+# mode first and tightened against real violations, or it silently breaks the site.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Optimized images are content-stable per URL — cache hard.
+/img/opt/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Source images change rarely.
+/img/*
+  Cache-Control: public, max-age=2592000
+
+# Self-hosted vendor bundles (versioned by content, replaced wholesale on change).
+/assets/*
+  Cache-Control: public, max-age=604800
+
+# output.css / blog-output.css / script.js are hashless and rebuilt in place, so they
+# are deliberately left to Cloudflare's ETag revalidation — never hard-cached — or a CSS
+# change would never reach a returning visitor.
