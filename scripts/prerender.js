@@ -139,6 +139,16 @@ const OPEN_SOURCE = [
         blurb: 'An Android home-screen widget that pulls live davening times from a shul\'s Luach feed. Built in Kotlin, in use at multiple synagogues.',
     },
     {
+        name: 'Torah Anytime Downloader', repo: 'Shalom-Karr/Torah-Anytime-Downloader', stars: 0,
+        lang: 'JavaScript', color: '#F7DF1E',
+        blurb: 'A Windows desktop app that opens torahanytime.com through a local proxy and adds a one-click downloader — every lecture page gets a button that saves the shiur as a seekable MP4 or MP3 at your chosen resolution. Self-updating tray app that works behind TLS-intercepting filters.',
+    },
+    {
+        name: 'SK Video Downloader', repo: 'Shalom-Karr/SK-Video-Downloader', stars: 0,
+        lang: 'JavaScript', color: '#F7DF1E',
+        blurb: 'A Manifest V3 extension that detects videos on any page and downloads them as seekable MP4s — remuxing MPEG-TS and fragmented-MP4 HLS locally with a custom transmuxer, plus YouTube via player-stream capture. No servers, no WASM, no re-encoding.',
+    },
+    {
         name: 'kiosk-exit-guard', repo: 'Shalom-Karr/kiosk-exit-guard', stars: 1,
         lang: 'Go', color: '#00ADD8',
         blurb: 'A single-executable Windows kiosk: a WebView2 window, a low-level keyboard hook with password-gated re-injection, a default-deny allowlist firewall and a SHA-256-verified self-updater.',
